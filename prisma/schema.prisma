@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Cliente {
+  id                   Int       @id @default(autoincrement())
+  unico_id             String?   @unique
+  nome                 String
+  contato              String?
+  empresa              String?
+  data_cancelamento    DateTime?
+  data_contato         DateTime?
+  responsavel          String?
+
+  // Site
+  site_url             String?
+  site_online          SiteStatus @default(NAO_VERIFICADO)
+
+  // Ferramentas
+  plugins_rastreio     String[]
+  checkout             String?
+  checkout_outro       String?
+
+  // O que usava na UD
+  usava_dashboard      Boolean  @default(false)
+  usava_plugin         Boolean  @default(false)
+  usava_whatsapp       Boolean  @default(false)
+
+  // Feedback
+  motivo_cancelamento  String?
+  feedback_completo    String?
+  nota_interna         String?
+
+  // Status
+  status               StatusCliente @default(PENDENTE)
+  prioridade           Prioridade    @default(MEDIA)
+
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  @@map("clientes")
+}
+
+enum SiteStatus {
+  ONLINE
+  OFFLINE
+  NAO_VERIFICADO
+}
+
+enum StatusCliente {
+  PENDENTE
+  EM_NEGOCIACAO
+  CONVERTIDO
+  NAO_CONVERTIDO
+}
+
+enum Prioridade {
+  BAIXA
+  MEDIA
+  ALTA
+}
