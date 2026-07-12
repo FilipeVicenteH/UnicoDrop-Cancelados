@@ -19,6 +19,8 @@ export async function GET() {
       por_status,
       por_checkout,
       por_prioridade,
+      por_plataforma,
+      clientes_com_motivo,
     ] = await Promise.all([
       prisma.cliente.count(),
       prisma.cliente.count({ where: { status: 'CONVERTIDO' } }),
@@ -26,14 +28,10 @@ export async function GET() {
       prisma.cliente.count({ where: { status: 'EM_NEGOCIACAO' } }),
       prisma.cliente.count({ where: { status: 'PENDENTE' } }),
       prisma.cliente.count({
-        where: {
-          data_contato: { gte: hoje, lt: amanha },
-        },
+        where: { data_contato: { gte: hoje, lt: amanha } },
       }),
       prisma.cliente.count({
-        where: {
-          data_cancelamento: { gte: hoje, lt: amanha },
-        },
+        where: { data_cancelamento: { gte: hoje, lt: amanha } },
       }),
       prisma.cliente.groupBy({
         by: ['status'],
@@ -50,7 +48,29 @@ export async function GET() {
         by: ['prioridade'],
         _count: { prioridade: true },
       }),
+      prisma.cliente.groupBy({
+        by: ['plataforma_loja'],
+        _count: { plataforma_loja: true },
+        where: { plataforma_loja: { not: null } },
+        orderBy: { _count: { plataforma_loja: 'desc' } },
+        take: 8,
+      }),
+      prisma.cliente.findMany({
+        where: { motivo_cancelamento: { not: null } },
+        select: { motivo_cancelamento: true },
+      }),
     ])
+
+    // Agrupa motivos de cancelamento por ocorrência
+    const motivosMap: Record<string, number> = {}
+    for (const c of clientes_com_motivo) {
+      const m = (c.motivo_cancelamento || '').trim()
+      if (m) motivosMap[m] = (motivosMap[m] || 0) + 1
+    }
+    const top_motivos = Object.entries(motivosMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([motivo, count]) => ({ motivo, count }))
 
     const taxa_conversao = total > 0 ? Math.round((convertidos / total) * 100) : 0
 
@@ -75,6 +95,11 @@ export async function GET() {
         prioridade: p.prioridade,
         count: p._count.prioridade,
       })),
+      por_plataforma: por_plataforma.map((p) => ({
+        plataforma: p.plataforma_loja || 'Não informado',
+        count: p._count.plataforma_loja,
+      })),
+      top_motivos,
     })
   } catch (error) {
     console.error('GET /api/dashboard error:', error)

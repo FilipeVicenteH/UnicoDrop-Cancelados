@@ -52,6 +52,8 @@ export interface DashboardMetrics {
   por_status: { status: string; count: number }[]
   por_checkout: { checkout: string; count: number }[]
   por_prioridade: { prioridade: string; count: number }[]
+  por_plataforma: { plataforma: string; count: number }[]
+  top_motivos: { motivo: string; count: number }[]
 }
 
 export interface ClienteFormData {
