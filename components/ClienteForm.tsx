@@ -164,15 +164,15 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-6 md:p-10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-3xl my-auto flex flex-col bg-[#0f0f1a] border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden z-10">
+      <div className="relative w-full max-w-3xl max-h-[92vh] flex flex-col bg-[#0f0f1a] border border-purple-500/20 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-gradient-to-r from-purple-900/30 to-violet-900/20">
           <div>
