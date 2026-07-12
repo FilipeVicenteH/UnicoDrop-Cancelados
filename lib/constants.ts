@@ -35,13 +35,16 @@ export const PLUGINS_RASTREIO = [
   'Cainiao',
   '17Tracking (Site de Rastreios)',
   'Reportana',
+  'Sem Plugin de Rastreio',
   'Outro',
 ]
 
 export const RECURSOS_UD = [
   { key: 'Rastreio de pedidos e atualizações de encomendas', icon: '📦', desc: 'Rastreio de pedidos e atualizações de encomendas' },
   { key: 'ADS Google ADS, Facebook', icon: '📣', desc: 'Campanhas de anúncios no Google Ads e Facebook Ads' },
-  { key: 'Campanhas de WhatsApp, e-mail e SMS', icon: '💬', desc: 'Campanhas de WhatsApp, e-mail e SMS' },
+  { key: 'Automação de WhatsApp', icon: '💬', desc: 'Automação e campanhas via WhatsApp' },
+  { key: 'Automação E-mail', icon: '📧', desc: 'Automação e campanhas de e-mail' },
+  { key: 'Campanhas de WhatsApp, e-mail e SMS', icon: '📨', desc: 'Campanhas de WhatsApp, e-mail e SMS' },
   { key: 'Gestão de produtos, pedidos e custos', icon: '🛒', desc: 'Gestão de produtos, pedidos e custos' },
   { key: 'Relatórios para acompanhar desempenho da operação', icon: '📊', desc: 'Relatórios para acompanhar desempenho da operação' },
   { key: 'Acesso por equipe', icon: '👥', desc: 'Acesso por equipe (múltiplos usuários)' },

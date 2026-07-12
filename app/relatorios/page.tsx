@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { DashboardMetrics, Cliente } from '@/lib/types'
-import { STATUS_LABELS, STATUS_COLORS } from '@/lib/constants'
-import { BarChart2, Download, Calendar, TrendingUp, Users, CheckCircle, Globe, Puzzle, LayoutDashboard, MessageCircle, ShoppingCart } from 'lucide-react'
+import { STATUS_LABELS, STATUS_COLORS, RECURSOS_UD } from '@/lib/constants'
+import { BarChart2, Download, Calendar, TrendingUp, Users, CheckCircle, Globe, ShoppingCart } from 'lucide-react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -37,7 +37,8 @@ export default function RelatoriosPage() {
     const headers = [
       'ID Unico', 'Nome', 'Empresa', 'Contato', 'Status', 'Prioridade',
       'Data Cancelamento', 'Data Contato', 'Site', 'Site Online',
-      'Checkout', 'Plugins', 'Usava Dashboard', 'Usava Plugin', 'Usava WhatsApp',
+      'Checkout', 'Plataforma Loja', 'Plugins Rastreio',
+      'Recursos UD Utilizados',
       'Motivo', 'Feedback', 'Responsável'
     ]
     const rows = clientes.map(c => [
@@ -52,10 +53,9 @@ export default function RelatoriosPage() {
       c.site_url || '',
       c.site_online,
       c.checkout || '',
+      c.plataforma_loja || '',
       (c.plugins_rastreio || []).join('; '),
-      c.usava_dashboard ? 'Sim' : 'Não',
-      c.usava_plugin ? 'Sim' : 'Não',
-      c.usava_whatsapp ? 'Sim' : 'Não',
+      (c.recursos_ud || []).join('; '),
       c.motivo_cancelamento || '',
       c.feedback_completo || '',
       c.responsavel || '',
@@ -83,10 +83,13 @@ export default function RelatoriosPage() {
     )
   }
 
-  // Compute statistics
-  const usandoDashboard = clientes.filter(c => c.usava_dashboard).length
-  const usandoPlugin = clientes.filter(c => c.usava_plugin).length
-  const usandoWhatsapp = clientes.filter(c => c.usava_whatsapp).length
+  // Compute resource usage from recursos_ud array
+  const recursosCount: Record<string, number> = {}
+  clientes.forEach(c => {
+    (c.recursos_ud || []).forEach(r => {
+      recursosCount[r] = (recursosCount[r] || 0) + 1
+    })
+  })
   const siteOnline = clientes.filter(c => c.site_online === 'ONLINE').length
   const siteOffline = clientes.filter(c => c.site_online === 'OFFLINE').length
 
@@ -253,36 +256,54 @@ export default function RelatoriosPage() {
             </div>
           </div>
 
-          {/* Uso na UD */}
+          {/* Recursos UD */}
           <div className="glass-card p-5">
             <h2 className="text-sm font-semibold text-gray-300 mb-4">Recursos UD Utilizados</h2>
-            <div className="space-y-3">
-              {[
-                { label: 'Dashboard', value: usandoDashboard, icon: LayoutDashboard },
-                { label: 'Plugin', value: usandoPlugin, icon: Puzzle },
-                { label: 'WhatsApp', value: usandoWhatsapp, icon: MessageCircle },
-              ].map(item => {
-                const Icon = item.icon
-                const pct = clientes.length > 0 ? Math.round((item.value / clientes.length) * 100) : 0
-                return (
-                  <div key={item.label} className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Icon className="w-3.5 h-3.5 text-purple-400" />
-                        <span className="text-xs text-gray-400">{item.label}</span>
+            {Object.keys(recursosCount).length === 0 ? (
+              <p className="text-xs text-gray-500 italic">Nenhum dado registrado ainda</p>
+            ) : (
+              <div className="space-y-2.5">
+                {RECURSOS_UD
+                  .filter(r => recursosCount[r.key])
+                  .sort((a, b) => (recursosCount[b.key] || 0) - (recursosCount[a.key] || 0))
+                  .map(item => {
+                    const count = recursosCount[item.key] || 0
+                    const pct = clientes.length > 0 ? Math.round((count / clientes.length) * 100) : 0
+                    return (
+                      <div key={item.key} className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400 flex items-center gap-1.5">
+                            <span>{item.icon}</span>
+                            <span className="truncate max-w-[160px]" title={item.key}>{item.key}</span>
+                          </span>
+                          <span className="text-xs text-gray-500 flex-shrink-0 ml-2">{count} ({pct}%)</span>
+                        </div>
+                        <div className="bg-white/5 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-purple-500 transition-all duration-700"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
                       </div>
-                      <span className="text-xs text-gray-400">{item.value} ({pct}%)</span>
+                    )
+                  })}
+                {/* Outros */}
+                {recursosCount['Outros'] && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">✏️ Outros</span>
+                      <span className="text-xs text-gray-500">{recursosCount['Outros']}</span>
                     </div>
                     <div className="bg-white/5 rounded-full h-1.5 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-purple-500 transition-all duration-700"
-                        style={{ width: `${pct}%` }}
+                        style={{ width: `${Math.round((recursosCount['Outros'] / clientes.length) * 100)}%` }}
                       />
                     </div>
                   </div>
-                )
-              })}
-            </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Conversão por prioridade */}
