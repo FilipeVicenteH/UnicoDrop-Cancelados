@@ -12,21 +12,39 @@ export const CHECKOUTS = [
   'PerfectPay',
   'Braip',
   'Ticto',
+  'UnicoPag',
+  'Outro',
+]
+
+export const PLATAFORMAS_LOJA = [
+  'Shopify',
+  'Nuvemshop',
+  'WooCommerce',
+  'Tray',
+  'VTEX',
+  'Bagy',
+  'Loja Integrada',
+  'Wix',
+  'Lojamaker',
   'Outro',
 ]
 
 export const PLUGINS_RASTREIO = [
-  'Meta Pixel (Facebook)',
-  'Google Analytics (GA4)',
-  'Google Tag Manager (GTM)',
-  'TikTok Pixel',
-  'Hotjar',
-  'Microsoft Clarity',
-  'Kwai Pixel',
-  'Pinterest Tag',
-  'Twitter/X Pixel',
-  'Criteo',
+  'UnicoDrop Novo',
+  'UnicoDrop Antigo',
+  'Cainiao',
+  '17Tracking (Site de Rastreios)',
+  'Reportana',
   'Outro',
+]
+
+export const RECURSOS_UD = [
+  { key: 'Rastreio de pedidos e atualizações de encomendas', icon: '📦', desc: 'Rastreio de pedidos e atualizações de encomendas' },
+  { key: 'ADS Google ADS, Facebook', icon: '📣', desc: 'Campanhas de anúncios no Google Ads e Facebook Ads' },
+  { key: 'Campanhas de WhatsApp, e-mail e SMS', icon: '💬', desc: 'Campanhas de WhatsApp, e-mail e SMS' },
+  { key: 'Gestão de produtos, pedidos e custos', icon: '🛒', desc: 'Gestão de produtos, pedidos e custos' },
+  { key: 'Relatórios para acompanhar desempenho da operação', icon: '📊', desc: 'Relatórios para acompanhar desempenho da operação' },
+  { key: 'Acesso por equipe', icon: '👥', desc: 'Acesso por equipe (múltiplos usuários)' },
 ]
 
 export const STATUS_LABELS: Record<string, string> = {

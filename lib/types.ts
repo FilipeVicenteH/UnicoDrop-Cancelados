@@ -16,8 +16,14 @@ export interface Cliente {
   site_online: SiteStatus
 
   plugins_rastreio: string[]
+  plugins_rastreio_outro?: string | null
   checkout?: string | null
   checkout_outro?: string | null
+  plataforma_loja?: string | null
+  plataforma_loja_outro?: string | null
+
+  recursos_ud: string[]
+  recursos_ud_outro?: string | null
 
   usava_dashboard: boolean
   usava_plugin: boolean
@@ -59,8 +65,13 @@ export interface ClienteFormData {
   site_url?: string
   site_online: SiteStatus
   plugins_rastreio: string[]
+  plugins_rastreio_outro?: string
   checkout?: string
   checkout_outro?: string
+  plataforma_loja?: string
+  plataforma_loja_outro?: string
+  recursos_ud: string[]
+  recursos_ud_outro?: string
   usava_dashboard: boolean
   usava_plugin: boolean
   usava_whatsapp: boolean

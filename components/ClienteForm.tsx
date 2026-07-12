@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { X, Loader2, Globe, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
-import { CHECKOUTS, PLUGINS_RASTREIO } from '@/lib/constants'
+import { CHECKOUTS, PLATAFORMAS_LOJA, PLUGINS_RASTREIO, RECURSOS_UD } from '@/lib/constants'
 import { ClienteFormData, SiteStatus, StatusCliente, Prioridade } from '@/lib/types'
 import toast from 'react-hot-toast'
 
@@ -25,8 +25,13 @@ const defaultForm: ClienteFormData = {
   site_url: '',
   site_online: 'NAO_VERIFICADO',
   plugins_rastreio: [],
+  plugins_rastreio_outro: '',
   checkout: '',
   checkout_outro: '',
+  plataforma_loja: '',
+  plataforma_loja_outro: '',
+  recursos_ud: [],
+  recursos_ud_outro: '',
   usava_dashboard: false,
   usava_plugin: false,
   usava_whatsapp: false,
@@ -50,10 +55,12 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
       const res = await fetch(`/api/clientes/${clienteId}`)
       const data = await res.json()
       setForm({
+        ...defaultForm,
         ...data,
         data_cancelamento: data.data_cancelamento ? data.data_cancelamento.split('T')[0] : '',
         data_contato: data.data_contato ? data.data_contato.split('T')[0] : '',
         plugins_rastreio: data.plugins_rastreio || [],
+        recursos_ud: data.recursos_ud || [],
       })
     } catch {
       toast.error('Erro ao carregar dados do cliente')
@@ -107,6 +114,15 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
     }))
   }
 
+  const toggleRecurso = (recurso: string) => {
+    setForm(prev => ({
+      ...prev,
+      recursos_ud: prev.recursos_ud.includes(recurso)
+        ? prev.recursos_ud.filter(r => r !== recurso)
+        : [...prev.recursos_ud, recurso],
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.nome.trim()) {
@@ -119,15 +135,10 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
       const method = clienteId ? 'PUT' : 'POST'
       const url = clienteId ? `/api/clientes/${clienteId}` : '/api/clientes'
 
-      const payload = {
-        ...form,
-        checkout: form.checkout === 'Outro' ? 'Outro' : form.checkout,
-      }
-
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(form),
       })
 
       if (!res.ok) throw new Error('Erro na requisição')
@@ -202,7 +213,7 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
 
-            {/* Tab 0: Identificação */}
+            {/* ── Tab 0: Identificação ── */}
             {activeTab === 0 && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -280,9 +291,10 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
               </div>
             )}
 
-            {/* Tab 1: Site & Ferramentas */}
+            {/* ── Tab 1: Site & Ferramentas ── */}
             {activeTab === 1 && (
-              <div className="space-y-5">
+              <div className="space-y-6">
+
                 {/* Site URL */}
                 <div>
                   <label className="form-label">URL do Site</label>
@@ -310,8 +322,6 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                       Verificar
                     </button>
                   </div>
-
-                  {/* Status indicator */}
                   <div className="mt-2 flex items-center gap-2">
                     <span className="text-xs text-gray-500">Status:</span>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -323,7 +333,7 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                     }`}>
                       {form.site_online === 'ONLINE' ? '● Online' : form.site_online === 'OFFLINE' ? '● Offline' : '○ Não verificado'}
                     </span>
-                    <span className="text-xs text-gray-600">ou selecione manualmente:</span>
+                    <span className="text-xs text-gray-600">ou selecione:</span>
                     <select
                       className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1 text-gray-300"
                       value={form.site_online}
@@ -338,7 +348,9 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
 
                 {/* Plugins de Rastreio */}
                 <div>
-                  <label className="form-label">Plugins de Rastreio <span className="text-gray-500 font-normal">(selecione todos que usa)</span></label>
+                  <label className="form-label">
+                    Plugin de Rastreio <span className="text-gray-500 font-normal">(selecione todos que usa)</span>
+                  </label>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     {PLUGINS_RASTREIO.map(plugin => (
                       <button
@@ -366,84 +378,106 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                       </button>
                     ))}
                   </div>
-                </div>
-
-                {/* Checkout */}
-                <div>
-                  <label className="form-label">Checkout Utilizado</label>
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {CHECKOUTS.map(co => (
-                      <button
-                        key={co}
-                        type="button"
-                        onClick={() => setForm(p => ({ ...p, checkout: co }))}
-                        className={`px-3 py-2 rounded-lg text-sm border transition-all ${
-                          form.checkout === co
-                            ? 'border-violet-500/60 bg-violet-500/15 text-violet-300'
-                            : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:text-gray-300'
-                        }`}
-                      >
-                        {co}
-                      </button>
-                    ))}
-                  </div>
-                  {form.checkout === 'Outro' && (
+                  {/* Input "Outro" para plugin */}
+                  {form.plugins_rastreio.includes('Outro') && (
                     <input
                       className="form-input mt-2"
-                      placeholder="Qual checkout?"
-                      value={form.checkout_outro || ''}
-                      onChange={e => setForm(p => ({ ...p, checkout_outro: e.target.value }))}
+                      placeholder="Qual plugin de rastreio?"
+                      value={form.plugins_rastreio_outro || ''}
+                      onChange={e => setForm(p => ({ ...p, plugins_rastreio_outro: e.target.value }))}
                     />
                   )}
                 </div>
+
+                {/* Checkout e Plataforma — lado a lado */}
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Checkout Utilizado */}
+                  <div>
+                    <label className="form-label">Checkout Utilizado</label>
+                    <div className="grid grid-cols-2 gap-1.5 mt-2">
+                      {CHECKOUTS.map(co => (
+                        <button
+                          key={co}
+                          type="button"
+                          onClick={() => setForm(p => ({ ...p, checkout: co }))}
+                          className={`px-2 py-1.5 rounded-lg text-xs border transition-all text-center ${
+                            form.checkout === co
+                              ? 'border-violet-500/60 bg-violet-500/15 text-violet-300'
+                              : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:text-gray-300'
+                          }`}
+                        >
+                          {co}
+                        </button>
+                      ))}
+                    </div>
+                    {form.checkout === 'Outro' && (
+                      <input
+                        className="form-input mt-2"
+                        placeholder="Qual checkout?"
+                        value={form.checkout_outro || ''}
+                        onChange={e => setForm(p => ({ ...p, checkout_outro: e.target.value }))}
+                      />
+                    )}
+                  </div>
+
+                  {/* Plataforma de Loja */}
+                  <div>
+                    <label className="form-label">Plataforma de Loja</label>
+                    <div className="grid grid-cols-2 gap-1.5 mt-2">
+                      {PLATAFORMAS_LOJA.map(pl => (
+                        <button
+                          key={pl}
+                          type="button"
+                          onClick={() => setForm(p => ({ ...p, plataforma_loja: pl }))}
+                          className={`px-2 py-1.5 rounded-lg text-xs border transition-all text-center ${
+                            form.plataforma_loja === pl
+                              ? 'border-cyan-500/60 bg-cyan-500/15 text-cyan-300'
+                              : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:text-gray-300'
+                          }`}
+                        >
+                          {pl}
+                        </button>
+                      ))}
+                    </div>
+                    {form.plataforma_loja === 'Outro' && (
+                      <input
+                        className="form-input mt-2"
+                        placeholder="Qual plataforma?"
+                        value={form.plataforma_loja_outro || ''}
+                        onChange={e => setForm(p => ({ ...p, plataforma_loja_outro: e.target.value }))}
+                      />
+                    )}
+                  </div>
+                </div>
+
               </div>
             )}
 
-            {/* Tab 2: Uso na UD */}
+            {/* ── Tab 2: Uso na UD ── */}
             {activeTab === 2 && (
-              <div className="space-y-5">
+              <div className="space-y-4">
                 <p className="text-sm text-gray-400">Quais recursos da UnicoDrop esse cliente utilizava?</p>
 
-                <div className="grid grid-cols-1 gap-4">
-                  {[
-                    {
-                      key: 'usava_dashboard',
-                      label: 'Dashboard',
-                      desc: 'Usava o painel de métricas e relatórios da UD',
-                      icon: '📊',
-                    },
-                    {
-                      key: 'usava_plugin',
-                      label: 'Plugin',
-                      desc: 'Utilizava o plugin de integração/rastreamento da UD',
-                      icon: '🔌',
-                    },
-                    {
-                      key: 'usava_whatsapp',
-                      label: 'WhatsApp',
-                      desc: 'Usava a integração ou automações de WhatsApp',
-                      icon: '💬',
-                    },
-                  ].map(item => (
+                <div className="grid grid-cols-1 gap-3">
+                  {RECURSOS_UD.map(item => (
                     <button
                       key={item.key}
                       type="button"
-                      onClick={() => setForm(p => ({ ...p, [item.key]: !p[item.key as keyof ClienteFormData] }))}
+                      onClick={() => toggleRecurso(item.key)}
                       className={`flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${
-                        form[item.key as keyof ClienteFormData]
+                        form.recursos_ud.includes(item.key)
                           ? 'border-purple-500/50 bg-purple-500/10'
                           : 'border-white/10 bg-white/5 hover:border-white/20'
                       }`}
                     >
-                      <span className="text-3xl">{item.icon}</span>
-                      <div className="flex-1">
-                        <p className={`font-semibold ${form[item.key as keyof ClienteFormData] ? 'text-purple-300' : 'text-gray-300'}`}>
-                          {item.label}
+                      <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium text-sm ${form.recursos_ud.includes(item.key) ? 'text-purple-300' : 'text-gray-300'}`}>
+                          {item.key}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
                       </div>
-                      <div className={`w-12 h-6 rounded-full transition-all flex items-center px-1 ${
-                        form[item.key as keyof ClienteFormData]
+                      <div className={`w-12 h-6 rounded-full transition-all flex items-center px-1 flex-shrink-0 ${
+                        form.recursos_ud.includes(item.key)
                           ? 'bg-purple-500 justify-end'
                           : 'bg-gray-700 justify-start'
                       }`}>
@@ -451,11 +485,49 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                       </div>
                     </button>
                   ))}
+
+                  {/* Outros — com input */}
+                  <div className={`rounded-xl border transition-all ${
+                    form.recursos_ud.includes('Outros')
+                      ? 'border-purple-500/50 bg-purple-500/10'
+                      : 'border-white/10 bg-white/5'
+                  }`}>
+                    <button
+                      type="button"
+                      onClick={() => toggleRecurso('Outros')}
+                      className="flex items-center gap-4 p-4 w-full text-left"
+                    >
+                      <span className="text-2xl flex-shrink-0">✏️</span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium text-sm ${form.recursos_ud.includes('Outros') ? 'text-purple-300' : 'text-gray-300'}`}>
+                          Outros
+                        </p>
+                      </div>
+                      <div className={`w-12 h-6 rounded-full transition-all flex items-center px-1 flex-shrink-0 ${
+                        form.recursos_ud.includes('Outros')
+                          ? 'bg-purple-500 justify-end'
+                          : 'bg-gray-700 justify-start'
+                      }`}>
+                        <div className="w-4 h-4 bg-white rounded-full shadow" />
+                      </div>
+                    </button>
+                    {form.recursos_ud.includes('Outros') && (
+                      <div className="px-4 pb-4">
+                        <input
+                          className="form-input"
+                          placeholder="Descreva os outros recursos utilizados..."
+                          value={form.recursos_ud_outro || ''}
+                          onChange={e => setForm(p => ({ ...p, recursos_ud_outro: e.target.value }))}
+                          onClick={e => e.stopPropagation()}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Tab 3: Feedback & Status */}
+            {/* ── Tab 3: Feedback & Status ── */}
             {activeTab === 3 && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">

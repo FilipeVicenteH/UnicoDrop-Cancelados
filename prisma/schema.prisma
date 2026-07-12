@@ -26,10 +26,15 @@ model Cliente {
 
   // Ferramentas
   plugins_rastreio     String[]
+  plugins_rastreio_outro String?
   checkout             String?
   checkout_outro       String?
+  plataforma_loja      String?
+  plataforma_loja_outro String?
 
   // O que usava na UD
+  recursos_ud          String[]
+  recursos_ud_outro    String?
   usava_dashboard      Boolean  @default(false)
   usava_plugin         Boolean  @default(false)
   usava_whatsapp       Boolean  @default(false)
