@@ -12,8 +12,9 @@ function createPrismaClient(): PrismaClient {
     throw new Error('DATABASE_URL environment variable is not defined.')
   }
 
-  // PrismaNeonHttp accepts the connection string directly (Prisma 7 + @neondatabase/serverless)
-  const adapter = new PrismaNeonHttp(url)
+  // PrismaNeonHttp(connectionString, options) — options can be empty object
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const adapter = new PrismaNeonHttp(url, {} as any)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new PrismaClient({ adapter } as any)
 }
