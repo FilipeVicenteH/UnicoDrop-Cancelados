@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { DashboardMetrics, Cliente } from '@/lib/types'
 import { STATUS_LABELS, STATUS_COLORS, RECURSOS_UD } from '@/lib/constants'
+import DateFilterBar from '@/components/DateFilterBar'
 import {
   BarChart2, Download, TrendingUp, Users, CheckCircle, Globe,
   ShoppingCart, MessageSquare, AlertTriangle, Store, Activity,
@@ -45,13 +46,25 @@ export default function RelatoriosPage() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [loading, setLoading] = useState(true)
+  const [dateFilter, setDateFilter] = useState({
+    dateField: 'cancelamento',
+    dateFrom: '',
+    dateTo: '',
+  })
 
   const fetchAll = useCallback(async () => {
     setLoading(true)
     try {
+      const params = new URLSearchParams()
+      if (dateFilter.dateFrom || dateFilter.dateTo) {
+        params.set('date_field', dateFilter.dateField)
+        if (dateFilter.dateFrom) params.set('date_from', dateFilter.dateFrom)
+        if (dateFilter.dateTo) params.set('date_to', dateFilter.dateTo)
+      }
+      const qs = params.toString()
       const [mRes, cRes] = await Promise.all([
-        fetch('/api/dashboard'),
-        fetch('/api/clientes?limit=1000'),
+        fetch(`/api/dashboard${qs ? '?' + qs : ''}`),
+        fetch(`/api/clientes?limit=1000${qs ? '&' + qs : ''}`),
       ])
       setMetrics(await mRes.json())
       const cd = await cRes.json()
@@ -61,7 +74,7 @@ export default function RelatoriosPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [dateFilter])
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
@@ -155,6 +168,9 @@ export default function RelatoriosPage() {
           Exportar CSV
         </button>
       </div>
+
+      {/* Date Filter */}
+      <DateFilterBar value={dateFilter} onChange={setDateFilter} />
 
       {/* ── KPI Summary Row ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-5">
