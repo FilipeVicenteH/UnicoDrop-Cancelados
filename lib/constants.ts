@@ -20,6 +20,7 @@ export const PLATAFORMAS_LOJA = [
   'Shopify',
   'Nuvemshop',
   'WooCommerce',
+  'Yampi',
   'Tray',
   'VTEX',
   'Bagy',

@@ -185,6 +185,15 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
               </div>
             )}
 
+            {(cliente.plataforma_loja || cliente.plataforma_loja_outro) && (
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Plataforma de Loja</p>
+                <span className="text-sm bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  {cliente.plataforma_loja === 'Outro' ? cliente.plataforma_loja_outro : cliente.plataforma_loja}
+                </span>
+              </div>
+            )}
+
             <div>
               <p className="text-xs text-gray-500 mb-1">Usava na UD</p>
               <div className="flex gap-3">
