@@ -7,7 +7,7 @@ import { Cliente } from '@/lib/types'
 import { STATUS_LABELS } from '@/lib/constants'
 import {
   Plus, Search, Filter, Users, RefreshCw, ChevronDown,
-  LayoutDashboard, Puzzle, MessageCircle, X
+  LayoutDashboard, Puzzle, MessageCircle, X, Calendar, CalendarRange
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -19,6 +19,41 @@ const USAVA_OPTIONS = [
   { value: 'plugin', label: 'Plugin', icon: Puzzle },
   { value: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
 ]
+
+const DATE_FIELD_OPTIONS = [
+  { value: 'cancelamento', label: 'Data de Cancelamento' },
+  { value: 'contato', label: 'Data de Contato' },
+]
+
+// Quick period presets
+function getPresetRange(preset: string): { from: string; to: string } {
+  const today = new Date()
+  const fmt = (d: Date) => d.toISOString().split('T')[0]
+
+  if (preset === 'hoje') {
+    return { from: fmt(today), to: fmt(today) }
+  }
+  if (preset === '7d') {
+    const from = new Date(today)
+    from.setDate(from.getDate() - 6)
+    return { from: fmt(from), to: fmt(today) }
+  }
+  if (preset === '30d') {
+    const from = new Date(today)
+    from.setDate(from.getDate() - 29)
+    return { from: fmt(from), to: fmt(today) }
+  }
+  if (preset === 'mes') {
+    const from = new Date(today.getFullYear(), today.getMonth(), 1)
+    return { from: fmt(from), to: fmt(today) }
+  }
+  if (preset === 'mes_ant') {
+    const from = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+    const to = new Date(today.getFullYear(), today.getMonth(), 0)
+    return { from: fmt(from), to: fmt(to) }
+  }
+  return { from: '', to: '' }
+}
 
 export default function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
@@ -34,6 +69,12 @@ export default function ClientesPage() {
   const [usava, setUsava] = useState('')
   const [filtersOpen, setFiltersOpen] = useState(false)
 
+  // Date filters
+  const [dateField, setDateField] = useState('cancelamento')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [activePreset, setActivePreset] = useState('')
+
   const fetchClientes = useCallback(async () => {
     setLoading(true)
     try {
@@ -42,7 +83,12 @@ export default function ClientesPage() {
       if (status !== 'TODOS') params.set('status', status)
       if (prioridade !== 'TODOS') params.set('prioridade', prioridade)
       if (usava) params.set('usava', usava)
-      params.set('limit', '100')
+      if (dateFrom || dateTo) {
+        params.set('date_field', dateField)
+        if (dateFrom) params.set('date_from', dateFrom)
+        if (dateTo) params.set('date_to', dateTo)
+      }
+      params.set('limit', '200')
 
       const res = await fetch(`/api/clientes?${params.toString()}`)
       const data = await res.json()
@@ -53,7 +99,7 @@ export default function ClientesPage() {
     } finally {
       setLoading(false)
     }
-  }, [search, status, prioridade, usava])
+  }, [search, status, prioridade, usava, dateFrom, dateTo, dateField])
 
   useEffect(() => {
     const timer = setTimeout(fetchClientes, 300)
@@ -81,18 +127,43 @@ export default function ClientesPage() {
     setEditId(null)
   }
 
+  const applyPreset = (preset: string) => {
+    const range = getPresetRange(preset)
+    setDateFrom(range.from)
+    setDateTo(range.to)
+    setActivePreset(preset)
+  }
+
+  const clearDates = () => {
+    setDateFrom('')
+    setDateTo('')
+    setActivePreset('')
+  }
+
+  const hasDateFilter = dateFrom || dateTo
+
   const activeFiltersCount = [
     status !== 'TODOS',
     prioridade !== 'TODOS',
     usava !== '',
+    !!hasDateFilter,
   ].filter(Boolean).length
 
-  const clearFilters = () => {
+  const clearAllFilters = () => {
     setStatus('TODOS')
     setPrioridade('TODOS')
     setUsava('')
     setSearch('')
+    clearDates()
   }
+
+  const PRESETS = [
+    { key: 'hoje', label: 'Hoje' },
+    { key: '7d', label: 'Últimos 7 dias' },
+    { key: '30d', label: 'Últimos 30 dias' },
+    { key: 'mes', label: 'Este mês' },
+    { key: 'mes_ant', label: 'Mês anterior' },
+  ]
 
   return (
     <>
@@ -107,6 +178,7 @@ export default function ClientesPage() {
             <h1 className="text-2xl font-bold text-white">Clientes Cancelados</h1>
             <p className="text-sm text-gray-500 mt-1">
               {loading ? 'Carregando...' : `${total} ${total === 1 ? 'cliente' : 'clientes'} encontrado${total === 1 ? '' : 's'}`}
+              {hasDateFilter && <span className="ml-2 text-purple-400 text-xs">• filtrado por data</span>}
             </p>
           </div>
 
@@ -128,10 +200,10 @@ export default function ClientesPage() {
           </div>
         </div>
 
-        {/* Search + Filters Bar */}
-        <div className="flex gap-3 mb-4">
+        {/* Search + Filter Bar */}
+        <div className="flex gap-3 mb-4 flex-wrap">
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 min-w-[200px] max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
             <input
               className="form-input pl-10 h-10"
@@ -170,19 +242,96 @@ export default function ClientesPage() {
 
           {activeFiltersCount > 0 && (
             <button
-              onClick={clearFilters}
+              onClick={clearAllFilters}
               className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:text-red-300 border border-red-500/20 rounded-lg bg-red-500/5 hover:bg-red-500/10 transition-all"
             >
               <X className="w-3.5 h-3.5" />
-              Limpar
+              Limpar tudo
             </button>
           )}
         </div>
 
         {/* Filter Panel */}
         {filtersOpen && (
-          <div className="glass-card p-4 mb-4 animate-fade-in">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="glass-card p-5 mb-4 animate-fade-in space-y-5">
+
+            {/* ── Filtro de Data ── */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <CalendarRange className="w-4 h-4 text-purple-400" />
+                <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">Filtro por Data</label>
+                {hasDateFilter && (
+                  <button
+                    onClick={clearDates}
+                    className="ml-auto text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1"
+                  >
+                    <X className="w-3 h-3" /> Limpar datas
+                  </button>
+                )}
+              </div>
+
+              {/* Tipo de data */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {DATE_FIELD_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setDateField(opt.value)}
+                    className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${
+                      dateField === opt.value
+                        ? 'border-purple-500/50 bg-purple-500/15 text-purple-300'
+                        : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                    }`}
+                  >
+                    <Calendar className="w-3 h-3" />
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Presets rápidos */}
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {PRESETS.map(p => (
+                  <button
+                    key={p.key}
+                    onClick={() => applyPreset(p.key)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all font-medium ${
+                      activePreset === p.key
+                        ? 'border-violet-500/50 bg-violet-500/15 text-violet-300'
+                        : 'border-white/8 bg-white/4 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Date pickers */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="form-label">De</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={dateFrom}
+                    onChange={e => { setDateFrom(e.target.value); setActivePreset('') }}
+                  />
+                </div>
+                <div>
+                  <label className="form-label">Até</label>
+                  <input
+                    type="date"
+                    className="form-input"
+                    value={dateTo}
+                    onChange={e => { setDateTo(e.target.value); setActivePreset('') }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-white/5" />
+
+            {/* ── Outros Filtros ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               {/* Status */}
               <div>
                 <label className="form-label">Status</label>
@@ -246,6 +395,23 @@ export default function ClientesPage() {
           </div>
         )}
 
+        {/* Active date filter badge */}
+        {hasDateFilter && !filtersOpen && (
+          <div className="flex items-center gap-2 mb-4 px-1">
+            <div className="flex items-center gap-2 text-xs text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-full">
+              <Calendar className="w-3 h-3" />
+              <span>
+                {dateField === 'cancelamento' ? 'Cancelamento' : 'Contato'}
+                {dateFrom && ` de ${dateFrom.split('-').reverse().join('/')}`}
+                {dateTo && ` até ${dateTo.split('-').reverse().join('/')}`}
+              </span>
+              <button onClick={clearDates} className="ml-1 hover:text-white">
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Table Header */}
         <div className="hidden lg:grid grid-cols-[80px_1fr_140px_100px_120px_100px_80px_40px] gap-3 px-4 py-2 mb-1">
           {['ID Unico', 'Cliente', 'Status', 'Prioridade', 'Site', 'UD', 'Contato', ''].map(h => (
@@ -269,7 +435,7 @@ export default function ClientesPage() {
               </div>
               <p className="text-gray-500 font-medium">Nenhum cliente encontrado</p>
               <p className="text-gray-600 text-sm">
-                {activeFiltersCount > 0 || search ? 'Tente ajustar os filtros' : 'Adicione o primeiro cliente cancelado'}
+                {activeFiltersCount > 0 || search ? 'Tente ajustar os filtros ou o período de data' : 'Adicione o primeiro cliente cancelado'}
               </p>
               {!activeFiltersCount && !search && (
                 <button
@@ -298,7 +464,7 @@ export default function ClientesPage() {
         </div>
       </div>
 
-      {/* Form Modal (Renderizado fora do container animado para evitar corte por causa do z-index e transform/stacking context) */}
+      {/* Form Modal (fora do container para evitar corte) */}
       <ClienteForm
         isOpen={formOpen}
         onClose={handleCloseForm}

@@ -8,6 +8,9 @@ export async function GET(request: NextRequest) {
     const prioridade = searchParams.get('prioridade')
     const search = searchParams.get('search')
     const usava = searchParams.get('usava')
+    const date_field = searchParams.get('date_field') // 'cancelamento' | 'contato'
+    const date_from = searchParams.get('date_from')   // YYYY-MM-DD
+    const date_to = searchParams.get('date_to')       // YYYY-MM-DD
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '50')
     const skip = (page - 1) * limit
@@ -15,12 +18,8 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {}
 
-    if (status && status !== 'TODOS') {
-      where.status = status
-    }
-    if (prioridade && prioridade !== 'TODOS') {
-      where.prioridade = prioridade
-    }
+    if (status && status !== 'TODOS') where.status = status
+    if (prioridade && prioridade !== 'TODOS') where.prioridade = prioridade
     if (search) {
       where.OR = [
         { nome: { contains: search, mode: 'insensitive' } },
@@ -32,6 +31,24 @@ export async function GET(request: NextRequest) {
     if (usava === 'dashboard') where.usava_dashboard = true
     if (usava === 'plugin') where.usava_plugin = true
     if (usava === 'whatsapp') where.usava_whatsapp = true
+
+    // Date range filter
+    if ((date_from || date_to) && date_field) {
+      const field = date_field === 'contato' ? 'data_contato' : 'data_cancelamento'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dateRange: any = {}
+      if (date_from) {
+        const from = new Date(date_from)
+        from.setHours(0, 0, 0, 0)
+        dateRange.gte = from
+      }
+      if (date_to) {
+        const to = new Date(date_to)
+        to.setHours(23, 59, 59, 999)
+        dateRange.lte = to
+      }
+      where[field] = dateRange
+    }
 
     const [clientes, total] = await Promise.all([
       prisma.cliente.findMany({
