@@ -7,7 +7,7 @@ import DateFilterBar from '@/components/DateFilterBar'
 import {
   BarChart2, Download, TrendingUp, Users, CheckCircle, Globe,
   ShoppingCart, MessageSquare, AlertTriangle, Store, Activity,
-  Target, Zap
+  Target, Zap, Radio
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -124,6 +124,17 @@ export default function RelatoriosPage() {
   clientes.forEach(c => {
     (c.recursos_ud || []).forEach(r => { recursosCount[r] = (recursosCount[r] || 0) + 1 })
   })
+
+  // Plugins de rastreio count
+  const pluginsCount: Record<string, number> = {}
+  clientes.forEach(c => {
+    (c.plugins_rastreio || []).forEach(p => { pluginsCount[p] = (pluginsCount[p] || 0) + 1 })
+  })
+  const pluginsSorted = Object.entries(pluginsCount)
+    .sort((a, b) => b[1] - a[1])
+  const maxPlugin = pluginsSorted[0]?.[1] || 1
+  const UNICO_PLUGINS = ['UnicoDrop Novo', 'UnicoDrop Antigo']
+
   const siteOnline = clientes.filter(c => c.site_online === 'ONLINE').length
   const siteOffline = clientes.filter(c => c.site_online === 'OFFLINE').length
   const siteNaoVerif = clientes.length - siteOnline - siteOffline
@@ -342,6 +353,63 @@ export default function RelatoriosPage() {
 
         {/* ── RIGHT COLUMN (1/3) ── */}
         <div className="space-y-5">
+
+          {/* Plugins de Rastreio */}
+          <div className="glass-card p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="p-1.5 bg-purple-500/10 rounded-lg">
+                <Radio className="w-4 h-4 text-purple-400" />
+              </div>
+              <h2 className="text-sm font-semibold text-gray-200">Plugins de Rastreio</h2>
+            </div>
+            {pluginsSorted.length > 0 ? (
+              <div className="space-y-3">
+                {pluginsSorted.map(([plugin, count]) => {
+                  const isUnico = UNICO_PLUGINS.includes(plugin)
+                  const isNovo = plugin === 'UnicoDrop Novo'
+                  const pct = Math.round((count / maxPlugin) * 100)
+                  return (
+                    <div key={plugin}>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          {isUnico && <Radio className="w-3 h-3 flex-shrink-0 text-purple-400" />}
+                          <span className={`text-xs truncate ${
+                            isUnico
+                              ? isNovo ? 'text-purple-300 font-semibold' : 'text-violet-300 font-semibold'
+                              : 'text-gray-400'
+                          }`} title={plugin}>{plugin}</span>
+                          {isUnico && (
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-bold flex-shrink-0 ${
+                              isNovo
+                                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                                : 'bg-violet-500/15 text-violet-400 border-violet-500/30'
+                            }`}>
+                              UD
+                            </span>
+                          )}
+                        </div>
+                        <span className={`text-xs font-bold flex-shrink-0 ml-2 ${
+                          isUnico ? 'text-purple-400' : 'text-gray-500'
+                        }`}>{count}</span>
+                      </div>
+                      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ${
+                            isUnico
+                              ? isNovo ? 'bg-gradient-to-r from-purple-600 to-purple-400' : 'bg-gradient-to-r from-violet-600 to-violet-400'
+                              : 'bg-indigo-600'
+                          }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <p className="text-xs text-gray-600 italic">Nenhum plugin registrado</p>
+            )}
+          </div>
 
           {/* Status Pie */}
           <div className="glass-card p-5">

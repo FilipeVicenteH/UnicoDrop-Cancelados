@@ -6,9 +6,11 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import {
   Edit2, Trash2, Globe, CheckCircle, XCircle, AlertCircle,
-  ChevronDown, ChevronUp, ExternalLink, LayoutDashboard, Puzzle, MessageCircle
+  ChevronDown, ChevronUp, ExternalLink, LayoutDashboard, Puzzle, MessageCircle, Radio
 } from 'lucide-react'
 import { useState } from 'react'
+
+const UNICO_PLUGINS = ['UnicoDrop Novo', 'UnicoDrop Antigo']
 
 interface ClienteCardProps {
   cliente: Cliente
@@ -89,6 +91,31 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
           </span>
         </div>
 
+        {/* UnicoDrop Plugin Badge */}
+        <div className="flex-shrink-0 hidden lg:block">
+          {(() => {
+            const plugins = cliente.plugins_rastreio || []
+            const unicoPlugin = plugins.find(p => UNICO_PLUGINS.includes(p))
+            if (unicoPlugin) {
+              const isNovo = unicoPlugin === 'UnicoDrop Novo'
+              return (
+                <span
+                  title={unicoPlugin}
+                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                    isNovo
+                      ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                      : 'bg-violet-500/15 text-violet-400 border-violet-500/30'
+                  }`}
+                >
+                  <Radio className="w-2.5 h-2.5" />
+                  {isNovo ? 'UD Novo' : 'UD Antigo'}
+                </span>
+              )
+            }
+            return <span className="text-[10px] text-gray-700">Sem plugin</span>
+          })()}
+        </div>
+
         {/* UD Tools */}
         <div className="flex gap-1.5 flex-shrink-0 hidden lg:flex">
           <span title="Dashboard" className={`p-1 rounded ${cliente.usava_dashboard ? 'text-purple-400' : 'text-gray-700'}`}>
@@ -167,11 +194,25 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
               <div>
                 <p className="text-xs text-gray-500 mb-1">Plugins de Rastreio</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {cliente.plugins_rastreio.map(p => (
-                    <span key={p} className="text-xs bg-indigo-500/10 text-indigo-300 px-2 py-0.5 rounded-full border border-indigo-500/20">
-                      {p}
-                    </span>
-                  ))}
+                  {cliente.plugins_rastreio.map(p => {
+                    const isUnico = UNICO_PLUGINS.includes(p)
+                    const isNovo = p === 'UnicoDrop Novo'
+                    return (
+                      <span
+                        key={p}
+                        className={`text-xs px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                          isUnico
+                            ? isNovo
+                              ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 font-semibold'
+                              : 'bg-violet-500/15 text-violet-300 border-violet-500/30 font-semibold'
+                            : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
+                        }`}
+                      >
+                        {isUnico && <Radio className="w-2.5 h-2.5" />}
+                        {p}
+                      </span>
+                    )
+                  })}
                 </div>
               </div>
             )}
