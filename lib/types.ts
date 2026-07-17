@@ -83,3 +83,27 @@ export interface ClienteFormData {
   status: StatusCliente
   prioridade: Prioridade
 }
+
+export type TipoClienteFeedback = 'ATIVO' | 'CANCELADO'
+export type StatusFeedback = 'PENDENTE' | 'EM_ANALISE' | 'PLANEJADO' | 'CONCLUIDO'
+
+export interface FeedbackMelhoria {
+  id: number
+  cliente: string
+  tipo_cliente: TipoClienteFeedback
+  funcionalidade: string
+  descricao: string
+  status: StatusFeedback
+  prioridade: Prioridade
+  created_at: string
+  updated_at: string
+}
+
+export interface FeedbackFormData {
+  cliente: string
+  tipo_cliente: TipoClienteFeedback
+  funcionalidade: string
+  descricao: string
+  status: StatusFeedback
+  prioridade: Prioridade
+}

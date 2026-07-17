@@ -13,6 +13,7 @@ const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
+  { href: '/feedbacks', label: 'Feedbacks de Melhoria', icon: Zap },
 ]
 
 export default function Sidebar() {

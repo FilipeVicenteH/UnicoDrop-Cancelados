@@ -72,3 +72,30 @@ enum Prioridade {
   MEDIA
   ALTA
 }
+
+model FeedbackMelhoria {
+  id               Int                 @id @default(autoincrement())
+  cliente          String
+  tipo_cliente     TipoClienteFeedback @default(ATIVO)
+  funcionalidade   String
+  descricao        String
+  status           StatusFeedback      @default(PENDENTE)
+  prioridade       Prioridade          @default(MEDIA)
+  
+  created_at       DateTime            @default(now())
+  updated_at       DateTime            @updatedAt
+
+  @@map("feedbacks_melhoria")
+}
+
+enum TipoClienteFeedback {
+  ATIVO
+  CANCELADO
+}
+
+enum StatusFeedback {
+  PENDENTE
+  EM_ANALISE
+  PLANEJADO
+  CONCLUIDO
+}

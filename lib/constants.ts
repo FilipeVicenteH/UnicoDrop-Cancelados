@@ -76,3 +76,17 @@ export const SITE_STATUS_LABELS: Record<string, string> = {
   OFFLINE: 'Offline',
   NAO_VERIFICADO: 'Não Verificado',
 }
+
+export const FEEDBACK_STATUS_LABELS: Record<string, string> = {
+  PENDENTE: 'Pendente',
+  EM_ANALISE: 'Em Análise',
+  PLANEJADO: 'Planejado',
+  CONCLUIDO: 'Concluído',
+}
+
+export const FEEDBACK_STATUS_COLORS: Record<string, string> = {
+  PENDENTE: '#6B7280', // gray
+  EM_ANALISE: '#F59E0B', // amber
+  PLANEJADO: '#3B82F6', // blue
+  CONCLUIDO: '#10B981', // emerald
+}
