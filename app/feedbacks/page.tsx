@@ -297,7 +297,8 @@ export default function FeedbacksPage() {
                         {item.funcionalidade}
                       </h3>
                       <p className="text-xs text-gray-500 truncate" title={item.cliente}>
-                        {item.cliente}
+                        <span className="font-medium text-gray-400">{item.cliente}</span>
+                        {item.unico_id && <span className="ml-2 px-1.5 py-0.5 bg-white/5 rounded border border-white/10 text-[10px]">ID: {item.unico_id}</span>}
                       </p>
                     </div>
 

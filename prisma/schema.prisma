@@ -75,6 +75,7 @@ enum Prioridade {
 
 model FeedbackMelhoria {
   id               Int                 @id @default(autoincrement())
+  unico_id         String?
   cliente          String
   tipo_cliente     TipoClienteFeedback @default(ATIVO)
   funcionalidade   String

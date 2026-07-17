@@ -13,6 +13,7 @@ export async function PUT(
     const feedback = await prisma.feedbackMelhoria.update({
       where: { id },
       data: {
+        unico_id: body.unico_id,
         cliente: body.cliente,
         tipo_cliente: body.tipo_cliente,
         funcionalidade: body.funcionalidade,

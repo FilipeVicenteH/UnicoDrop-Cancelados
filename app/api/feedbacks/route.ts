@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
 
     const feedback = await prisma.feedbackMelhoria.create({
       data: {
+        unico_id: body.unico_id,
         cliente: body.cliente,
         tipo_cliente: body.tipo_cliente || 'ATIVO',
         funcionalidade: body.funcionalidade,

@@ -14,6 +14,7 @@ interface FeedbackFormProps {
 }
 
 const defaultForm: FeedbackFormData = {
+  unico_id: '',
   cliente: '',
   tipo_cliente: 'ATIVO',
   funcionalidade: '',
@@ -40,6 +41,7 @@ export default function FeedbackForm({ isOpen, onClose, onSaved, feedbackId }: F
       const feedback = feedbacks.find((f: any) => f.id === feedbackId)
       if (feedback) {
         setForm({
+          unico_id: feedback.unico_id || '',
           cliente: feedback.cliente,
           tipo_cliente: feedback.tipo_cliente,
           funcionalidade: feedback.funcionalidade,
@@ -132,7 +134,7 @@ export default function FeedbackForm({ isOpen, onClose, onSaved, feedbackId }: F
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 
                 {/* Cliente */}
-                <div className="md:col-span-2">
+                <div className="md:col-span-1">
                   <label className="form-label">Nome do Cliente *</label>
                   <input
                     type="text"
@@ -141,6 +143,18 @@ export default function FeedbackForm({ isOpen, onClose, onSaved, feedbackId }: F
                     value={form.cliente}
                     onChange={e => setForm({ ...form, cliente: e.target.value })}
                     required
+                  />
+                </div>
+
+                {/* ID Unico */}
+                <div className="md:col-span-1">
+                  <label className="form-label">ID na UnicoDrop</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Ex: UD-12345 (Opcional)"
+                    value={form.unico_id || ''}
+                    onChange={e => setForm({ ...form, unico_id: e.target.value })}
                   />
                 </div>
 

@@ -89,6 +89,7 @@ export type StatusFeedback = 'PENDENTE' | 'EM_ANALISE' | 'PLANEJADO' | 'CONCLUID
 
 export interface FeedbackMelhoria {
   id: number
+  unico_id?: string | null
   cliente: string
   tipo_cliente: TipoClienteFeedback
   funcionalidade: string
@@ -100,6 +101,7 @@ export interface FeedbackMelhoria {
 }
 
 export interface FeedbackFormData {
+  unico_id?: string
   cliente: string
   tipo_cliente: TipoClienteFeedback
   funcionalidade: string
