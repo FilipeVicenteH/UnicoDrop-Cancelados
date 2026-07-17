@@ -20,6 +20,7 @@ export default function FeedbacksPage() {
   const [loading, setLoading] = useState(true)
   const [formOpen, setFormOpen] = useState(false)
   const [editId, setEditId] = useState<number | null>(null)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -319,7 +320,10 @@ export default function FeedbacksPage() {
                     </div>
                   </div>
 
-                  <div className="text-sm text-gray-400 mb-4 line-clamp-3 leading-relaxed">
+                  <div 
+                    className={`text-sm text-gray-400 mb-4 leading-relaxed cursor-pointer transition-all ${expandedId === item.id ? '' : 'line-clamp-3'}`}
+                    onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                  >
                     {item.descricao}
                   </div>
 
