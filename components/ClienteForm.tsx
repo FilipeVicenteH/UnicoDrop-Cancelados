@@ -1,10 +1,33 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { X, Loader2, Globe, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import { X, Loader2, Globe, CheckCircle, XCircle, AlertCircle, Phone, ExternalLink } from 'lucide-react'
 import { CHECKOUTS, PLATAFORMAS_LOJA, PLUGINS_RASTREIO, RECURSOS_UD } from '@/lib/constants'
 import { ClienteFormData, SiteStatus, StatusCliente, Prioridade } from '@/lib/types'
 import toast from 'react-hot-toast'
+
+// Brazilian phone validation
+function parseBrazilianPhone(raw: string): string | null {
+  // Strip everything except digits
+  const digits = raw.replace(/\D/g, '')
+  // Accept formats: 11 digits (with country code 55) or 10-11 digits (mobile/landline)
+  if (digits.length === 13 && digits.startsWith('55')) return digits // +55 DDD 9XXXXX-XXXX
+  if (digits.length === 12 && digits.startsWith('55')) return digits // +55 DDD XXXX-XXXX
+  if (digits.length === 11) return `55${digits}` // DDD 9XXXXX-XXXX
+  if (digits.length === 10) return `55${digits}` // DDD XXXX-XXXX
+  return null
+}
+
+type PhoneStatus = 'empty' | 'valid' | 'invalid'
+
+function getPhoneStatus(contato: string): PhoneStatus {
+  if (!contato || contato.trim() === '') return 'empty'
+  // If it looks like an email only, no phone
+  const hasDigits = /\d/.test(contato)
+  if (!hasDigits) return 'invalid'
+  const parsed = parseBrazilianPhone(contato)
+  return parsed ? 'valid' : 'invalid'
+}
 
 interface ClienteFormProps {
   isOpen: boolean
@@ -47,6 +70,13 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
   const [loading, setLoading] = useState(false)
   const [checkingSite, setCheckingSite] = useState(false)
   const [activeTab, setActiveTab] = useState(0)
+
+  const phoneStatus = useMemo(() => getPhoneStatus(form.contato || ''), [form.contato])
+
+  const waLink = useMemo(() => {
+    const parsed = parseBrazilianPhone(form.contato || '')
+    return parsed ? `https://wa.me/${parsed}` : null
+  }, [form.contato])
 
   const loadCliente = useCallback(async () => {
     if (!clienteId) return
@@ -248,14 +278,59 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                       onChange={e => setForm(p => ({ ...p, empresa: e.target.value }))}
                     />
                   </div>
-                  <div>
-                    <label className="form-label">Contato (Tel / E-mail)</label>
-                    <input
-                      className="form-input"
-                      placeholder="+55 (11) 99999-9999"
-                      value={form.contato || ''}
-                      onChange={e => setForm(p => ({ ...p, contato: e.target.value }))}
-                    />
+                <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="form-label mb-0">Contato (Tel / E-mail)</label>
+                      {/* Phone status indicator */}
+                      {phoneStatus === 'valid' && (
+                        <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
+                          <CheckCircle className="w-3 h-3" /> Número válido
+                        </span>
+                      )}
+                      {phoneStatus === 'invalid' && form.contato && (
+                        <span className="flex items-center gap-1 text-[10px] text-red-400 font-medium">
+                          <XCircle className="w-3 h-3" /> Formato inválido
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-600" />
+                      <input
+                        className={`form-input pl-9 pr-10 transition-all ${
+                          phoneStatus === 'valid'
+                            ? 'border-emerald-500/40 focus:border-emerald-500/60'
+                            : phoneStatus === 'invalid' && form.contato
+                            ? 'border-red-500/40 focus:border-red-500/60'
+                            : ''
+                        }`}
+                        placeholder="+55 (11) 99999-9999"
+                        value={form.contato || ''}
+                        onChange={e => setForm(p => ({ ...p, contato: e.target.value }))}
+                      />
+                      {phoneStatus === 'valid' && (
+                        <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 pointer-events-none" />
+                      )}
+                      {phoneStatus === 'invalid' && form.contato && (
+                        <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500 pointer-events-none" />
+                      )}
+                    </div>
+                    {/* WhatsApp verify button */}
+                    {waLink && (
+                      <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] text-emerald-400 hover:text-emerald-300 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Verificar no WhatsApp
+                      </a>
+                    )}
+                    {phoneStatus === 'invalid' && form.contato && (
+                      <p className="mt-1 text-[11px] text-red-400/80">
+                        Use o formato: (11) 99999-9999 ou +55 11 99999-9999
+                      </p>
+                    )}
                   </div>
                 </div>
 

@@ -50,9 +50,40 @@ function getPresetRange(preset: string): { from: string; to: string } {
   return { from: '', to: '' }
 }
 
+// Keywords in nota_interna that indicate invalid phone
+const INVALID_PHONE_KEYWORDS = [
+  'número incorreto', 'numero incorreto',
+  'número inválido', 'numero invalido',
+  'número não existe', 'numero nao existe',
+  'número inexistente', 'numero inexistente',
+  'telefone incorreto', 'telefone inválido', 'telefone invalido',
+  'telefone não existe', 'telefone nao existe',
+  'fone errado', 'número errado', 'numero errado',
+  'contato errado', 'sem telefone', 'sem número', 'sem numero',
+  'número desligado', 'numero desligado',
+  'fora de área', 'fora de area',
+]
+
 function isMissingPhone(contato?: string | null): boolean {
   if (!contato || contato.trim() === '') return true
   return !/\d/.test(contato)
+}
+
+function hasInvalidPhoneNote(nota?: string | null): boolean {
+  if (!nota) return false
+  const lower = nota.toLowerCase()
+  return INVALID_PHONE_KEYWORDS.some(kw => lower.includes(kw))
+}
+
+function isInvalidContact(cliente: Cliente): boolean {
+  return isMissingPhone(cliente.contato) || hasInvalidPhoneNote(cliente.nota_interna)
+}
+
+function getContactReason(cliente: Cliente): string {
+  if (!cliente.contato || cliente.contato.trim() === '') return 'Contato não informado'
+  if (isMissingPhone(cliente.contato)) return `"${cliente.contato}" — sem número`
+  if (hasInvalidPhoneNote(cliente.nota_interna)) return 'Número marcado como inválido na nota interna'
+  return ''
 }
 
 export default function ClientesPage() {
@@ -111,7 +142,7 @@ export default function ClientesPage() {
       const res = await fetch('/api/clientes?limit=1000')
       const data = await res.json()
       const all: Cliente[] = data.clientes || []
-      setSemContato(all.filter(c => isMissingPhone(c.contato)))
+      setSemContato(all.filter(c => isInvalidContact(c)))
     } catch {
       toast.error('Erro ao carregar lista')
     } finally {
@@ -356,9 +387,9 @@ export default function ClientesPage() {
             <div className="flex items-start gap-3 p-4 mb-5 rounded-xl border border-orange-500/20 bg-orange-500/5">
               <PhoneOff className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-orange-300">Clientes sem número de telefone</p>
+                <p className="text-sm font-medium text-orange-300">Clientes sem telefone válido</p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Campo de contato vazio ou sem dígitos numéricos (apenas e-mail). Clique em <strong className="text-gray-400">Editar</strong> para preencher o número.
+                  Inclui clientes com contato vazio, sem número, e clientes cuja <strong className="text-gray-400">nota interna</strong> indica número incorreto, inválido ou inexistente. Clique em <strong className="text-gray-400">Editar</strong> para corrigir.
                 </p>
               </div>
             </div>
@@ -375,8 +406,8 @@ export default function ClientesPage() {
                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
                   <PhoneOff className="w-7 h-7 text-emerald-500/50" />
                 </div>
-                <p className="text-emerald-400 font-medium">Todos os clientes têm telefone cadastrado!</p>
-                <p className="text-gray-600 text-sm">Nenhum cliente com contato telefônico faltando.</p>
+                <p className="text-emerald-400 font-medium">Nenhum cliente com problema no contato!</p>
+                <p className="text-gray-600 text-sm">Todos os clientes têm telefone válido e nenhum tem nota interna indicando número inválido.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -403,8 +434,14 @@ export default function ClientesPage() {
                       <p className="text-sm font-semibold text-white truncate">{cliente.nome}</p>
                       <p className="text-xs text-orange-400/70 flex items-center gap-1 mt-0.5">
                         <PhoneOff className="w-3 h-3" />
-                        {cliente.contato ? `"${cliente.contato}" — sem número` : 'Contato não informado'}
+                        {getContactReason(cliente)}
                       </p>
+                      {/* Tag se foi identificado pela nota interna */}
+                      {!isMissingPhone(cliente.contato) && hasInvalidPhoneNote(cliente.nota_interna) && (
+                        <span className="inline-flex items-center gap-1 mt-1 text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
+                          ⚠️ Nota interna
+                        </span>
+                      )}
                     </div>
 
                     <div className="w-32 flex-shrink-0 hidden sm:block">
@@ -445,7 +482,7 @@ export default function ClientesPage() {
                 ))}
 
                 <p className="text-xs text-gray-700 text-center pt-3 pb-1">
-                  {semContato.length} cliente{semContato.length !== 1 ? 's' : ''} sem telefone cadastrado
+                  {semContato.length} cliente{semContato.length !== 1 ? 's' : ''} com problema no contato
                 </p>
               </div>
             )}
