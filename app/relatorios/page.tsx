@@ -188,19 +188,19 @@ export default function RelatoriosPage() {
         {[
           { label: 'Total', value: metrics.total, color: 'text-white', icon: Users },
           { label: 'Convertidos', value: metrics.convertidos, color: 'text-emerald-400', icon: CheckCircle },
-          { label: 'Em Negoc.', value: metrics.em_negociacao, color: 'text-amber-400', icon: Activity },
+          { label: 'Em Neg.', value: metrics.em_negociacao, color: 'text-amber-400', icon: Activity },
           { label: 'Pendentes', value: metrics.pendentes, color: 'text-gray-400', icon: Activity },
           { label: 'Não Conv.', value: metrics.nao_convertidos, color: 'text-red-400', icon: AlertTriangle },
           { label: 'Conversão', value: `${metrics.taxa_conversao}%`, color: 'text-purple-400', icon: Target },
           { label: 'Cont. Hoje', value: metrics.contatados_hoje, color: 'text-sky-400', icon: Zap },
-          { label: 'Cancel. Hoje', value: metrics.cancelados_hoje, color: 'text-rose-400', icon: AlertTriangle },
+          { label: 'Cancel. Hj', value: metrics.cancelados_hoje, color: 'text-rose-400', icon: AlertTriangle },
         ].map(item => {
           const Icon = item.icon
           return (
             <div key={item.label} className="glass-card p-3 text-center">
               <Icon className={`w-4 h-4 mx-auto mb-1.5 ${item.color} opacity-70`} />
               <p className={`text-xl font-black tabular-nums ${item.color}`}>{item.value}</p>
-              <p className="text-[10px] text-gray-600 mt-0.5 uppercase tracking-wide">{item.label}</p>
+              <p className="text-[10px] text-gray-600 mt-0.5 leading-tight">{item.label}</p>
             </div>
           )
         })}
@@ -515,7 +515,7 @@ export default function RelatoriosPage() {
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-[11px] text-gray-400 flex items-center gap-1.5">
                             <span>{item.icon}</span>
-                            <span className="truncate max-w-[140px]" title={item.key}>{item.key}</span>
+                            <span title={item.key}>{item.key}</span>
                           </span>
                           <span className="text-[11px] text-gray-500 flex-shrink-0 ml-1">{count} ({pct}%)</span>
                         </div>

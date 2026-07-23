@@ -231,6 +231,22 @@ export default function ClientesList({ onAdd, onEdit, refreshKey }: ClientesList
         <div className="w-20 flex-shrink-0" />
       </div>
 
+      {/* Status color legend */}
+      <div className="flex items-center gap-4 px-4 pb-1">
+        <span className="text-[10px] text-gray-700">Barra lateral:</span>
+        {[
+          { color: '#10B981', label: 'Convertido' },
+          { color: '#F59E0B', label: 'Em Negoc.' },
+          { color: '#6B7280', label: 'Pendente' },
+          { color: '#EF4444', label: 'Não Conv.' },
+        ].map(item => (
+          <div key={item.label} className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+            <span className="text-[10px] text-gray-700">{item.label}</span>
+          </div>
+        ))}
+      </div>
+
       {/* List */}
       <div className="space-y-2">
         {loading ? (

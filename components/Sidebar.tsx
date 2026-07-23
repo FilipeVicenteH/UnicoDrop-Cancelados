@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Users,
   BarChart2,
+  MessageSquarePlus,
   Zap,
 } from 'lucide-react'
 
@@ -13,7 +14,7 @@ const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
-  { href: '/feedbacks', label: 'Feedbacks de Melhoria', icon: Zap },
+  { href: '/feedbacks', label: 'Feedbacks de Melhoria', icon: MessageSquarePlus },
 ]
 
 export default function Sidebar() {

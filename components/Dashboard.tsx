@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  PieChart, Pie, RadialBarChart, RadialBar, Legend,
+  PieChart, Pie,
   type PieLabelRenderProps
 } from 'recharts'
 import { STATUS_LABELS, STATUS_COLORS } from '@/lib/constants'
@@ -414,33 +414,33 @@ export default function Dashboard({ metrics }: DashboardProps) {
             <h3 className="text-sm font-semibold text-gray-200">Por Prioridade</h3>
           </div>
           {prioridadeData.length > 0 ? (
-            <>
-              <ResponsiveContainer width="100%" height={140}>
-                <RadialBarChart
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="25%"
-                  outerRadius="95%"
-                  barSize={14}
-                  data={prioridadeData}
-                >
-                  <RadialBar dataKey="value" cornerRadius={6} />
-                  <Tooltip {...tooltipStyle} />
-                </RadialBarChart>
-              </ResponsiveContainer>
-              <div className="space-y-2 mt-2">
-                {[
-                  { label: '🔴 Alta', value: metrics.por_prioridade.find(p => p.prioridade === 'ALTA')?.count || 0, color: 'text-red-400' },
-                  { label: '🟡 Média', value: metrics.por_prioridade.find(p => p.prioridade === 'MEDIA')?.count || 0, color: 'text-amber-400' },
-                  { label: '🔵 Baixa', value: metrics.por_prioridade.find(p => p.prioridade === 'BAIXA')?.count || 0, color: 'text-blue-400' },
-                ].map(p => (
-                  <div key={p.label} className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">{p.label}</span>
-                    <span className={`text-sm font-bold ${p.color}`}>{p.value}</span>
+            <div className="space-y-3 mt-2">
+              {[
+                { label: '🔴 Alta', value: metrics.por_prioridade.find(p => p.prioridade === 'ALTA')?.count || 0, bar: 'bg-gradient-to-r from-red-600 to-red-400', text: 'text-red-400' },
+                { label: '🟡 Média', value: metrics.por_prioridade.find(p => p.prioridade === 'MEDIA')?.count || 0, bar: 'bg-gradient-to-r from-amber-600 to-amber-400', text: 'text-amber-400' },
+                { label: '🔵 Baixa', value: metrics.por_prioridade.find(p => p.prioridade === 'BAIXA')?.count || 0, bar: 'bg-gradient-to-r from-blue-600 to-blue-400', text: 'text-blue-400' },
+              ].map(p => {
+                const total = metrics.por_prioridade.reduce((s, x) => s + x.count, 0) || 1
+                const pct = Math.round((p.value / total) * 100)
+                return (
+                  <div key={p.label}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs text-gray-400">{p.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-bold ${p.text}`}>{p.value}</span>
+                        <span className="text-[10px] text-gray-600 w-8 text-right">{pct}%</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${p.bar} transition-all duration-700 ease-out`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
                   </div>
-                ))}
-              </div>
-            </>
+                )
+              })}
+            </div>
           ) : (
             <div className="h-[200px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
           )}

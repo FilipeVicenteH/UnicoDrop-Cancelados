@@ -140,12 +140,14 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onEdit(cliente.id)}
+            title="Editar cliente"
             className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
           >
             <Edit2 className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => onDelete(cliente.id)}
+            title="Excluir cliente"
             className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -155,6 +157,7 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         {/* Expand */}
         <button
           onClick={() => setExpanded(!expanded)}
+          title={expanded ? 'Recolher detalhes' : 'Ver detalhes'}
           className="p-1.5 rounded-lg hover:bg-white/10 text-gray-600 hover:text-gray-300 transition-colors flex-shrink-0"
         >
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -235,20 +238,39 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
               </div>
             )}
 
-            <div>
-              <p className="text-xs text-gray-500 mb-1">Usava na UD</p>
-              <div className="flex gap-3">
-                <span className={`flex items-center gap-1 text-xs ${cliente.usava_dashboard ? 'text-purple-400' : 'text-gray-700'}`}>
-                  <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
-                </span>
-                <span className={`flex items-center gap-1 text-xs ${cliente.usava_plugin ? 'text-purple-400' : 'text-gray-700'}`}>
-                  <Puzzle className="w-3.5 h-3.5" /> Plugin
-                </span>
-                <span className={`flex items-center gap-1 text-xs ${cliente.usava_whatsapp ? 'text-purple-400' : 'text-gray-700'}`}>
-                  <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
-                </span>
-              </div>
+            <div className="space-y-3">
+              {/* Recursos UD */}
+              {cliente.recursos_ud && cliente.recursos_ud.length > 0 ? (
+                <div>
+                  <p className="text-xs text-gray-500 mb-1.5">Recursos Utilizados na UD</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {cliente.recursos_ud.map(r => (
+                      <span key={r} className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/20">
+                        {r}
+                      </span>
+                    ))}
+                    {cliente.recursos_ud_outro && (
+                      <span className="text-xs bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/20">
+                        {cliente.recursos_ud_outro}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  <span className={`flex items-center gap-1 text-xs ${cliente.usava_dashboard ? 'text-purple-400' : 'text-gray-700'}`}>
+                    <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
+                  </span>
+                  <span className={`flex items-center gap-1 text-xs ${cliente.usava_plugin ? 'text-purple-400' : 'text-gray-700'}`}>
+                    <Puzzle className="w-3.5 h-3.5" /> Plugin
+                  </span>
+                  <span className={`flex items-center gap-1 text-xs ${cliente.usava_whatsapp ? 'text-purple-400' : 'text-gray-700'}`}>
+                    <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+                  </span>
+                </div>
+              )}
             </div>
+
           </div>
 
           {/* Right Column */}

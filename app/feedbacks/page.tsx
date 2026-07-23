@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { FeedbackMelhoria } from '@/lib/types'
 import { FEEDBACK_STATUS_LABELS, FEEDBACK_STATUS_COLORS, PRIORIDADE_LABELS } from '@/lib/constants'
 import {
-  Plus, Search, Filter, X, ChevronDown, MessageSquare, Edit2, Trash2, Zap, Clock, CalendarDays
+  Plus, Search, Filter, X, ChevronDown, MessageSquare, Edit2, Trash2, MessageSquarePlus, Clock, CalendarDays
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import FeedbackForm from '@/components/FeedbackForm'
@@ -94,8 +94,8 @@ export default function FeedbacksPage() {
         <div className="flex items-start justify-between mb-6">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Zap className="w-4 h-4 text-purple-400" />
-              <span className="text-xs text-purple-400 font-medium uppercase tracking-wider">Mapeamento</span>
+              <MessageSquarePlus className="w-4 h-4 text-purple-400" />
+              <span className="text-xs text-purple-400 font-medium uppercase tracking-wider">Feedbacks</span>
             </div>
             <h1 className="text-2xl font-bold text-white">Feedbacks de Melhoria</h1>
             <p className="text-sm text-gray-500 mt-1">
@@ -320,11 +320,15 @@ export default function FeedbacksPage() {
                     </div>
                   </div>
 
-                  <div 
-                    className={`text-sm text-gray-400 mb-4 leading-relaxed cursor-pointer transition-all ${expandedId === item.id ? '' : 'line-clamp-3'}`}
+                  <div
+                    className={`text-sm text-gray-400 mb-4 leading-relaxed cursor-pointer hover:text-gray-300 transition-colors ${expandedId === item.id ? '' : 'line-clamp-3'}`}
                     onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                    title={expandedId === item.id ? 'Clique para recolher' : 'Clique para ler tudo'}
                   >
                     {item.descricao}
+                    {expandedId !== item.id && item.descricao.length > 200 && (
+                      <span className="text-purple-400 font-medium ml-1 not-italic">· ver mais</span>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
