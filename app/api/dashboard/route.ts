@@ -135,7 +135,9 @@ export async function GET(request: NextRequest) {
       .slice(0, 8)
       .map(([motivo, count]) => ({ motivo, count }))
 
-    const taxa_conversao = total > 0 ? Math.round((convertidos / total) * 100) : 0
+    // taxa_conversao excludes inacessiveis from denominator (they can't be converted)
+    const base_conversao = total - inacessiveis
+    const taxa_conversao = base_conversao > 0 ? Math.round((convertidos / base_conversao) * 100) : 0
 
     return NextResponse.json({
       total,

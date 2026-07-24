@@ -139,11 +139,25 @@ export default function RelatoriosPage() {
   const siteOffline = clientes.filter(c => c.site_online === 'OFFLINE').length
   const siteNaoVerif = clientes.length - siteOnline - siteOffline
 
-  const pieStatusData = metrics.por_status.map(s => ({
-    name: STATUS_LABELS[s.status] || s.status,
-    value: s.count,
-    color: STATUS_COLORS[s.status] || '#6B7280',
-  }))
+  // Split PENDENTE into reachable + Inacess\u00edveis (orange)
+  const pieStatusData = metrics.por_status.map(s => {
+    if (s.status === 'PENDENTE') {
+      return {
+        name: 'Pendentes',
+        value: Math.max(0, s.count - metrics.inacessiveis),
+        color: STATUS_COLORS[s.status] || '#6B7280',
+      }
+    }
+    return {
+      name: STATUS_LABELS[s.status] || s.status,
+      value: s.count,
+      color: STATUS_COLORS[s.status] || '#6B7280',
+    }
+  }).filter(d => d.value > 0)
+
+  if (metrics.inacessiveis > 0) {
+    pieStatusData.push({ name: 'Inacess\u00edveis', value: metrics.inacessiveis, color: '#F97316' })
+  }
 
   const checkoutChart = metrics.por_checkout
     .filter(c => c.checkout !== 'Não informado')

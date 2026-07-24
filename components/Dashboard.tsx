@@ -137,11 +137,26 @@ export default function Dashboard({ metrics }: DashboardProps) {
     },
   ]
 
-  const pieData = metrics.por_status.map(s => ({
-    name: STATUS_LABELS[s.status] || s.status,
-    value: s.count,
-    color: STATUS_COLORS[s.status] || '#6B7280',
-  }))
+  // Build pie data: split PENDENTE raw into Pendentes (reachable) + Inacessíveis
+  const pieData = metrics.por_status.map(s => {
+    if (s.status === 'PENDENTE') {
+      return {
+        name: 'Pendentes',
+        value: Math.max(0, s.count - metrics.inacessiveis),
+        color: STATUS_COLORS[s.status] || '#6B7280',
+      }
+    }
+    return {
+      name: STATUS_LABELS[s.status] || s.status,
+      value: s.count,
+      color: STATUS_COLORS[s.status] || '#6B7280',
+    }
+  }).filter(d => d.value > 0)
+
+  // Append inacessíveis slice if any
+  if (metrics.inacessiveis > 0) {
+    pieData.push({ name: 'Inacessíveis', value: metrics.inacessiveis, color: '#F97316' })
+  }
 
   const checkoutData = metrics.por_checkout
     .filter(c => c.checkout !== 'Não informado')
@@ -245,7 +260,10 @@ export default function Dashboard({ metrics }: DashboardProps) {
 
           {/* Taxa de conversão destaque */}
           <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
-            <span className="text-xs text-gray-600">Taxa de conversão geral</span>
+            <div>
+              <span className="text-xs text-gray-600">Taxa de conversão real</span>
+              <p className="text-[10px] text-gray-700">excluindo {metrics.inacessiveis} inacessíveis</p>
+            </div>
             <div className="flex items-center gap-2">
               <div className="h-1.5 w-24 bg-white/5 rounded-full overflow-hidden">
                 <div
