@@ -36,7 +36,10 @@ const tt = {
     borderRadius: '10px',
     color: '#e5e7eb',
     fontSize: '12px',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
   },
+  labelStyle: { color: '#e5e7eb', fontWeight: 600 },
+  itemStyle: { color: '#c4b5fd' },
   cursor: { fill: 'rgba(139,92,246,0.06)' },
 }
 
