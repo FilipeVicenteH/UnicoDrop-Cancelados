@@ -7,7 +7,7 @@ import DateFilterBar from '@/components/DateFilterBar'
 import {
   BarChart2, Download, TrendingUp, Users, CheckCircle, Globe,
   ShoppingCart, MessageSquare, AlertTriangle, Store, Activity,
-  Target, Zap, Radio
+  Target, Zap, Radio, WifiOff
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -184,12 +184,13 @@ export default function RelatoriosPage() {
       <DateFilterBar value={dateFilter} onChange={setDateFilter} />
 
       {/* ── KPI Summary Row ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-5">
+      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3 mb-5">
         {[
           { label: 'Total', value: metrics.total, color: 'text-white', icon: Users },
           { label: 'Convertidos', value: metrics.convertidos, color: 'text-emerald-400', icon: CheckCircle },
           { label: 'Em Neg.', value: metrics.em_negociacao, color: 'text-amber-400', icon: Activity },
           { label: 'Pendentes', value: metrics.pendentes, color: 'text-gray-400', icon: Activity },
+          { label: 'Inacessíveis', value: metrics.inacessiveis, color: 'text-orange-400', icon: WifiOff },
           { label: 'Não Conv.', value: metrics.nao_convertidos, color: 'text-red-400', icon: AlertTriangle },
           { label: 'Conversão', value: `${metrics.taxa_conversao}%`, color: 'text-purple-400', icon: Target },
           { label: 'Cont. Hoje', value: metrics.contatados_hoje, color: 'text-sky-400', icon: Zap },
@@ -219,6 +220,7 @@ export default function RelatoriosPage() {
               <h2 className="text-sm font-semibold text-gray-200">Distribuição por Status</h2>
             </div>
             <div className="space-y-4">
+              {/* Status from API */}
               {metrics.por_status
                 .sort((a, b) => b.count - a.count)
                 .map(item => {
@@ -237,14 +239,36 @@ export default function RelatoriosPage() {
                         </div>
                       </div>
                       <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-700"
-                          style={{ width: `${pct}%`, background: color }}
-                        />
+                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: color }} />
                       </div>
                     </div>
                   )
                 })}
+              {/* Inacessíveis (calculado) */}
+              {metrics.inacessiveis > 0 && (() => {
+                const pct = metrics.total > 0 ? (metrics.inacessiveis / metrics.total) * 100 : 0
+                return (
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-orange-500" />
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <WifiOff className="w-3 h-3 text-orange-400" />
+                          Inacessíveis
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-orange-400">{metrics.inacessiveis}</span>
+                        <span className="text-[10px] text-gray-600 w-9 text-right">{pct.toFixed(0)}%</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-700" style={{ width: `${pct}%` }} />
+                    </div>
+                    <p className="text-[10px] text-gray-700 mt-1">Pendentes sem telefone válido ou com site Offline/Não verificado</p>
+                  </div>
+                )
+              })()}
             </div>
           </div>
 

@@ -15,6 +15,7 @@ const emptyMetrics: DashboardMetrics = {
   nao_convertidos: 0,
   em_negociacao: 0,
   pendentes: 0,
+  inacessiveis: 0,
   taxa_conversao: 0,
   contatados_hoje: 0,
   cancelados_hoje: 0,

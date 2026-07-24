@@ -4,7 +4,7 @@ import { DashboardMetrics } from '@/lib/types'
 import {
   TrendingUp, Users, CheckCircle, XCircle, Clock,
   PhoneCall, UserMinus, Activity, ShoppingBag, AlertTriangle,
-  BarChart2, MessageSquare, Store
+  BarChart2, MessageSquare, Store, WifiOff
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -109,6 +109,15 @@ export default function Dashboard({ metrics }: DashboardProps) {
       glow: 'shadow-gray-500/10',
     },
     {
+      label: 'Inacessíveis',
+      value: metrics.inacessiveis,
+      icon: WifiOff,
+      color: 'text-orange-400',
+      bg: 'from-orange-500/15 to-orange-500/5',
+      border: 'border-orange-500/25',
+      glow: 'shadow-orange-500/10',
+    },
+    {
       label: 'Contatados Hoje',
       value: metrics.contatados_hoje,
       icon: PhoneCall,
@@ -205,8 +214,9 @@ export default function Dashboard({ metrics }: DashboardProps) {
           <div className="space-y-4">
             {[
               { label: 'Convertidos', value: metrics.convertidos, color: 'from-emerald-500 to-emerald-400', textColor: 'text-emerald-400', emoji: '✅' },
-              { label: 'Em Negociação', value: metrics.em_negociacao, color: 'from-amber-500 to-amber-400', textColor: 'text-amber-400', emoji: '🔄' },
+              { label: 'Em Negociacão', value: metrics.em_negociacao, color: 'from-amber-500 to-amber-400', textColor: 'text-amber-400', emoji: '🔄' },
               { label: 'Pendentes', value: metrics.pendentes, color: 'from-gray-600 to-gray-500', textColor: 'text-gray-400', emoji: '⏳' },
+              { label: 'Inacessíveis', value: metrics.inacessiveis, color: 'from-orange-600 to-orange-400', textColor: 'text-orange-400', emoji: '📥' },
               { label: 'Não Convertidos', value: metrics.nao_convertidos, color: 'from-red-600 to-red-500', textColor: 'text-red-400', emoji: '❌' },
             ].map(item => {
               const pct = metrics.total > 0 ? (item.value / metrics.total) * 100 : 0

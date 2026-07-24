@@ -46,6 +46,7 @@ export interface DashboardMetrics {
   nao_convertidos: number
   em_negociacao: number
   pendentes: number
+  inacessiveis: number
   taxa_conversao: number
   contatados_hoje: number
   cancelados_hoje: number
