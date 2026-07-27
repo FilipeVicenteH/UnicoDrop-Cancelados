@@ -637,20 +637,19 @@ export default function RelatoriosPage() {
             
             return (
               <>
-                <ResponsiveContainer width="100%" height={180}>
+                <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie
                       data={data}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={renderLabel}
                       outerRadius={80}
-                      innerRadius={35}
+                      innerRadius={50}
+                      paddingAngle={3}
                       dataKey="percent"
                       nameKey="faixa"
-                      strokeWidth={2}
-                      stroke="#07070f"
+                      stroke="none"
                     >
                       {data.map((_, i) => (
                         <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
@@ -659,14 +658,14 @@ export default function RelatoriosPage() {
                     <Tooltip {...tt} formatter={(val: any) => [`${val}%`, 'Lojas']} />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="space-y-1.5 mt-3 grid grid-cols-2 gap-x-2">
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
                   {data.map((item, i) => (
-                    <div key={item.faixa} className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
-                        <span className="text-[10px] text-gray-500">{item.faixa}</span>
+                    <div key={item.faixa} className="flex items-center justify-between bg-white/5 rounded-md px-2 py-1.5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full shadow-sm flex-shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+                        <span className="text-[11px] text-gray-300 font-medium truncate" title={item.faixa}>{item.faixa}</span>
                       </div>
-                      <span className="text-[11px] font-bold text-gray-300">{item.percent}%</span>
+                      <span className="text-xs font-bold text-white">{item.percent}%</span>
                     </div>
                   ))}
                 </div>
