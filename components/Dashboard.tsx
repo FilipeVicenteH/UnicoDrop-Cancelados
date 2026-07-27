@@ -4,7 +4,7 @@ import { DashboardMetrics } from '@/lib/types'
 import {
   TrendingUp, Users, CheckCircle, XCircle, Clock,
   PhoneCall, UserMinus, Activity, ShoppingBag, AlertTriangle,
-  BarChart2, MessageSquare, Store, WifiOff
+  BarChart2, MessageSquare, Store, WifiOff, DollarSign
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -181,6 +181,9 @@ export default function Dashboard({ metrics }: DashboardProps) {
     value: p.count,
     fill: p.prioridade === 'ALTA' ? '#EF4444' : p.prioridade === 'MEDIA' ? '#F59E0B' : '#3B82F6',
   }))
+
+  const faturamentoData = (metrics.por_faturamento || [])
+    .filter(f => f.count > 0 && f.faixa !== 'Não Informado') // Hide empty buckets & missing data from chart
 
   const maxMotivo = metrics.top_motivos[0]?.count || 1
 
@@ -435,11 +438,11 @@ export default function Dashboard({ metrics }: DashboardProps) {
           )}
         </div>
 
-        {/* Distribuição por Prioridade */}
+        {/* Prioridade */}
         <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-1.5 bg-yellow-500/10 rounded-lg">
-              <AlertTriangle className="w-4 h-4 text-yellow-400" />
+            <div className="p-1.5 bg-blue-500/10 rounded-lg">
+              <AlertTriangle className="w-4 h-4 text-blue-400" />
             </div>
             <h3 className="text-sm font-semibold text-gray-200">Por Prioridade</h3>
           </div>
@@ -476,6 +479,33 @@ export default function Dashboard({ metrics }: DashboardProps) {
           )}
         </div>
       </div>
+
+      {/* ── Faturamento Anterior ── */}
+      <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5 bg-yellow-500/10 rounded-lg">
+            <DollarSign className="w-4 h-4 text-yellow-400" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-200">Faturamento do Mês Anterior (Lojas)</h3>
+        </div>
+        {faturamentoData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={faturamentoData} barCategoryGap="25%">
+              <XAxis dataKey="faixa" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip {...tooltipStyle} />
+              <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                {faturamentoData.map((_, i) => (
+                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.85} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-[260px] flex items-center justify-center text-gray-600 text-sm">Sem faturamentos reportados</div>
+        )}
+      </div>
+
     </div>
   )
 }

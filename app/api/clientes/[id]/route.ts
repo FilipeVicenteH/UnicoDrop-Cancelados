@@ -40,6 +40,7 @@ export async function PUT(
         data_cancelamento: body.data_cancelamento ? new Date(body.data_cancelamento) : null,
         data_contato: body.data_contato ? new Date(body.data_contato) : null,
         responsavel: body.responsavel || null,
+        faturamento_anterior: body.faturamento_anterior ? parseFloat(body.faturamento_anterior) : null,
         site_url: body.site_url || null,
         site_online: body.site_online || 'NAO_VERIFICADO',
         plugins_rastreio: body.plugins_rastreio || [],

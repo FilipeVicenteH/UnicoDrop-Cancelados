@@ -12,6 +12,9 @@ export interface Cliente {
   data_contato?: string | null
   responsavel?: string | null
 
+  // Financeiro
+  faturamento_anterior?: number | null
+
   site_url?: string | null
   site_online: SiteStatus
 
@@ -55,6 +58,7 @@ export interface DashboardMetrics {
   por_prioridade: { prioridade: string; count: number }[]
   por_plataforma: { plataforma: string; count: number }[]
   top_motivos: { motivo: string; count: number }[]
+  por_faturamento: { faixa: string; count: number }[]
 }
 
 export interface ClienteFormData {
@@ -65,6 +69,7 @@ export interface ClienteFormData {
   data_cancelamento?: string
   data_contato?: string
   responsavel?: string
+  faturamento_anterior?: number
   site_url?: string
   site_online: SiteStatus
   plugins_rastreio: string[]

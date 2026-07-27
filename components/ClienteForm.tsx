@@ -334,7 +334,7 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div>
                     <label className="form-label">Data do Cancelamento</label>
                     <input
@@ -360,6 +360,17 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                       placeholder="Quem fez o contato"
                       value={form.responsavel || ''}
                       onChange={e => setForm(p => ({ ...p, responsavel: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="form-label">Faturamento (R$)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="form-input"
+                      placeholder="Ex: 50000"
+                      value={form.faturamento_anterior || ''}
+                      onChange={e => setForm(p => ({ ...p, faturamento_anterior: e.target.value ? Number(e.target.value) : undefined }))}
                     />
                   </div>
                 </div>

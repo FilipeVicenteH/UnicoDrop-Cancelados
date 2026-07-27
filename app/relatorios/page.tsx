@@ -7,7 +7,7 @@ import DateFilterBar from '@/components/DateFilterBar'
 import {
   BarChart2, Download, TrendingUp, Users, CheckCircle, Globe,
   ShoppingCart, MessageSquare, AlertTriangle, Store, Activity,
-  Target, Zap, Radio, WifiOff
+  Target, Zap, Radio, WifiOff, DollarSign
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -86,7 +86,7 @@ export default function RelatoriosPage() {
     const headers = [
       'ID Unico', 'Nome', 'Empresa', 'Contato', 'Status', 'Prioridade',
       'Data Cancelamento', 'Data Contato', 'Site', 'Site Online',
-      'Checkout', 'Plataforma Loja', 'Plugins Rastreio',
+      'Checkout', 'Plataforma Loja', 'Faturamento Anterior', 'Plugins Rastreio',
       'Recursos UD Utilizados', 'Motivo', 'Feedback', 'Responsável'
     ]
     const rows = clientes.map(c => [
@@ -95,6 +95,7 @@ export default function RelatoriosPage() {
       c.data_cancelamento ? format(new Date(c.data_cancelamento), 'dd/MM/yyyy') : '',
       c.data_contato ? format(new Date(c.data_contato), 'dd/MM/yyyy') : '',
       c.site_url || '', c.site_online, c.checkout || '', c.plataforma_loja || '',
+      c.faturamento_anterior !== null && c.faturamento_anterior !== undefined ? `R$ ${c.faturamento_anterior}` : 'Não Informado',
       (c.plugins_rastreio || []).join('; '),
       (c.recursos_ud || []).join('; '),
       c.motivo_cancelamento || '', c.feedback_completo || '', c.responsavel || '',
@@ -617,6 +618,32 @@ export default function RelatoriosPage() {
               })}
             </div>
           </div>
+        </div>
+
+        {/* ── Faturamento Anterior ── */}
+        <div className="glass-card p-5 mt-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-1.5 bg-yellow-500/10 rounded-lg">
+              <DollarSign className="w-4 h-4 text-yellow-400" />
+            </div>
+            <h2 className="text-sm font-semibold text-gray-200">Faturamento do Mês Anterior</h2>
+          </div>
+          {metrics.por_faturamento && metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado').length > 0 ? (
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado')} barCategoryGap="25%">
+                <XAxis dataKey="faixa" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip {...tt} />
+                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                  {metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado').map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.85} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[260px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
+          )}
         </div>
       </div>
     </div>

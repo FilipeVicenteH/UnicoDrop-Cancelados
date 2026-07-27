@@ -20,6 +20,9 @@ model Cliente {
   data_contato         DateTime?
   responsavel          String?
 
+  // Financeiro
+  faturamento_anterior Float?
+
   // Site
   site_url             String?
   site_online          SiteStatus @default(NAO_VERIFICADO)

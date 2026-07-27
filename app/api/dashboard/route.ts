@@ -70,6 +70,8 @@ export async function GET(request: NextRequest) {
       clientes_com_motivo,
       // Fetch all PENDENTE clients to compute inacessiveis correctly
       pendentes_clientes,
+      // Fetch all clients faturamento to aggregate
+      clientes_faturamento,
     ] = await Promise.all([
       prisma.cliente.count({ where: baseWhere }),
       prisma.cliente.count({ where: { ...baseWhere, status: 'CONVERTIDO' } }),
@@ -111,6 +113,11 @@ export async function GET(request: NextRequest) {
         where: { ...baseWhere, status: 'PENDENTE' },
         select: { contato: true, nota_interna: true, site_online: true },
       }),
+      // All clients to aggregate faturamento
+      prisma.cliente.findMany({
+        where: baseWhere,
+        select: { faturamento_anterior: true },
+      }),
     ])
 
     // Compute inacessiveis: PENDENTE clients with no valid phone OR site not ONLINE
@@ -135,6 +142,32 @@ export async function GET(request: NextRequest) {
       .slice(0, 8)
       .map(([motivo, count]) => ({ motivo, count }))
 
+    // Faturamento grouping
+    const faturamentoMap = {
+      'Até R$ 5k': 0,
+      'R$ 5k a 10k': 0,
+      'R$ 10k a 50k': 0,
+      'R$ 50k a 100k': 0,
+      'R$ 100k a 500k': 0,
+      'R$ 500k a 1M': 0,
+      'Acima de R$ 1M': 0,
+      'Não Informado': 0,
+    }
+
+    for (const c of clientes_faturamento) {
+      const val = c.faturamento_anterior
+      if (val === null || val === undefined) faturamentoMap['Não Informado']++
+      else if (val <= 5000) faturamentoMap['Até R$ 5k']++
+      else if (val <= 10000) faturamentoMap['R$ 5k a 10k']++
+      else if (val <= 50000) faturamentoMap['R$ 10k a 50k']++
+      else if (val <= 100000) faturamentoMap['R$ 50k a 100k']++
+      else if (val <= 500000) faturamentoMap['R$ 100k a 500k']++
+      else if (val <= 1000000) faturamentoMap['R$ 500k a 1M']++
+      else faturamentoMap['Acima de R$ 1M']++
+    }
+
+    const por_faturamento = Object.entries(faturamentoMap).map(([faixa, count]) => ({ faixa, count }))
+
     // taxa_conversao excludes inacessiveis from denominator (they can't be converted)
     const base_conversao = total - inacessiveis
     const taxa_conversao = base_conversao > 0 ? Math.round((convertidos / base_conversao) * 100) : 0
@@ -154,6 +187,7 @@ export async function GET(request: NextRequest) {
       por_prioridade: por_prioridade.map(p => ({ prioridade: p.prioridade, count: p._count.prioridade })),
       por_plataforma: por_plataforma.map(p => ({ plataforma: p.plataforma_loja || 'Não informado', count: p._count.plataforma_loja })),
       top_motivos,
+      por_faturamento,
     })
   } catch (error) {
     console.error('GET /api/dashboard error:', error)

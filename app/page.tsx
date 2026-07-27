@@ -24,6 +24,7 @@ const emptyMetrics: DashboardMetrics = {
   por_prioridade: [],
   por_plataforma: [],
   top_motivos: [],
+  por_faturamento: [],
 }
 
 export default function HomePage() {
