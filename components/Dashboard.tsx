@@ -182,8 +182,12 @@ export default function Dashboard({ metrics }: DashboardProps) {
     fill: p.prioridade === 'ALTA' ? '#EF4444' : p.prioridade === 'MEDIA' ? '#F59E0B' : '#3B82F6',
   }))
 
-  const faturamentoData = (metrics.por_faturamento || [])
-    .filter(f => f.count > 0 && f.faixa !== 'Não Informado') // Hide empty buckets & missing data from chart
+  const rawFaturamento = (metrics.por_faturamento || []).filter(f => f.count > 0 && f.faixa !== 'Não Informado')
+  const faturamentoTotal = rawFaturamento.reduce((acc, f) => acc + f.count, 0)
+  const faturamentoData = rawFaturamento.map(f => ({
+    ...f,
+    percent: faturamentoTotal > 0 ? Math.round((f.count / faturamentoTotal) * 100) : 0
+  }))
 
   const maxMotivo = metrics.top_motivos[0]?.count || 1
 
@@ -492,9 +496,9 @@ export default function Dashboard({ metrics }: DashboardProps) {
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={faturamentoData} barCategoryGap="25%">
               <XAxis dataKey="faixa" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip {...tooltipStyle} />
-              <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+              <YAxis tickFormatter={(val) => `${val}%`} tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip {...tooltipStyle} formatter={(val) => [`${val}%`, 'Lojas']} />
+              <Bar dataKey="percent" radius={[6, 6, 0, 0]}>
                 {faturamentoData.map((_, i) => (
                   <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.85} />
                 ))}

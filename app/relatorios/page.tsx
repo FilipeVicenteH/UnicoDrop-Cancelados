@@ -628,22 +628,28 @@ export default function RelatoriosPage() {
             </div>
             <h2 className="text-sm font-semibold text-gray-200">Faturamento do Mês Anterior</h2>
           </div>
-          {metrics.por_faturamento && metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado').length > 0 ? (
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado')} barCategoryGap="25%">
-                <XAxis dataKey="faixa" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip {...tt} />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                  {metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado').map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.85} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="h-[260px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
-          )}
+          {(() => {
+            const raw = metrics.por_faturamento ? metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado') : []
+            if (raw.length === 0) return <div className="h-[260px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
+            
+            const total = raw.reduce((acc, f) => acc + f.count, 0)
+            const data = raw.map(f => ({ ...f, percent: total > 0 ? Math.round((f.count / total) * 100) : 0 }))
+            
+            return (
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={data} barCategoryGap="25%">
+                  <XAxis dataKey="faixa" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={(val) => `${val}%`} tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip {...tt} formatter={(val) => [`${val}%`, 'Lojas']} />
+                  <Bar dataKey="percent" radius={[6, 6, 0, 0]}>
+                    {data.map((_, i) => (
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.85} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )
+          })()}
         </div>
       </div>
     </div>
