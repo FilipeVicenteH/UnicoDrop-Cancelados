@@ -636,18 +636,41 @@ export default function RelatoriosPage() {
             const data = raw.map(f => ({ ...f, percent: total > 0 ? Math.round((f.count / total) * 100) : 0 }))
             
             return (
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={data} barCategoryGap="25%">
-                  <XAxis dataKey="faixa" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tickFormatter={(val) => `${val}%`} tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip {...tt} formatter={(val) => [`${val}%`, 'Lojas']} />
-                  <Bar dataKey="percent" radius={[6, 6, 0, 0]}>
-                    {data.map((_, i) => (
-                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.85} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              <>
+                <ResponsiveContainer width="100%" height={180}>
+                  <PieChart>
+                    <Pie
+                      data={data}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderLabel}
+                      outerRadius={80}
+                      innerRadius={35}
+                      dataKey="percent"
+                      nameKey="faixa"
+                      strokeWidth={2}
+                      stroke="#07070f"
+                    >
+                      {data.map((_, i) => (
+                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip {...tt} formatter={(val: any) => [`${val}%`, 'Lojas']} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-1.5 mt-3 grid grid-cols-2 gap-x-2">
+                  {data.map((item, i) => (
+                    <div key={item.faixa} className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
+                        <span className="text-[10px] text-gray-500">{item.faixa}</span>
+                      </div>
+                      <span className="text-[11px] font-bold text-gray-300">{item.percent}%</span>
+                    </div>
+                  ))}
+                </div>
+              </>
             )
           })()}
         </div>
