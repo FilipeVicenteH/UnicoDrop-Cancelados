@@ -162,13 +162,25 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
 
     setLoading(true)
     try {
+      const payload = { ...form }
+      if (typeof payload.faturamento_anterior === 'string') {
+        const strVal = payload.faturamento_anterior.trim()
+        if (strVal === '') {
+          payload.faturamento_anterior = undefined
+        } else {
+          // Remover pontos de milhar e trocar virgula por ponto
+          const parsed = parseFloat(strVal.replace(/\./g, '').replace(',', '.'))
+          payload.faturamento_anterior = isNaN(parsed) ? undefined : parsed
+        }
+      }
+
       const method = clienteId ? 'PUT' : 'POST'
       const url = clienteId ? `/api/clientes/${clienteId}` : '/api/clientes'
 
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       })
 
       if (!res.ok) throw new Error('Erro na requisição')
@@ -365,12 +377,11 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                   <div>
                     <label className="form-label">Faturamento (R$)</label>
                     <input
-                      type="number"
-                      step="0.01"
+                      type="text"
                       className="form-input"
-                      placeholder="Ex: 50000"
+                      placeholder="Ex: 35.820,38"
                       value={form.faturamento_anterior || ''}
-                      onChange={e => setForm(p => ({ ...p, faturamento_anterior: e.target.value ? Number(e.target.value) : undefined }))}
+                      onChange={e => setForm(p => ({ ...p, faturamento_anterior: e.target.value }))}
                     />
                   </div>
                 </div>

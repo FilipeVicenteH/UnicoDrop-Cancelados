@@ -69,7 +69,7 @@ export interface ClienteFormData {
   data_cancelamento?: string
   data_contato?: string
   responsavel?: string
-  faturamento_anterior?: number
+  faturamento_anterior?: number | string
   site_url?: string
   site_online: SiteStatus
   plugins_rastreio: string[]
