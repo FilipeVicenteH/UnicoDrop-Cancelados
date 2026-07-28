@@ -45,6 +45,7 @@ const defaultForm: ClienteFormData = {
   data_cancelamento: '',
   data_contato: new Date().toISOString().split('T')[0],
   responsavel: '',
+  telefone_atualizado: false,
   site_url: '',
   site_online: 'NAO_VERIFICADO',
   plugins_rastreio: [],

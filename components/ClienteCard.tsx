@@ -57,7 +57,14 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
         {/* Nome e Empresa */}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">{cliente.nome}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold text-white truncate">{cliente.nome}</p>
+            {cliente.telefone_atualizado && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 flex-shrink-0">
+                Tel. Atualizado
+              </span>
+            )}
+          </div>
           {cliente.empresa && (
             <p className="text-xs text-gray-500 truncate">{cliente.empresa}</p>
           )}

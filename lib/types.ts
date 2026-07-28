@@ -11,6 +11,7 @@ export interface Cliente {
   data_cancelamento?: string | null
   data_contato?: string | null
   responsavel?: string | null
+  telefone_atualizado: boolean
 
   // Financeiro
   faturamento_anterior?: number | null
@@ -69,6 +70,7 @@ export interface ClienteFormData {
   data_cancelamento?: string
   data_contato?: string
   responsavel?: string
+  telefone_atualizado: boolean
   faturamento_anterior?: number | string
   site_url?: string
   site_online: SiteStatus

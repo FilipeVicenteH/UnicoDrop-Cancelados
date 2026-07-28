@@ -30,6 +30,21 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
+    const existing = await prisma.cliente.findUnique({
+      where: { id: parseInt(id) }
+    })
+    
+    if (!existing) {
+      return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 404 })
+    }
+
+    let telefone_atualizado = existing.telefone_atualizado
+    if (body.contato !== undefined && body.contato !== existing.contato && body.contato) {
+      telefone_atualizado = true
+    } else if (body.telefone_atualizado !== undefined) {
+      telefone_atualizado = body.telefone_atualizado
+    }
+
     const cliente = await prisma.cliente.update({
       where: { id: parseInt(id) },
       data: {
@@ -40,6 +55,7 @@ export async function PUT(
         data_cancelamento: body.data_cancelamento ? new Date(body.data_cancelamento) : null,
         data_contato: body.data_contato ? new Date(body.data_contato) : null,
         responsavel: body.responsavel || null,
+        telefone_atualizado,
         faturamento_anterior: body.faturamento_anterior ? parseFloat(body.faturamento_anterior) : null,
         site_url: body.site_url || null,
         site_online: body.site_online || 'NAO_VERIFICADO',

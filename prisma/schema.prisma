@@ -19,6 +19,7 @@ model Cliente {
   data_cancelamento    DateTime?
   data_contato         DateTime?
   responsavel          String?
+  telefone_atualizado  Boolean   @default(false)
 
   // Financeiro
   faturamento_anterior Float?
