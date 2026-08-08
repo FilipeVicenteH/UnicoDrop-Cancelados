@@ -71,31 +71,31 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
   }
 
   return (
-    <div className="mb-5">
+    <div className="mb-4">
       {/* Toggle button */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-2.5 flex-wrap">
         <button
           onClick={() => setOpen(o => !o)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
             open || hasFilter
-              ? 'border-purple-500/40 bg-purple-500/10 text-purple-300'
-              : 'border-white/10 bg-white/5 text-gray-400 hover:text-gray-200 hover:border-white/20'
+              ? 'border-zinc-700 bg-zinc-800 text-zinc-100 shadow-sm'
+              : 'border-zinc-800 bg-[#121316] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
           }`}
         >
-          <CalendarRange className="w-4 h-4" />
+          <CalendarRange className="w-3.5 h-3.5" />
           Filtrar por Período
           {hasFilter && (
-            <span className="bg-purple-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+            <span className="bg-zinc-100 text-zinc-950 font-mono text-[10px] font-bold px-1.5 rounded-full">
               1
             </span>
           )}
-          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
 
         {/* Active badge (shown when panel is closed) */}
         {hasFilter && !open && (
-          <div className="flex items-center gap-2 text-xs text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-full">
-            <Calendar className="w-3 h-3" />
+          <div className="flex items-center gap-2 text-xs font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-md">
+            <Calendar className="w-3.5 h-3.5" />
             <span>
               {value.dateField === 'contato' ? 'Contato' : 'Cancelamento'}
               {value.dateFrom && ` de ${fmtDate(value.dateFrom)}`}
@@ -110,16 +110,16 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
 
       {/* Panel */}
       {open && (
-        <div className="mt-3 glass-card p-5 animate-fade-in">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mt-2 bg-[#121316] border border-zinc-800 rounded-xl p-4 animate-fade-in space-y-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CalendarRange className="w-4 h-4 text-purple-400" />
-              <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider">Filtro por Período</span>
+              <CalendarRange className="w-4 h-4 text-zinc-400" />
+              <span className="text-[11px] font-mono font-semibold text-zinc-400 uppercase tracking-wider">Seletor de Período</span>
             </div>
             {hasFilter && (
               <button
                 onClick={clearDates}
-                className="text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1"
+                className="text-xs font-mono text-rose-400 hover:text-rose-300 flex items-center gap-1"
               >
                 <X className="w-3 h-3" /> Limpar
               </button>
@@ -127,15 +127,15 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
           </div>
 
           {/* Campo */}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap gap-1.5">
             {DATE_FIELD_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => onChange({ ...value, dateField: opt.value })}
-                className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${
+                className={`flex items-center gap-1.5 text-xs font-mono px-3 py-1 rounded-md border transition-all ${
                   value.dateField === opt.value
-                    ? 'border-purple-500/50 bg-purple-500/15 text-purple-300'
-                    : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                    ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                    : 'border-zinc-800 bg-zinc-900/60 text-zinc-500 hover:text-zinc-300'
                 }`}
               >
                 <Calendar className="w-3 h-3" />
@@ -145,15 +145,15 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
           </div>
 
           {/* Presets */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
+          <div className="flex flex-wrap gap-1.5">
             {PRESETS.map(p => (
               <button
                 key={p.key}
                 onClick={() => applyPreset(p.key)}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all font-medium ${
+                className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
                   activePreset === p.key
-                    ? 'border-violet-500/50 bg-violet-500/15 text-violet-300'
-                    : 'border-white/8 bg-white/4 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                    ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                    : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
                 }`}
               >
                 {p.label}
@@ -162,12 +162,12 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
           </div>
 
           {/* Date pickers */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 max-w-md">
             <div>
               <label className="form-label">De</label>
               <input
                 type="date"
-                className="form-input"
+                className="form-input text-xs"
                 value={value.dateFrom}
                 onChange={e => { onChange({ ...value, dateFrom: e.target.value }); setActivePreset('') }}
               />
@@ -176,7 +176,7 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
               <label className="form-label">Até</label>
               <input
                 type="date"
-                className="form-input"
+                className="form-input text-xs"
                 value={value.dateTo}
                 onChange={e => { onChange({ ...value, dateTo: e.target.value }); setActivePreset('') }}
               />

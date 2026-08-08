@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { DashboardMetrics, Cliente } from '@/lib/types'
-import { STATUS_LABELS, STATUS_COLORS, RECURSOS_UD } from '@/lib/constants'
+import { STATUS_LABELS, RECURSOS_UD } from '@/lib/constants'
 import DateFilterBar from '@/components/DateFilterBar'
 import {
-  BarChart2, Download, TrendingUp, Users, CheckCircle, Globe,
-  ShoppingCart, MessageSquare, AlertTriangle, Store, Activity,
-  Target, Zap, Radio, WifiOff, DollarSign
+  BarChart2, Download, TrendingUp, Users, CheckCircle2, Globe,
+  ShoppingBag, MessageSquare, AlertCircle, Store,
+  Target, Zap, Radio, WifiOff, DollarSign, Activity
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
@@ -26,24 +26,31 @@ const renderLabel = (props: PieLabelRenderProps) => {
   const r = innerRadius + (outerRadius - innerRadius) * 0.55
   const x = cx + r * Math.cos(-midAngle * RADIAN)
   const y = cy + r * Math.sin(-midAngle * RADIAN)
-  return <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight="700">{`${(percent * 100).toFixed(0)}%`}</text>
+  return <text x={x} y={y} fill="#f4f4f5" textAnchor="middle" dominantBaseline="central" fontSize={10} fontWeight="700" className="font-mono">{`${(percent * 100).toFixed(0)}%`}</text>
 }
 
 const tt = {
   contentStyle: {
-    background: '#13131f',
-    border: '1px solid rgba(139,92,246,0.25)',
-    borderRadius: '10px',
-    color: '#e5e7eb',
+    background: '#18181b',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    color: '#f4f4f5',
     fontSize: '12px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
   },
-  labelStyle: { color: '#e5e7eb', fontWeight: 600 },
-  itemStyle: { color: '#c4b5fd' },
-  cursor: { fill: 'rgba(139,92,246,0.06)' },
+  labelStyle: { color: '#f4f4f5', fontWeight: 600 },
+  itemStyle: { color: '#a1a1aa' },
+  cursor: { fill: 'rgba(255,255,255,0.03)' },
 }
 
-const CHART_COLORS = ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#6366F1', '#14B8A6']
+const STATUS_NEUTRAL_COLORS: Record<string, string> = {
+  CONVERTIDO: '#10B981',
+  EM_NEGOCIACAO: '#F59E0B',
+  PENDENTE: '#71717A',
+  NAO_CONVERTIDO: '#F43F5E',
+}
+
+const CHART_PALETTE = ['#6366F1', '#10B981', '#F59E0B', '#06B6D4', '#F43F5E', '#EC4899', '#8B5CF6', '#3B82F6']
 
 export default function RelatoriosPage() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
@@ -114,10 +121,10 @@ export default function RelatoriosPage() {
 
   if (loading || !metrics) {
     return (
-      <div className="p-6 flex items-center justify-center h-64">
+      <div className="p-8 flex items-center justify-center h-64 border border-zinc-800 rounded-xl bg-zinc-900/30">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Carregando relatório...</p>
+          <Activity className="w-6 h-6 text-zinc-500 animate-spin" />
+          <p className="text-xs font-mono text-zinc-500">Gerando relatórios detalhados...</p>
         </div>
       </div>
     )
@@ -143,24 +150,23 @@ export default function RelatoriosPage() {
   const siteOffline = clientes.filter(c => c.site_online === 'OFFLINE').length
   const siteNaoVerif = clientes.length - siteOnline - siteOffline
 
-  // Split PENDENTE into reachable + Inacess\u00edveis (orange)
   const pieStatusData = metrics.por_status.map(s => {
     if (s.status === 'PENDENTE') {
       return {
         name: 'Pendentes',
         value: Math.max(0, s.count - metrics.inacessiveis),
-        color: STATUS_COLORS[s.status] || '#6B7280',
+        color: STATUS_NEUTRAL_COLORS[s.status] || '#71717A',
       }
     }
     return {
       name: STATUS_LABELS[s.status] || s.status,
       value: s.count,
-      color: STATUS_COLORS[s.status] || '#6B7280',
+      color: STATUS_NEUTRAL_COLORS[s.status] || '#71717A',
     }
   }).filter(d => d.value > 0)
 
   if (metrics.inacessiveis > 0) {
-    pieStatusData.push({ name: 'Inacess\u00edveis', value: metrics.inacessiveis, color: '#F97316' })
+    pieStatusData.push({ name: 'Inacessíveis', value: metrics.inacessiveis, color: '#F97316' })
   }
 
   const checkoutChart = metrics.por_checkout
@@ -176,22 +182,24 @@ export default function RelatoriosPage() {
   const maxMotivo = metrics.top_motivos[0]?.count || 1
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto animate-fade-in">
+    <div className="p-6 md:p-8 max-w-[1400px] mx-auto animate-fade-in space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <BarChart2 className="w-4 h-4 text-purple-400" />
-            <span className="text-xs text-purple-400 font-medium uppercase tracking-wider">Relatórios</span>
+            <span className="text-[11px] font-mono font-medium text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              Reports
+            </span>
+            <span className="text-[11px] text-zinc-500 font-mono">UnicoCRM</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">Análise & Relatórios</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl font-bold tracking-tight text-zinc-100">Análise & Relatórios Consolidados</h1>
+          <p className="text-xs text-zinc-400 font-mono mt-1">
             Gerado em {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
           </p>
         </div>
         <button
           onClick={exportCSV}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 text-sm font-medium transition-all hover:scale-105"
+          className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold shadow-sm transition-all"
         >
           <Download className="w-4 h-4" />
           Exportar CSV
@@ -202,27 +210,23 @@ export default function RelatoriosPage() {
       <DateFilterBar value={dateFilter} onChange={setDateFilter} />
 
       {/* ── KPI Summary Row ── */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3 mb-5">
+      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2.5">
         {[
-          { label: 'Total', value: metrics.total, color: 'text-white', icon: Users },
-          { label: 'Convertidos', value: metrics.convertidos, color: 'text-emerald-400', icon: CheckCircle },
-          { label: 'Em Neg.', value: metrics.em_negociacao, color: 'text-amber-400', icon: Activity },
-          { label: 'Pendentes', value: metrics.pendentes, color: 'text-gray-400', icon: Activity },
-          { label: 'Inacessíveis', value: metrics.inacessiveis, color: 'text-orange-400', icon: WifiOff },
-          { label: 'Não Conv.', value: metrics.nao_convertidos, color: 'text-red-400', icon: AlertTriangle },
-          { label: 'Conversão', value: `${metrics.taxa_conversao}%`, color: 'text-purple-400', icon: Target },
-          { label: 'Cont. Hoje', value: metrics.contatados_hoje, color: 'text-sky-400', icon: Zap },
-          { label: 'Cancel. Hj', value: metrics.cancelados_hoje, color: 'text-rose-400', icon: AlertTriangle },
-        ].map(item => {
-          const Icon = item.icon
-          return (
-            <div key={item.label} className="glass-card p-3 text-center">
-              <Icon className={`w-4 h-4 mx-auto mb-1.5 ${item.color} opacity-70`} />
-              <p className={`text-xl font-black tabular-nums ${item.color}`}>{item.value}</p>
-              <p className="text-[10px] text-gray-600 mt-0.5 leading-tight">{item.label}</p>
-            </div>
-          )
-        })}
+          { label: 'Total', value: metrics.total, color: 'text-zinc-100' },
+          { label: 'Convertidos', value: metrics.convertidos, color: 'text-emerald-400' },
+          { label: 'Em Neg.', value: metrics.em_negociacao, color: 'text-amber-400' },
+          { label: 'Pendentes', value: metrics.pendentes, color: 'text-zinc-400' },
+          { label: 'Inacessíveis', value: metrics.inacessiveis, color: 'text-orange-400' },
+          { label: 'Não Conv.', value: metrics.nao_convertidos, color: 'text-rose-400' },
+          { label: 'Conversão', value: `${metrics.taxa_conversao}%`, color: 'text-emerald-400' },
+          { label: 'Cont. Hoje', value: metrics.contatados_hoje, color: 'text-sky-400' },
+          { label: 'Cancel. Hj', value: metrics.cancelados_hoje, color: 'text-rose-400' },
+        ].map(item => (
+          <div key={item.label} className="bg-[#121316] border border-zinc-800/80 rounded-xl p-3 text-center">
+            <p className={`text-lg font-bold font-mono ${item.color}`}>{item.value}</p>
+            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mt-0.5 truncate">{item.label}</p>
+          </div>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -230,60 +234,57 @@ export default function RelatoriosPage() {
         <div className="lg:col-span-2 space-y-5">
 
           {/* Status breakdown */}
-          <div className="glass-card p-5">
+          <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-5">
-              <div className="p-1.5 bg-purple-500/10 rounded-lg">
-                <Users className="w-4 h-4 text-purple-400" />
+              <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                <Users className="w-4 h-4" />
               </div>
-              <h2 className="text-sm font-semibold text-gray-200">Distribuição por Status</h2>
+              <h2 className="text-sm font-semibold text-zinc-100">Distribuição por Status</h2>
             </div>
             <div className="space-y-4">
-              {/* Status from API */}
               {metrics.por_status
                 .sort((a, b) => b.count - a.count)
                 .map(item => {
                   const pct = metrics.total > 0 ? (item.count / metrics.total) * 100 : 0
-                  const color = STATUS_COLORS[item.status] || '#6B7280'
+                  const color = STATUS_NEUTRAL_COLORS[item.status] || '#71717A'
                   return (
                     <div key={item.status}>
-                      <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center justify-between mb-1.5 text-xs">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                          <span className="text-xs text-gray-400">{STATUS_LABELS[item.status] || item.status}</span>
+                          <span className="text-zinc-300 font-medium">{STATUS_LABELS[item.status] || item.status}</span>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-bold text-gray-300">{item.count}</span>
-                          <span className="text-[10px] text-gray-600 w-9 text-right">{pct.toFixed(0)}%</span>
+                        <div className="flex items-center gap-3 font-mono">
+                          <span className="font-bold text-zinc-200">{item.count}</span>
+                          <span className="text-[11px] text-zinc-500 w-9 text-right">{pct.toFixed(0)}%</span>
                         </div>
                       </div>
-                      <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
+                      <div className="w-full bg-zinc-800/80 rounded-full h-2 overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: color }} />
                       </div>
                     </div>
                   )
                 })}
-              {/* Inacessíveis (calculado) */}
               {metrics.inacessiveis > 0 && (() => {
                 const pct = metrics.total > 0 ? (metrics.inacessiveis / metrics.total) * 100 : 0
                 return (
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center justify-between mb-1.5 text-xs">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-orange-500" />
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <span className="text-zinc-300 font-medium flex items-center gap-1">
                           <WifiOff className="w-3 h-3 text-orange-400" />
                           Inacessíveis
                         </span>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-bold text-orange-400">{metrics.inacessiveis}</span>
-                        <span className="text-[10px] text-gray-600 w-9 text-right">{pct.toFixed(0)}%</span>
+                      <div className="flex items-center gap-3 font-mono">
+                        <span className="font-bold text-orange-400">{metrics.inacessiveis}</span>
+                        <span className="text-[11px] text-zinc-500 w-9 text-right">{pct.toFixed(0)}%</span>
                       </div>
                     </div>
-                    <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
-                      <div className="h-full rounded-full bg-gradient-to-r from-orange-600 to-orange-400 transition-all duration-700" style={{ width: `${pct}%` }} />
+                    <div className="w-full bg-zinc-800/80 rounded-full h-2 overflow-hidden">
+                      <div className="h-full rounded-full bg-orange-500 transition-all duration-700" style={{ width: `${pct}%` }} />
                     </div>
-                    <p className="text-[10px] text-gray-700 mt-1">Pendentes sem telefone válido ou com site Offline/Não verificado</p>
                   </div>
                 )
               })()}
@@ -291,44 +292,32 @@ export default function RelatoriosPage() {
           </div>
 
           {/* Top Motivos de Cancelamento */}
-          <div className="glass-card p-5">
+          <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-5">
-              <div className="p-1.5 bg-rose-500/10 rounded-lg">
-                <MessageSquare className="w-4 h-4 text-rose-400" />
+              <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                <MessageSquare className="w-4 h-4" />
               </div>
-              <h2 className="text-sm font-semibold text-gray-200">Principais Motivos de Cancelamento</h2>
+              <h2 className="text-sm font-semibold text-zinc-100">Principais Motivos de Cancelamento</h2>
             </div>
 
             {metrics.top_motivos.length > 0 ? (
               <div className="space-y-4">
                 {metrics.top_motivos.map((item, i) => {
                   const pct = Math.round((item.count / maxMotivo) * 100)
-                  const barColors = [
-                    'from-rose-600 to-rose-400', 'from-orange-600 to-orange-400',
-                    'from-amber-600 to-amber-400', 'from-yellow-600 to-yellow-400',
-                    'from-lime-600 to-lime-400', 'from-green-600 to-green-400',
-                    'from-teal-600 to-teal-400', 'from-cyan-600 to-cyan-400',
-                  ]
-                  const textColors = [
-                    'text-rose-400', 'text-orange-400', 'text-amber-400', 'text-yellow-400',
-                    'text-lime-400', 'text-green-400', 'text-teal-400', 'text-cyan-400',
-                  ]
                   return (
                     <div key={i}>
-                      <div className="flex items-start justify-between mb-1.5 gap-3">
+                      <div className="flex items-start justify-between mb-1.5 gap-3 text-xs">
                         <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                          <span className={`text-[11px] font-black mt-0.5 flex-shrink-0 ${textColors[i] || 'text-gray-500'}`}>
-                            #{i + 1}
-                          </span>
-                          <p className="text-xs text-gray-300 leading-relaxed">{item.motivo}</p>
+                          <span className="font-mono text-[11px] font-bold text-zinc-500 mt-0.5">#{i + 1}</span>
+                          <p className="text-zinc-300 leading-relaxed">{item.motivo}</p>
                         </div>
-                        <span className={`text-xs font-black flex-shrink-0 ${textColors[i] || 'text-gray-400'} bg-white/5 px-2.5 py-1 rounded-full`}>
+                        <span className="font-mono text-xs font-bold text-zinc-200 bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700/50 flex-shrink-0">
                           {item.count}×
                         </span>
                       </div>
-                      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden ml-6">
+                      <div className="w-full bg-zinc-800/80 rounded-full h-1.5 overflow-hidden ml-6">
                         <div
-                          className={`h-full rounded-full bg-gradient-to-r ${barColors[i] || 'from-gray-600 to-gray-500'} transition-all duration-1000`}
+                          className="h-full rounded-full bg-zinc-400 transition-all duration-700"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -338,29 +327,29 @@ export default function RelatoriosPage() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8 gap-2">
-                <MessageSquare className="w-8 h-8 text-gray-700" />
-                <p className="text-sm text-gray-600">Nenhum motivo registrado ainda</p>
+                <AlertCircle className="w-6 h-6 text-zinc-600" />
+                <p className="text-xs font-mono text-zinc-500">Nenhum motivo registrado ainda</p>
               </div>
             )}
           </div>
 
           {/* Checkouts */}
           {checkoutChart.length > 0 && (
-            <div className="glass-card p-5">
+            <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <div className="p-1.5 bg-cyan-500/10 rounded-lg">
-                  <ShoppingCart className="w-4 h-4 text-cyan-400" />
+                <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                  <ShoppingBag className="w-4 h-4" />
                 </div>
-                <h2 className="text-sm font-semibold text-gray-200">Checkouts Utilizados</h2>
+                <h2 className="text-sm font-semibold text-zinc-100">Checkouts Utilizados</h2>
               </div>
               <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={checkoutChart} barCategoryGap="35%" layout="vertical">
-                  <XAxis type="number" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} width={100} />
+                <BarChart data={checkoutChart} barCategoryGap="30%" layout="vertical">
+                  <XAxis type="number" tick={{ fill: '#71717A', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fill: '#A1A1AA', fontSize: 11 }} axisLine={false} tickLine={false} width={100} />
                   <Tooltip {...tt} />
-                  <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     {checkoutChart.map((_, i) => (
-                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.9} />
+                      <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} fillOpacity={0.85} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -370,21 +359,21 @@ export default function RelatoriosPage() {
 
           {/* Plataformas */}
           {plataformaChart.length > 0 && (
-            <div className="glass-card p-5">
+            <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-                  <Store className="w-4 h-4 text-emerald-400" />
+                <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                  <Store className="w-4 h-4" />
                 </div>
-                <h2 className="text-sm font-semibold text-gray-200">Plataformas de Loja</h2>
+                <h2 className="text-sm font-semibold text-zinc-100">Plataformas de Loja</h2>
               </div>
               <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={plataformaChart} barCategoryGap="35%" layout="vertical">
-                  <XAxis type="number" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis type="category" dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} width={100} />
+                <BarChart data={plataformaChart} barCategoryGap="30%" layout="vertical">
+                  <XAxis type="number" tick={{ fill: '#71717A', fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fill: '#A1A1AA', fontSize: 11 }} axisLine={false} tickLine={false} width={100} />
                   <Tooltip {...tt} />
-                  <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                  <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                     {plataformaChart.map((_, i) => (
-                      <Cell key={i} fill={CHART_COLORS[(i + 3) % CHART_COLORS.length]} fillOpacity={0.9} />
+                      <Cell key={i} fill={CHART_PALETTE[(i + 3) % CHART_PALETTE.length]} fillOpacity={0.85} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -397,50 +386,35 @@ export default function RelatoriosPage() {
         <div className="space-y-5">
 
           {/* Plugins de Rastreio */}
-          <div className="glass-card p-5">
+          <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-purple-500/10 rounded-lg">
-                <Radio className="w-4 h-4 text-purple-400" />
+              <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                <Radio className="w-4 h-4" />
               </div>
-              <h2 className="text-sm font-semibold text-gray-200">Plugins de Rastreio</h2>
+              <h2 className="text-sm font-semibold text-zinc-100">Plugins de Rastreio</h2>
             </div>
             {pluginsSorted.length > 0 ? (
               <div className="space-y-3">
                 {pluginsSorted.map(([plugin, count]) => {
                   const isUnico = UNICO_PLUGINS.includes(plugin)
-                  const isNovo = plugin === 'UnicoDrop Novo'
                   const pct = Math.round((count / maxPlugin) * 100)
                   return (
                     <div key={plugin}>
-                      <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center justify-between mb-1 text-xs">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          {isUnico && <Radio className="w-3 h-3 flex-shrink-0 text-purple-400" />}
-                          <span className={`text-xs truncate ${
-                            isUnico
-                              ? isNovo ? 'text-purple-300 font-semibold' : 'text-violet-300 font-semibold'
-                              : 'text-gray-400'
-                          }`} title={plugin}>{plugin}</span>
+                          {isUnico && <Radio className="w-3 h-3 flex-shrink-0 text-emerald-400" />}
+                          <span className={`truncate ${isUnico ? 'text-zinc-100 font-semibold font-mono' : 'text-zinc-400'}`} title={plugin}>{plugin}</span>
                           {isUnico && (
-                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full border font-bold flex-shrink-0 ${
-                              isNovo
-                                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-                                : 'bg-violet-500/15 text-violet-400 border-violet-500/30'
-                            }`}>
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold flex-shrink-0">
                               UD
                             </span>
                           )}
                         </div>
-                        <span className={`text-xs font-bold flex-shrink-0 ml-2 ${
-                          isUnico ? 'text-purple-400' : 'text-gray-500'
-                        }`}>{count}</span>
+                        <span className="font-mono text-xs font-bold text-zinc-300 ml-2">{count}</span>
                       </div>
-                      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+                      <div className="w-full bg-zinc-800/80 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-700 ${
-                            isUnico
-                              ? isNovo ? 'bg-gradient-to-r from-purple-600 to-purple-400' : 'bg-gradient-to-r from-violet-600 to-violet-400'
-                              : 'bg-indigo-600'
-                          }`}
+                          className={`h-full rounded-full transition-all duration-700 ${isUnico ? 'bg-emerald-500' : 'bg-zinc-500'}`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -449,17 +423,17 @@ export default function RelatoriosPage() {
                 })}
               </div>
             ) : (
-              <p className="text-xs text-gray-600 italic">Nenhum plugin registrado</p>
+              <p className="text-xs font-mono text-zinc-500">Nenhum plugin registrado</p>
             )}
           </div>
 
           {/* Status Pie */}
-          <div className="glass-card p-5">
+          <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-violet-500/10 rounded-lg">
-                <TrendingUp className="w-4 h-4 text-violet-400" />
+              <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                <BarChart2 className="w-4 h-4" />
               </div>
-              <h2 className="text-sm font-semibold text-gray-200">Status (Gráfico)</h2>
+              <h2 className="text-sm font-semibold text-zinc-100">Status Geral</h2>
             </div>
             {pieStatusData.length > 0 ? (
               <>
@@ -472,10 +446,10 @@ export default function RelatoriosPage() {
                       labelLine={false}
                       label={renderLabel}
                       outerRadius={70}
-                      innerRadius={28}
+                      innerRadius={36}
                       dataKey="value"
                       strokeWidth={2}
-                      stroke="#07070f"
+                      stroke="#121316"
                     >
                       {pieStatusData.map((entry, i) => (
                         <Cell key={i} fill={entry.color} />
@@ -486,47 +460,44 @@ export default function RelatoriosPage() {
                 </ResponsiveContainer>
                 <div className="space-y-1.5 mt-2">
                   {pieStatusData.map(item => (
-                    <div key={item.name} className="flex items-center justify-between">
+                    <div key={item.name} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full" style={{ background: item.color }} />
-                        <span className="text-[11px] text-gray-500">{item.name}</span>
+                        <span className="text-zinc-400">{item.name}</span>
                       </div>
-                      <span className="text-xs font-bold text-gray-300">{item.value}</span>
+                      <span className="font-mono font-bold text-zinc-200">{item.value}</span>
                     </div>
                   ))}
                 </div>
               </>
             ) : (
-              <div className="h-[180px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
+              <div className="h-[180px] flex items-center justify-center text-zinc-500 text-xs font-mono">Sem dados</div>
             )}
           </div>
 
           {/* Sites */}
-          <div className="glass-card p-5">
+          <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-sky-500/10 rounded-lg">
-                <Globe className="w-4 h-4 text-sky-400" />
+              <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                <Globe className="w-4 h-4" />
               </div>
-              <h2 className="text-sm font-semibold text-gray-200">Status dos Sites</h2>
+              <h2 className="text-sm font-semibold text-zinc-100">Status dos Sites</h2>
             </div>
             <div className="space-y-3">
               {[
-                { label: 'Online', value: siteOnline, color: 'bg-emerald-500', text: 'text-emerald-400', dot: '●' },
-                { label: 'Offline', value: siteOffline, color: 'bg-red-500', text: 'text-red-400', dot: '●' },
-                { label: 'Não Verificado', value: siteNaoVerif, color: 'bg-gray-600', text: 'text-gray-400', dot: '○' },
+                { label: 'Online', value: siteOnline, bar: 'bg-emerald-500', text: 'text-emerald-400' },
+                { label: 'Offline', value: siteOffline, bar: 'bg-rose-500', text: 'text-rose-400' },
+                { label: 'Não Verificado', value: siteNaoVerif, bar: 'bg-zinc-600', text: 'text-zinc-400' },
               ].map(item => {
                 const pct = clientes.length > 0 ? Math.round((item.value / clientes.length) * 100) : 0
                 return (
                   <div key={item.label}>
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[10px] ${item.text}`}>{item.dot}</span>
-                        <span className="text-xs text-gray-400">{item.label}</span>
-                      </div>
-                      <span className={`text-sm font-bold ${item.text}`}>{item.value}</span>
+                    <div className="flex items-center justify-between mb-1 text-xs">
+                      <span className="text-zinc-300 font-medium">{item.label}</span>
+                      <span className={`font-mono font-bold ${item.text}`}>{item.value}</span>
                     </div>
-                    <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                      <div className={`h-full rounded-full ${item.color} transition-all duration-700`} style={{ width: `${pct}%` }} />
+                    <div className="w-full bg-zinc-800/80 rounded-full h-1.5 overflow-hidden">
+                      <div className={`h-full rounded-full ${item.bar} transition-all duration-700`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 )
@@ -534,144 +505,6 @@ export default function RelatoriosPage() {
             </div>
           </div>
 
-          {/* Recursos UD */}
-          <div className="glass-card p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-purple-500/10 rounded-lg">
-                <Zap className="w-4 h-4 text-purple-400" />
-              </div>
-              <h2 className="text-sm font-semibold text-gray-200">Recursos UD Utilizados</h2>
-            </div>
-            {Object.keys(recursosCount).length === 0 ? (
-              <p className="text-xs text-gray-600 italic">Nenhum dado registrado ainda</p>
-            ) : (
-              <div className="space-y-3">
-                {RECURSOS_UD
-                  .filter(r => recursosCount[r.key])
-                  .sort((a, b) => (recursosCount[b.key] || 0) - (recursosCount[a.key] || 0))
-                  .map(item => {
-                    const count = recursosCount[item.key] || 0
-                    const pct = clientes.length > 0 ? Math.round((count / clientes.length) * 100) : 0
-                    return (
-                      <div key={item.key}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[11px] text-gray-400 flex items-center gap-1.5">
-                            <span>{item.icon}</span>
-                            <span title={item.key}>{item.key}</span>
-                          </span>
-                          <span className="text-[11px] text-gray-500 flex-shrink-0 ml-1">{count} ({pct}%)</span>
-                        </div>
-                        <div className="bg-white/5 rounded-full h-1.5 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-purple-600 to-violet-400 transition-all duration-700"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  })}
-                {recursosCount['Outros'] && (
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[11px] text-gray-400">✏️ Outros</span>
-                      <span className="text-[11px] text-gray-500">{recursosCount['Outros']}</span>
-                    </div>
-                    <div className="bg-white/5 rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-purple-600 transition-all duration-700"
-                        style={{ width: `${Math.round((recursosCount['Outros'] / clientes.length) * 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Prioridades */}
-          <div className="glass-card p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-yellow-500/10 rounded-lg">
-                <AlertTriangle className="w-4 h-4 text-yellow-400" />
-              </div>
-              <h2 className="text-sm font-semibold text-gray-200">Por Prioridade</h2>
-            </div>
-            <div className="space-y-3">
-              {[
-                { key: 'ALTA', label: '🔴 Alta', color: 'bg-red-500', text: 'text-red-400' },
-                { key: 'MEDIA', label: '🟡 Média', color: 'bg-amber-500', text: 'text-amber-400' },
-                { key: 'BAIXA', label: '🔵 Baixa', color: 'bg-blue-500', text: 'text-blue-400' },
-              ].map(p => {
-                const count = metrics.por_prioridade.find(x => x.prioridade === p.key)?.count || 0
-                const pct = metrics.total > 0 ? Math.round((count / metrics.total) * 100) : 0
-                return (
-                  <div key={p.key}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-gray-400">{p.label}</span>
-                      <span className={`text-sm font-bold ${p.text}`}>{count}</span>
-                    </div>
-                    <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
-                      <div className={`h-full rounded-full ${p.color} transition-all duration-700`} style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Faturamento Anterior ── */}
-        <div className="glass-card p-5 mt-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-1.5 bg-yellow-500/10 rounded-lg">
-              <DollarSign className="w-4 h-4 text-yellow-400" />
-            </div>
-            <h2 className="text-sm font-semibold text-gray-200">Faturamento do Mês Anterior</h2>
-          </div>
-          {(() => {
-            const raw = metrics.por_faturamento ? metrics.por_faturamento.filter(f => f.count > 0 && f.faixa !== 'Não Informado') : []
-            if (raw.length === 0) return <div className="h-[260px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
-            
-            const total = raw.reduce((acc, f) => acc + f.count, 0)
-            const data = raw.map(f => ({ ...f, percent: total > 0 ? Math.round((f.count / total) * 100) : 0 }))
-            
-            return (
-              <>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={data}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={80}
-                      innerRadius={50}
-                      paddingAngle={3}
-                      dataKey="percent"
-                      nameKey="faixa"
-                      stroke="none"
-                    >
-                      {data.map((_, i) => (
-                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip {...tt} formatter={(val: any) => [`${val}%`, 'Lojas']} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
-                  {data.map((item, i) => (
-                    <div key={item.faixa} className="flex items-center justify-between bg-white/5 rounded-md px-2 py-1.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full shadow-sm flex-shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
-                        <span className="text-[11px] text-gray-300 font-medium truncate" title={item.faixa}>{item.faixa}</span>
-                      </div>
-                      <span className="text-xs font-bold text-white">{item.percent}%</span>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )
-          })()}
         </div>
       </div>
     </div>

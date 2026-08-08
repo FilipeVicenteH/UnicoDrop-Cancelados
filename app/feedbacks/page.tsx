@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { FeedbackMelhoria } from '@/lib/types'
-import { FEEDBACK_STATUS_LABELS, FEEDBACK_STATUS_COLORS, PRIORIDADE_LABELS } from '@/lib/constants'
+import { FEEDBACK_STATUS_LABELS, PRIORIDADE_LABELS } from '@/lib/constants'
 import {
   Plus, Search, Filter, X, ChevronDown, MessageSquare, Edit2, Trash2, MessageSquarePlus, Clock, CalendarDays
 } from 'lucide-react'
@@ -89,24 +89,26 @@ export default function FeedbacksPage() {
 
   return (
     <>
-      <div className="p-6 max-w-[1400px] mx-auto animate-fade-in">
+      <div className="p-6 md:p-8 max-w-[1400px] mx-auto animate-fade-in space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <MessageSquarePlus className="w-4 h-4 text-purple-400" />
-              <span className="text-xs text-purple-400 font-medium uppercase tracking-wider">Feedbacks</span>
+              <span className="text-[11px] font-mono font-medium text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                Feedbacks
+              </span>
+              <span className="text-[11px] text-zinc-500 font-mono">Melhoria Contínua</span>
             </div>
-            <h1 className="text-2xl font-bold text-white">Feedbacks de Melhoria</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {loading ? 'Carregando...' : `${feedbacks.length} ${feedbacks.length === 1 ? 'registro' : 'registros'} encontrado${feedbacks.length === 1 ? '' : 's'}`}
+            <h1 className="text-xl font-bold tracking-tight text-zinc-100">Feedbacks de Melhoria de Produto</h1>
+            <p className="text-xs text-zinc-400 font-mono mt-1">
+              {loading ? 'Buscando...' : `${feedbacks.length} registros cadastrados`}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => setFormOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white text-sm font-medium shadow-lg shadow-purple-500/20 transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold shadow-sm transition-all"
             >
               <Plus className="w-4 h-4" />
               Novo Feedback
@@ -115,11 +117,11 @@ export default function FeedbacksPage() {
         </div>
 
         {/* Search + Filter Bar */}
-        <div className="flex gap-3 mb-4 flex-wrap">
-          <div className="relative flex-1 min-w-[200px] max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+        <div className="flex gap-2.5 flex-wrap">
+          <div className="relative flex-1 min-w-[220px] max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <input
-              className="form-input pl-10 h-10"
+              className="form-input pl-9 text-xs h-9 bg-[#121316] border-zinc-800 focus:border-zinc-700"
               placeholder="Buscar por cliente, funcionalidade..."
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -127,37 +129,37 @@ export default function FeedbacksPage() {
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-200"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
           <button
             onClick={() => setFiltersOpen(!filtersOpen)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
               filtersOpen || activeFiltersCount > 0
-                ? 'border-purple-500/40 bg-purple-500/10 text-purple-300'
-                : 'border-white/10 bg-white/5 text-gray-400 hover:text-gray-200 hover:border-white/20'
+                ? 'border-zinc-700 bg-zinc-800 text-zinc-100'
+                : 'border-zinc-800 bg-[#121316] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
             }`}
           >
-            <Filter className="w-4 h-4" />
+            <Filter className="w-3.5 h-3.5" />
             Filtros
             {activeFiltersCount > 0 && (
-              <span className="bg-purple-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="bg-zinc-100 text-zinc-950 font-mono text-[10px] font-bold px-1.5 rounded-full">
                 {activeFiltersCount}
               </span>
             )}
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3 h-3 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {activeFiltersCount > 0 && (
             <button
               onClick={clearAllFilters}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:text-red-300 border border-red-500/20 rounded-lg bg-red-500/5 hover:bg-red-500/10 transition-all"
+              className="flex items-center gap-1 px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300 border border-rose-500/20 rounded-lg bg-rose-500/5 transition-all font-mono"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-3 h-3" />
               Limpar tudo
             </button>
           )}
@@ -165,9 +167,8 @@ export default function FeedbacksPage() {
 
         {/* Filter Panel */}
         {filtersOpen && (
-          <div className="glass-card p-5 mb-4 animate-fade-in space-y-5">
+          <div className="bg-[#121316] border border-zinc-800 rounded-xl p-5 animate-fade-in space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              {/* Status */}
               <div>
                 <label className="form-label">Status</label>
                 <div className="flex flex-wrap gap-1.5">
@@ -175,10 +176,10 @@ export default function FeedbacksPage() {
                     <button
                       key={s}
                       onClick={() => setStatus(s)}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${
+                      className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
                         status === s
-                          ? 'border-purple-500/50 bg-purple-500/15 text-purple-300'
-                          : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                          ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                          : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
                       }`}
                     >
                       {s === 'TODOS' ? 'Todos' : FEEDBACK_STATUS_LABELS[s]}
@@ -187,7 +188,6 @@ export default function FeedbacksPage() {
                 </div>
               </div>
 
-              {/* Prioridade */}
               <div>
                 <label className="form-label">Prioridade</label>
                 <div className="flex flex-wrap gap-1.5">
@@ -195,19 +195,18 @@ export default function FeedbacksPage() {
                     <button
                       key={p}
                       onClick={() => setPrioridade(p)}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${
+                      className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
                         prioridade === p
-                          ? 'border-purple-500/50 bg-purple-500/15 text-purple-300'
-                          : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                          ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                          : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
                       }`}
                     >
-                      {p === 'TODOS' ? 'Todas' : p === 'ALTA' ? '🔴 Alta' : p === 'MEDIA' ? '🟡 Média' : '🔵 Baixa'}
+                      {p === 'TODOS' ? 'Todas' : p}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Tipo Cliente */}
               <div>
                 <label className="form-label">Tipo de Cliente</label>
                 <div className="flex flex-wrap gap-1.5">
@@ -215,13 +214,13 @@ export default function FeedbacksPage() {
                     <button
                       key={t}
                       onClick={() => setTipo(t)}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${
+                      className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
                         tipo === t
-                          ? 'border-purple-500/50 bg-purple-500/15 text-purple-300'
-                          : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'
+                          ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                          : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
                       }`}
                     >
-                      {t === 'TODOS' ? 'Todos' : t === 'ATIVO' ? '🟢 Ativos' : '🔴 Cancelados'}
+                      {t === 'TODOS' ? 'Todos' : t === 'ATIVO' ? 'Ativos' : 'Cancelados'}
                     </button>
                   ))}
                 </div>
@@ -230,120 +229,97 @@ export default function FeedbacksPage() {
           </div>
         )}
 
-        {/* List */}
+        {/* List Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {loading && feedbacks.length === 0 ? (
-            <div className="col-span-full flex items-center justify-center h-48">
+            <div className="col-span-full flex items-center justify-center h-48 border border-zinc-800 rounded-xl bg-zinc-900/30">
               <div className="flex flex-col items-center gap-3">
-                <div className="w-7 h-7 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                <p className="text-sm text-gray-600">Buscando feedbacks...</p>
+                <div className="w-6 h-6 border-2 border-zinc-700 border-t-zinc-300 rounded-full animate-spin" />
+                <p className="text-xs font-mono text-zinc-500">Buscando feedbacks...</p>
               </div>
             </div>
           ) : feedbacks.length === 0 ? (
-            <div className="col-span-full glass-card py-16 flex flex-col items-center justify-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center">
-                <MessageSquare className="w-7 h-7 text-purple-500/50" />
+            <div className="col-span-full bg-[#121316] border border-zinc-800 rounded-xl py-16 flex flex-col items-center justify-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-zinc-800/80 border border-zinc-700/50 flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-zinc-500" />
               </div>
-              <p className="text-gray-500 font-medium">Nenhum feedback encontrado</p>
-              <p className="text-gray-600 text-sm text-center max-w-md">
-                {activeFiltersCount > 0 || search 
-                  ? 'Tente ajustar os filtros da busca' 
-                  : 'Registre sugestões, problemas ou necessidades passadas pelos clientes (ativos e cancelados) para mapear melhorias.'}
-              </p>
-              {!activeFiltersCount && !search && (
-                <button
-                  onClick={() => setFormOpen(true)}
-                  className="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors"
-                >
-                  <Plus className="w-4 h-4" /> Adicionar Primeiro
-                </button>
-              )}
+              <p className="text-zinc-300 font-medium text-sm">Nenhum feedback encontrado</p>
             </div>
           ) : (
             feedbacks.map((item, i) => {
-              const statusColor = FEEDBACK_STATUS_COLORS[item.status] || '#6B7280'
+              const statusBadgeClass = {
+                PENDENTE: 'bg-zinc-800 text-zinc-300 border-zinc-700',
+                EM_ANALISE: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                PLANEJADO: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+                CONCLUIDO: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+              }[item.status] || 'bg-zinc-800 text-zinc-400 border-zinc-700'
+
               const prioridadeClass = {
-                ALTA: 'text-red-400 bg-red-400/10 border-red-500/20',
-                MEDIA: 'text-amber-400 bg-amber-400/10 border-amber-500/20',
-                BAIXA: 'text-blue-400 bg-blue-400/10 border-blue-500/20',
-              }[item.prioridade] || 'text-gray-400 bg-gray-400/10 border-gray-500/20'
+                ALTA: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
+                MEDIA: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+                BAIXA: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+              }[item.prioridade] || 'text-zinc-400 bg-zinc-800 border-zinc-700'
 
               return (
                 <div
                   key={item.id}
-                  className="glass-card p-5 group animate-fade-in relative overflow-hidden"
-                  style={{ animationDelay: `${i * 20}ms` }}
+                  className="bg-[#121316] border border-zinc-800 hover:border-zinc-700 rounded-xl p-5 group animate-fade-in transition-all flex flex-col justify-between"
+                  style={{ animationDelay: `${i * 15}ms` }}
                 >
-                  {/* Status Indicator Bar */}
-                  <div 
-                    className="absolute top-0 left-0 h-1 w-full"
-                    style={{ backgroundColor: statusColor }}
-                  />
-
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 min-w-0 pr-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                          item.tipo_cliente === 'ATIVO' 
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                            : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                        }`}>
-                          {item.tipo_cliente === 'ATIVO' ? 'Cliente Ativo' : 'Cancelado'}
-                        </span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${prioridadeClass}`}>
-                          Prioridade {PRIORIDADE_LABELS[item.prioridade]}
-                        </span>
+                  <div>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${
+                            item.tipo_cliente === 'ATIVO'
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                              : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                          }`}>
+                            {item.tipo_cliente === 'ATIVO' ? 'Cliente Ativo' : 'Cancelado'}
+                          </span>
+                          <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${prioridadeClass}`}>
+                            {PRIORIDADE_LABELS[item.prioridade]}
+                          </span>
+                        </div>
+                        <h3 className="text-sm font-semibold text-zinc-100 truncate" title={item.funcionalidade}>
+                          {item.funcionalidade}
+                        </h3>
+                        <p className="text-xs text-zinc-400 truncate mt-0.5" title={item.cliente}>
+                          <span>{item.cliente}</span>
+                          {item.unico_id && <span className="ml-2 font-mono text-[10px] text-zinc-500 bg-zinc-800 px-1.5 py-0.2 rounded border border-zinc-700/50">{item.unico_id}</span>}
+                        </p>
                       </div>
-                      <h3 className="text-base font-semibold text-white truncate" title={item.funcionalidade}>
-                        {item.funcionalidade}
-                      </h3>
-                      <p className="text-xs text-gray-500 truncate" title={item.cliente}>
-                        <span className="font-medium text-gray-400">{item.cliente}</span>
-                        {item.unico_id && <span className="ml-2 px-1.5 py-0.5 bg-white/5 rounded border border-white/10 text-[10px]">ID: {item.unico_id}</span>}
-                      </p>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleEdit(item.id)}
+                          className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="p-1 rounded hover:bg-rose-500/10 text-zinc-400 hover:text-rose-400 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleEdit(item.id)}
-                        className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`text-sm text-gray-400 mb-4 leading-relaxed cursor-pointer hover:text-gray-300 transition-colors ${expandedId === item.id ? '' : 'line-clamp-3'}`}
-                    onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                    title={expandedId === item.id ? 'Clique para recolher' : 'Clique para ler tudo'}
-                  >
-                    {item.descricao}
-                    {expandedId !== item.id && item.descricao.length > 200 && (
-                      <span className="text-purple-400 font-medium ml-1 not-italic">· ver mais</span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <span
-                      className="text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5"
-                      style={{
-                        backgroundColor: `${statusColor}15`,
-                        color: statusColor,
-                        border: `1px solid ${statusColor}30`
-                      }}
+                    <div
+                      className={`text-xs text-zinc-400 mb-4 leading-relaxed cursor-pointer hover:text-zinc-200 transition-colors bg-zinc-950/40 p-3 rounded border border-zinc-800/80 ${expandedId === item.id ? '' : 'line-clamp-3'}`}
+                      onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
                     >
-                      {item.status === 'PENDENTE' && <Clock className="w-3 h-3" />}
+                      {item.descricao}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-800/80 font-mono text-xs">
+                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${statusBadgeClass}`}>
                       {FEEDBACK_STATUS_LABELS[item.status]}
                     </span>
-                    <span className="text-xs text-gray-600 flex items-center gap-1">
+                    <span className="text-[11px] text-zinc-500 flex items-center gap-1">
                       <CalendarDays className="w-3 h-3" />
                       {format(new Date(item.created_at), 'dd/MM/yy', { locale: ptBR })}
                     </span>

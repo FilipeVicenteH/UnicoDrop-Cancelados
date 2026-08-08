@@ -7,8 +7,7 @@ import { Cliente } from '@/lib/types'
 import { STATUS_LABELS } from '@/lib/constants'
 import {
   Plus, Search, Filter, Users, RefreshCw, ChevronDown,
-  LayoutDashboard, Puzzle, MessageCircle, X, Calendar, CalendarRange,
-  PhoneOff, Edit2
+  X, Calendar, CalendarRange, PhoneOff, Edit2
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -16,9 +15,9 @@ const STATUS_OPTIONS = ['TODOS', 'PENDENTE', 'EM_NEGOCIACAO', 'CONVERTIDO', 'NAO
 const PRIORIDADE_OPTIONS = ['TODOS', 'ALTA', 'MEDIA', 'BAIXA']
 const USAVA_OPTIONS = [
   { value: '', label: 'Todos os recursos' },
-  { value: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { value: 'plugin', label: 'Plugin', icon: Puzzle },
-  { value: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
+  { value: 'dashboard', label: 'Dashboard' },
+  { value: 'plugin', label: 'Plugin' },
+  { value: 'whatsapp', label: 'WhatsApp' },
 ]
 
 const DATE_FIELD_OPTIONS = [
@@ -50,7 +49,6 @@ function getPresetRange(preset: string): { from: string; to: string } {
   return { from: '', to: '' }
 }
 
-// Keywords in nota_interna that indicate invalid phone
 const INVALID_PHONE_KEYWORDS = [
   'número incorreto', 'numero incorreto',
   'número inválido', 'numero invalido',
@@ -198,31 +196,32 @@ export default function ClientesPage() {
 
   return (
     <>
-      <div className="p-6 max-w-[1400px] mx-auto animate-fade-in">
+      <div className="p-6 md:p-8 max-w-[1400px] mx-auto animate-fade-in space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-purple-400" />
-              <span className="text-xs text-purple-400 font-medium uppercase tracking-wider">Clientes</span>
+              <span className="text-[11px] font-mono font-medium text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                Database
+              </span>
+              <span className="text-[11px] text-zinc-500 font-mono">Gestão de Lojistas</span>
             </div>
-            <h1 className="text-2xl font-bold text-white">Clientes Cancelados</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {loading ? 'Carregando...' : `${total} ${total === 1 ? 'cliente' : 'clientes'} encontrado${total === 1 ? '' : 's'}`}
-              {hasDateFilter && <span className="ml-2 text-purple-400 text-xs">• filtrado por data</span>}
+            <h1 className="text-xl font-bold tracking-tight text-zinc-100">Clientes Cancelados</h1>
+            <p className="text-xs text-zinc-400 font-mono mt-1">
+              {loading ? 'Buscando...' : `${total} ${total === 1 ? 'cliente' : 'clientes'} no banco de dados`}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => { fetchClientes(); if (activeTab === 'sem_contato') fetchSemContato() }}
               disabled={loading} title="Atualizar"
-              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/8 text-gray-400 hover:text-white transition-all"
+              className="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-100 transition-all"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={() => setFormOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white text-sm font-medium shadow-lg shadow-purple-500/20 transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold shadow-sm transition-all"
             >
               <Plus className="w-4 h-4" /> Novo Cliente
             </button>
@@ -230,10 +229,10 @@ export default function ClientesPage() {
         </div>
 
         {/* ── TABS ── */}
-        <div className="flex items-center gap-1 mb-5 border-b border-white/5">
+        <div className="flex items-center gap-2 border-b border-zinc-800/80 pb-3">
           {([
             { key: 'todos' as const, label: 'Todos os Clientes', icon: Users, badge: null },
-            { key: 'sem_contato' as const, label: 'Sem Telefone', icon: PhoneOff, badge: semContato.length > 0 ? semContato.length : null },
+            { key: 'sem_contato' as const, label: 'Sem Telefone Válido', icon: PhoneOff, badge: semContato.length > 0 ? semContato.length : null },
           ]).map(tab => {
             const Icon = tab.icon
             const active = activeTab === tab.key
@@ -241,19 +240,18 @@ export default function ClientesPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium relative transition-all ${
-                  active ? 'text-purple-300' : 'text-gray-500 hover:text-gray-300'
+                className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                  active
+                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700/60 shadow-sm'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5" />
                 {tab.label}
                 {tab.badge !== null && (
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                    active ? 'bg-orange-500/20 text-orange-400' : 'bg-white/10 text-gray-500'
-                  }`}>{tab.badge}</span>
-                )}
-                {active && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full" />
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    {tab.badge}
+                  </span>
                 )}
               </button>
             )
@@ -262,228 +260,245 @@ export default function ClientesPage() {
 
         {/* ══ TAB: TODOS ══ */}
         {activeTab === 'todos' && (
-          <>
-            <div className="flex gap-3 mb-4 flex-wrap">
-              <div className="relative flex-1 min-w-[200px] max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
-                <input className="form-input pl-10 h-10" placeholder="Buscar por nome, ID Unico, empresa..." value={search} onChange={e => setSearch(e.target.value)} />
-                {search && <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-300"><X className="w-4 h-4" /></button>}
+          <div className="space-y-4">
+            <div className="flex gap-2.5 flex-wrap">
+              <div className="relative flex-1 min-w-[220px] max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <input
+                  className="form-input pl-9 text-xs h-9 bg-[#121316] border-zinc-800 focus:border-zinc-700"
+                  placeholder="Buscar por nome, ID Unico, empresa..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+                {search && (
+                  <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-200">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
-              <button onClick={() => setFiltersOpen(!filtersOpen)} className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all ${filtersOpen || activeFiltersCount > 0 ? 'border-purple-500/40 bg-purple-500/10 text-purple-300' : 'border-white/10 bg-white/5 text-gray-400 hover:text-gray-200 hover:border-white/20'}`}>
-                <Filter className="w-4 h-4" />
+
+              <button
+                onClick={() => setFiltersOpen(!filtersOpen)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                  filtersOpen || activeFiltersCount > 0
+                    ? 'border-zinc-700 bg-zinc-800 text-zinc-100'
+                    : 'border-zinc-800 bg-[#121316] text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+                }`}
+              >
+                <Filter className="w-3.5 h-3.5" />
                 Filtros
-                {activeFiltersCount > 0 && <span className="bg-purple-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{activeFiltersCount}</span>}
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
+                {activeFiltersCount > 0 && (
+                  <span className="bg-zinc-100 text-zinc-950 font-mono text-[10px] font-bold px-1.5 rounded-full">
+                    {activeFiltersCount}
+                  </span>
+                )}
+                <ChevronDown className={`w-3 h-3 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
               </button>
+
               {activeFiltersCount > 0 && (
-                <button onClick={clearAllFilters} className="flex items-center gap-1.5 px-3 py-2 text-xs text-red-400 hover:text-red-300 border border-red-500/20 rounded-lg bg-red-500/5 hover:bg-red-500/10 transition-all">
-                  <X className="w-3.5 h-3.5" /> Limpar tudo
+                <button
+                  onClick={clearAllFilters}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300 border border-rose-500/20 rounded-lg bg-rose-500/5 transition-all font-mono"
+                >
+                  <X className="w-3 h-3" /> Limpar tudo
                 </button>
               )}
             </div>
 
+            {/* Filter Drawer */}
             {filtersOpen && (
-              <div className="glass-card p-5 mb-4 animate-fade-in space-y-5">
+              <div className="bg-[#121316] border border-zinc-800 rounded-xl p-5 animate-fade-in space-y-4">
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <CalendarRange className="w-4 h-4 text-purple-400" />
-                    <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider">Filtro por Data</label>
-                    {hasDateFilter && <button onClick={clearDates} className="ml-auto text-[11px] text-red-400 hover:text-red-300 flex items-center gap-1"><X className="w-3 h-3" /> Limpar datas</button>}
+                    <CalendarRange className="w-4 h-4 text-zinc-400" />
+                    <label className="text-[11px] font-mono font-semibold text-zinc-400 uppercase tracking-wider">Período de Análise</label>
+                    {hasDateFilter && (
+                      <button onClick={clearDates} className="ml-auto text-[11px] font-mono text-rose-400 hover:text-rose-300 flex items-center gap-1">
+                        <X className="w-3 h-3" /> Limpar datas
+                      </button>
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-wrap gap-1.5 mb-3">
                     {DATE_FIELD_OPTIONS.map(opt => (
-                      <button key={opt.value} onClick={() => setDateField(opt.value)} className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${dateField === opt.value ? 'border-purple-500/50 bg-purple-500/15 text-purple-300' : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'}`}>
-                        <Calendar className="w-3 h-3" /> {opt.label}
+                      <button
+                        key={opt.value}
+                        onClick={() => setDateField(opt.value)}
+                        className={`text-xs font-mono px-3 py-1 rounded-md border transition-all ${
+                          dateField === opt.value
+                            ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        {opt.label}
                       </button>
                     ))}
                   </div>
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {PRESETS.map(p => (
-                      <button key={p.key} onClick={() => applyPreset(p.key)} className={`text-xs px-3 py-1.5 rounded-lg border transition-all font-medium ${activePreset === p.key ? 'border-violet-500/50 bg-violet-500/15 text-violet-300' : 'border-white/8 bg-white/4 text-gray-500 hover:text-gray-300 hover:border-white/20'}`}>
+                      <button
+                        key={p.key}
+                        onClick={() => applyPreset(p.key)}
+                        className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
+                          activePreset === p.key
+                            ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                            : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                        }`}
+                      >
                         {p.label}
                       </button>
                     ))}
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><label className="form-label">De</label><input type="date" className="form-input" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setActivePreset('') }} /></div>
-                    <div><label className="form-label">Até</label><input type="date" className="form-input" value={dateTo} onChange={e => { setDateTo(e.target.value); setActivePreset('') }} /></div>
+                  <div className="grid grid-cols-2 gap-3 max-w-md">
+                    <div><label className="form-label">De</label><input type="date" className="form-input text-xs" value={dateFrom} onChange={e => { setDateFrom(e.target.value); setActivePreset('') }} /></div>
+                    <div><label className="form-label">Até</label><input type="date" className="form-input text-xs" value={dateTo} onChange={e => { setDateTo(e.target.value); setActivePreset('') }} /></div>
                   </div>
                 </div>
-                <div className="border-t border-white/5" />
+                <div className="border-t border-zinc-800/80" />
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                   <div>
                     <label className="form-label">Status</label>
                     <div className="flex flex-wrap gap-1.5">
-                      {STATUS_OPTIONS.map(s => <button key={s} onClick={() => setStatus(s)} className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${status === s ? 'border-purple-500/50 bg-purple-500/15 text-purple-300' : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'}`}>{s === 'TODOS' ? 'Todos' : STATUS_LABELS[s]}</button>)}
+                      {STATUS_OPTIONS.map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setStatus(s)}
+                          className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
+                            status === s
+                              ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                              : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                          }`}
+                        >
+                          {s === 'TODOS' ? 'Todos' : STATUS_LABELS[s]}
+                        </button>
+                      ))}
                     </div>
                   </div>
                   <div>
                     <label className="form-label">Prioridade</label>
                     <div className="flex flex-wrap gap-1.5">
-                      {PRIORIDADE_OPTIONS.map(p => <button key={p} onClick={() => setPrioridade(p)} className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${prioridade === p ? 'border-purple-500/50 bg-purple-500/15 text-purple-300' : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'}`}>{p === 'TODOS' ? 'Todas' : p === 'ALTA' ? '🔴 Alta' : p === 'MEDIA' ? '🟡 Média' : '🔵 Baixa'}</button>)}
+                      {PRIORIDADE_OPTIONS.map(p => (
+                        <button
+                          key={p}
+                          onClick={() => setPrioridade(p)}
+                          className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
+                            prioridade === p
+                              ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                              : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                          }`}
+                        >
+                          {p === 'TODOS' ? 'Todas' : p}
+                        </button>
+                      ))}
                     </div>
                   </div>
                   <div>
-                    <label className="form-label">Usava na UnicoDrop</label>
+                    <label className="form-label">Recursos UnicoDrop</label>
                     <div className="flex flex-wrap gap-1.5">
-                      {USAVA_OPTIONS.map(opt => <button key={opt.value} onClick={() => setUsava(opt.value)} className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${usava === opt.value ? 'border-purple-500/50 bg-purple-500/15 text-purple-300' : 'border-white/10 bg-white/5 text-gray-500 hover:text-gray-300 hover:border-white/20'}`}>{opt.label}</button>)}
+                      {USAVA_OPTIONS.map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setUsava(opt.value)}
+                          className={`text-xs font-mono px-2.5 py-1 rounded-md border transition-all ${
+                            usava === opt.value
+                              ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-medium'
+                              : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {hasDateFilter && !filtersOpen && (
-              <div className="flex items-center gap-2 mb-4 px-1">
-                <div className="flex items-center gap-2 text-xs text-purple-300 bg-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-full">
-                  <Calendar className="w-3 h-3" />
-                  <span>{dateField === 'cancelamento' ? 'Cancelamento' : 'Contato'}{dateFrom && ` de ${dateFrom.split('-').reverse().join('/')}`}{dateTo && ` até ${dateTo.split('-').reverse().join('/')}`}</span>
-                  <button onClick={clearDates} className="ml-1 hover:text-white"><X className="w-3 h-3" /></button>
-                </div>
-              </div>
-            )}
-
-            <div className="hidden lg:grid grid-cols-[80px_1fr_140px_100px_120px_100px_80px_40px] gap-3 px-4 py-2 mb-1">
-              {['ID Unico', 'Cliente', 'Status', 'Prioridade', 'Site', 'UD', 'Contato', ''].map(h => (
-                <p key={h} className="text-[11px] font-medium text-gray-600 uppercase tracking-wider">{h}</p>
+            {/* Table Headers */}
+            <div className="hidden lg:grid grid-cols-[96px_1fr_130px_90px_110px_90px_80px_40px] gap-3 px-4 py-2 border-b border-zinc-800/60 font-mono text-[11px] font-medium text-zinc-500 uppercase tracking-wider">
+              {['ID Unico', 'Cliente / Empresa', 'Status', 'Prioridade', 'Site', 'Plataforma', 'Contato', ''].map((h, i) => (
+                <span key={i}>{h}</span>
               ))}
             </div>
 
+            {/* Customer List */}
             <div className="space-y-2">
               {loading && clientes.length === 0 ? (
-                <div className="flex items-center justify-center h-48">
+                <div className="flex items-center justify-center h-48 border border-zinc-800 rounded-xl bg-zinc-900/30">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-7 h-7 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                    <p className="text-sm text-gray-600">Buscando clientes...</p>
+                    <div className="w-6 h-6 border-2 border-zinc-700 border-t-zinc-300 rounded-full animate-spin" />
+                    <p className="text-xs font-mono text-zinc-500">Buscando lojistas...</p>
                   </div>
                 </div>
               ) : clientes.length === 0 ? (
-                <div className="glass-card py-16 flex flex-col items-center justify-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center">
-                    <Users className="w-7 h-7 text-purple-500/50" />
+                <div className="bg-[#121316] border border-zinc-800 rounded-xl py-16 flex flex-col items-center justify-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-zinc-800/80 border border-zinc-700/50 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-zinc-500" />
                   </div>
-                  <p className="text-gray-500 font-medium">Nenhum cliente encontrado</p>
-                  <p className="text-gray-600 text-sm">{activeFiltersCount > 0 || search ? 'Tente ajustar os filtros ou o período de data' : 'Adicione o primeiro cliente cancelado'}</p>
-                  {!activeFiltersCount && !search && (
-                    <button onClick={() => setFormOpen(true)} className="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors">
-                      <Plus className="w-4 h-4" /> Adicionar Cliente
-                    </button>
-                  )}
+                  <p className="text-zinc-300 font-medium text-sm">Nenhum cliente encontrado</p>
+                  <p className="text-zinc-500 text-xs font-mono">{activeFiltersCount > 0 || search ? 'Ajuste os filtros de busca' : 'Cadastre o primeiro cliente cancelado'}</p>
                 </div>
               ) : (
                 clientes.map((cliente, i) => (
-                  <div key={cliente.id} className="animate-fade-in" style={{ animationDelay: `${i * 20}ms` }}>
+                  <div key={cliente.id} className="animate-fade-in" style={{ animationDelay: `${i * 15}ms` }}>
                     <ClienteCard cliente={cliente} onEdit={handleEdit} onDelete={handleDelete} />
                   </div>
                 ))
               )}
             </div>
-          </>
+          </div>
         )}
 
         {/* ══ TAB: SEM CONTATO ══ */}
         {activeTab === 'sem_contato' && (
-          <div>
-            <div className="flex items-start gap-3 p-4 mb-5 rounded-xl border border-orange-500/20 bg-orange-500/5">
-              <PhoneOff className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
+              <PhoneOff className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-orange-300">Clientes sem telefone válido</p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Inclui clientes com contato vazio, sem número, e clientes cuja <strong className="text-gray-400">nota interna</strong> indica número incorreto, inválido ou inexistente. Clique em <strong className="text-gray-400">Editar</strong> para corrigir.
+                <p className="text-xs font-semibold text-amber-300 font-mono uppercase tracking-wider">Inconsistência de Contato</p>
+                <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                  Lista de lojistas sem telefone informado ou marcados com erro de contato na nota interna.
                 </p>
               </div>
             </div>
 
             {loadingSemContato ? (
-              <div className="flex items-center justify-center h-48">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-7 h-7 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin" />
-                  <p className="text-sm text-gray-600">Verificando contatos...</p>
-                </div>
+              <div className="flex items-center justify-center h-48 border border-zinc-800 rounded-xl bg-zinc-900/30">
+                <div className="w-6 h-6 border-2 border-zinc-700 border-t-zinc-300 rounded-full animate-spin" />
               </div>
             ) : semContato.length === 0 ? (
-              <div className="glass-card py-16 flex flex-col items-center justify-center gap-3">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                  <PhoneOff className="w-7 h-7 text-emerald-500/50" />
-                </div>
-                <p className="text-emerald-400 font-medium">Nenhum cliente com problema no contato!</p>
-                <p className="text-gray-600 text-sm">Todos os clientes têm telefone válido e nenhum tem nota interna indicando número inválido.</p>
+              <div className="bg-[#121316] border border-zinc-800 rounded-xl py-16 flex flex-col items-center justify-center gap-2">
+                <p className="text-emerald-400 font-mono text-xs font-semibold">Sem problemas de contato detectados</p>
               </div>
             ) : (
               <div className="space-y-2">
-                <div className="flex items-center gap-3 px-4 py-2 mb-1">
-                  <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider flex-1">Cliente</p>
-                  <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider w-32 hidden sm:block">ID Unico</p>
-                  <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider w-36 hidden md:block">Empresa</p>
-                  <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider w-28 hidden lg:block">Status</p>
-                  <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider w-28 hidden lg:block">Cancelamento</p>
-                  <p className="text-[11px] font-medium text-gray-600 uppercase tracking-wider w-20">Ação</p>
-                </div>
-
                 {semContato.map((cliente, i) => (
                   <div
                     key={cliente.id}
-                    className="flex items-center gap-3 px-4 py-3.5 bg-white/3 border border-orange-500/10 hover:border-orange-500/25 rounded-xl transition-all animate-fade-in"
-                    style={{ animationDelay: `${i * 20}ms` }}
+                    className="flex items-center gap-3 px-4 py-3 bg-[#121316] border border-zinc-800 hover:border-zinc-700 rounded-xl transition-all"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-orange-400">{cliente.nome.charAt(0).toUpperCase()}</span>
+                    <div className="w-7 h-7 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-mono font-bold text-amber-400">{cliente.nome.charAt(0).toUpperCase()}</span>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{cliente.nome}</p>
-                      <p className="text-xs text-orange-400/70 flex items-center gap-1 mt-0.5">
-                        <PhoneOff className="w-3 h-3" />
-                        {getContactReason(cliente)}
-                      </p>
-                      {/* Tag se foi identificado pela nota interna */}
-                      {!isMissingPhone(cliente.contato) && hasInvalidPhoneNote(cliente.nota_interna) && (
-                        <span className="inline-flex items-center gap-1 mt-1 text-[10px] px-1.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full">
-                          ⚠️ Nota interna
-                        </span>
-                      )}
+                      <p className="text-xs font-semibold text-zinc-100 truncate">{cliente.nome}</p>
+                      <p className="text-[11px] font-mono text-amber-400/80 truncate mt-0.5">{getContactReason(cliente)}</p>
                     </div>
 
-                    <div className="w-32 flex-shrink-0 hidden sm:block">
-                      {cliente.unico_id
-                        ? <span className="text-xs font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded">{cliente.unico_id}</span>
-                        : <span className="text-xs text-gray-700">—</span>}
-                    </div>
-
-                    <div className="w-36 flex-shrink-0 hidden md:block">
-                      <p className="text-xs text-gray-400 truncate">{cliente.empresa || '—'}</p>
-                    </div>
-
-                    <div className="w-28 flex-shrink-0 hidden lg:block">
-                      <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{
-                        backgroundColor: `${cliente.status === 'CONVERTIDO' ? '#10B98120' : cliente.status === 'EM_NEGOCIACAO' ? '#F59E0B20' : cliente.status === 'NAO_CONVERTIDO' ? '#EF444420' : '#6B728020'}`,
-                        color: cliente.status === 'CONVERTIDO' ? '#10B981' : cliente.status === 'EM_NEGOCIACAO' ? '#F59E0B' : cliente.status === 'NAO_CONVERTIDO' ? '#EF4444' : '#9CA3AF',
-                      }}>
-                        {STATUS_LABELS[cliente.status]}
-                      </span>
-                    </div>
-
-                    <div className="w-28 flex-shrink-0 hidden lg:block">
-                      <p className="text-xs text-gray-600">
-                        {cliente.data_cancelamento ? new Date(cliente.data_cancelamento).toLocaleDateString('pt-BR') : '—'}
-                      </p>
+                    <div className="w-28 flex-shrink-0 hidden sm:block">
+                      <span className="text-xs font-mono text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700/50">{cliente.unico_id || '—'}</span>
                     </div>
 
                     <div className="w-20 flex-shrink-0 flex justify-end">
                       <button
                         onClick={() => handleEdit(cliente.id)}
-                        title="Editar e adicionar telefone"
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 rounded-lg transition-all"
+                        className="flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded transition-all"
                       >
                         <Edit2 className="w-3 h-3" /> Editar
                       </button>
                     </div>
                   </div>
                 ))}
-
-                <p className="text-xs text-gray-700 text-center pt-3 pb-1">
-                  {semContato.length} cliente{semContato.length !== 1 ? 's' : ''} com problema no contato
-                </p>
               </div>
             )}
           </div>

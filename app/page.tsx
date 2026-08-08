@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Dashboard from '@/components/Dashboard'
 import DateFilterBar from '@/components/DateFilterBar'
 import { DashboardMetrics } from '@/lib/types'
-import { RefreshCw, Plus, TrendingUp, Calendar } from 'lucide-react'
+import { RefreshCw, Plus, Calendar, Activity } from 'lucide-react'
 import ClienteForm from '@/components/ClienteForm'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -62,7 +62,6 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchMetrics()
-    // Auto-refresh só quando não há filtro de data (para não interferir)
     if (!dateFilter.dateFrom && !dateFilter.dateTo) {
       const interval = setInterval(fetchMetrics, 60000)
       return () => clearInterval(interval)
@@ -74,33 +73,35 @@ export default function HomePage() {
   const hasDateFilter = dateFilter.dateFrom || dateFilter.dateTo
 
   return (
-    <div className="p-6 max-w-[1400px] mx-auto animate-fade-in">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+    <div className="p-6 md:p-8 max-w-[1400px] mx-auto animate-fade-in space-y-6">
+      {/* Header Bar */}
+      <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-4 h-4 text-purple-400" />
-            <span className="text-xs text-purple-400 font-medium uppercase tracking-wider">Dashboard</span>
+            <span className="text-[11px] font-mono font-medium text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              Overview
+            </span>
+            <span className="text-[11px] text-zinc-500 font-mono">UnicoCRM Analytics</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">Visão Geral</h1>
-          <div className="flex items-center gap-2 mt-1.5">
-            <Calendar className="w-3.5 h-3.5 text-gray-600" />
-            <p className="text-sm text-gray-500">{todayCapitalized}</p>
+          <h1 className="text-xl font-bold tracking-tight text-zinc-100">Visão Geral de Retenção & Churn</h1>
+          <div className="flex items-center gap-2 mt-1">
+            <Calendar className="w-3.5 h-3.5 text-zinc-500" />
+            <p className="text-xs text-zinc-400">{todayCapitalized}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={fetchMetrics}
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/8 text-gray-400 hover:text-white text-sm transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium transition-all"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Atualizar</span>
           </button>
           <button
             onClick={() => setFormOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white text-sm font-medium shadow-lg shadow-purple-500/20 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold shadow-sm transition-all"
           >
             <Plus className="w-4 h-4" />
             Novo Cliente
@@ -108,28 +109,28 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Last refresh + filter info */}
-      <div className="flex items-center gap-3 mb-5 flex-wrap">
-        <p className="text-[11px] text-gray-700">
-          Última atualização: {format(lastRefresh, 'HH:mm:ss', { locale: ptBR })}
-          {!hasDateFilter && ' • Auto-refresh a cada 60s'}
+      {/* Subheader info */}
+      <div className="flex items-center justify-between text-xs text-zinc-500 font-mono -mt-2">
+        <p>
+          Atualizado às {format(lastRefresh, 'HH:mm:ss', { locale: ptBR })}
+          {!hasDateFilter && ' • Auto-refresh 60s'}
         </p>
         {hasDateFilter && (
-          <span className="text-[11px] text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 rounded-full">
-            ⚡ Dados filtrados por período
+          <span className="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded text-[11px]">
+            Filtro de período ativo
           </span>
         )}
       </div>
 
-      {/* Date Filter */}
+      {/* Date Filter Bar */}
       <DateFilterBar value={dateFilter} onChange={setDateFilter} />
 
       {/* Dashboard Content */}
       {loading && metrics.total === 0 ? (
-        <div className="flex items-center justify-center h-64">
+        <div className="flex items-center justify-center h-64 border border-zinc-800 rounded-xl bg-zinc-900/30">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-            <p className="text-sm text-gray-500">Carregando métricas...</p>
+            <Activity className="w-6 h-6 text-zinc-500 animate-spin" />
+            <p className="text-xs text-zinc-400 font-mono">Carregando métricas da operação...</p>
           </div>
         </div>
       ) : (

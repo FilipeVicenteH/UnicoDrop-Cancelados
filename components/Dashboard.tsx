@@ -2,16 +2,16 @@
 
 import { DashboardMetrics } from '@/lib/types'
 import {
-  TrendingUp, Users, CheckCircle, XCircle, Clock,
-  PhoneCall, UserMinus, Activity, ShoppingBag, AlertTriangle,
-  BarChart2, MessageSquare, Store, WifiOff, DollarSign
+  TrendingUp, Users, CheckCircle2, XCircle, Clock,
+  PhoneCall, UserMinus, Activity, ShoppingBag, AlertCircle,
+  BarChart3, MessageSquare, Store, WifiOff, DollarSign
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   PieChart, Pie,
   type PieLabelRenderProps
 } from 'recharts'
-import { STATUS_LABELS, STATUS_COLORS } from '@/lib/constants'
+import { STATUS_LABELS } from '@/lib/constants'
 
 interface DashboardProps {
   metrics: DashboardMetrics
@@ -25,12 +25,12 @@ const renderCustomizedLabel = (props: PieLabelRenderProps) => {
   const innerRadius = props.innerRadius as number
   const outerRadius = props.outerRadius as number
   const percent = props.percent as number
-  if (!percent || percent < 0.07) return null
+  if (!percent || percent < 0.06) return null
   const radius = innerRadius + (outerRadius - innerRadius) * 0.55
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
   const y = cy + radius * Math.sin(-midAngle * RADIAN)
   return (
-    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight="700">
+    <text x={x} y={y} fill="#f4f4f5" textAnchor="middle" dominantBaseline="central" fontSize={10} fontWeight="700" className="font-mono">
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   )
@@ -38,19 +38,26 @@ const renderCustomizedLabel = (props: PieLabelRenderProps) => {
 
 const tooltipStyle = {
   contentStyle: {
-    background: '#13131f',
-    border: '1px solid rgba(139,92,246,0.25)',
-    borderRadius: '10px',
-    color: '#e5e7eb',
+    background: '#18181b',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    color: '#f4f4f5',
     fontSize: '12px',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
   },
-  labelStyle: { color: '#e5e7eb', fontWeight: 600 },
-  itemStyle: { color: '#c4b5fd' },
-  cursor: { fill: 'rgba(139,92,246,0.06)' },
+  labelStyle: { color: '#f4f4f5', fontWeight: 600 },
+  itemStyle: { color: '#a1a1aa' },
+  cursor: { fill: 'rgba(255,255,255,0.03)' },
 }
 
-const CHART_COLORS = ['#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#6366F1', '#14B8A6']
+const STATUS_NEUTRAL_COLORS: Record<string, string> = {
+  CONVERTIDO: '#10B981',
+  EM_NEGOCIACAO: '#F59E0B',
+  PENDENTE: '#71717A',
+  NAO_CONVERTIDO: '#F43F5E',
+}
+
+const CHART_PALETTE = ['#6366F1', '#10B981', '#F59E0B', '#06B6D4', '#F43F5E', '#EC4899', '#8B5CF6', '#3B82F6']
 
 export default function Dashboard({ metrics }: DashboardProps) {
   const taxa = metrics.taxa_conversao
@@ -60,82 +67,55 @@ export default function Dashboard({ metrics }: DashboardProps) {
       label: 'Total de Clientes',
       value: metrics.total,
       icon: Users,
-      color: 'text-purple-400',
-      bg: 'from-purple-500/15 to-purple-500/5',
-      border: 'border-purple-500/25',
-      glow: 'shadow-purple-500/10',
+      badgeColor: 'text-zinc-300',
     },
     {
       label: 'Convertidos',
       value: metrics.convertidos,
-      icon: CheckCircle,
-      color: 'text-emerald-400',
-      bg: 'from-emerald-500/15 to-emerald-500/5',
-      border: 'border-emerald-500/25',
-      glow: 'shadow-emerald-500/10',
+      icon: CheckCircle2,
+      badgeColor: 'text-emerald-400',
     },
     {
       label: 'Em Negociação',
       value: metrics.em_negociacao,
       icon: Clock,
-      color: 'text-amber-400',
-      bg: 'from-amber-500/15 to-amber-500/5',
-      border: 'border-amber-500/25',
-      glow: 'shadow-amber-500/10',
+      badgeColor: 'text-amber-400',
     },
     {
       label: 'Não Convertidos',
       value: metrics.nao_convertidos,
       icon: XCircle,
-      color: 'text-red-400',
-      bg: 'from-red-500/15 to-red-500/5',
-      border: 'border-red-500/25',
-      glow: 'shadow-red-500/10',
+      badgeColor: 'text-rose-400',
     },
     {
       label: 'Taxa de Conversão',
       value: `${taxa}%`,
       icon: TrendingUp,
-      color: taxa >= 30 ? 'text-emerald-400' : taxa >= 15 ? 'text-amber-400' : 'text-rose-400',
-      bg: 'from-violet-500/15 to-violet-500/5',
-      border: 'border-violet-500/25',
-      glow: 'shadow-violet-500/10',
+      badgeColor: taxa >= 30 ? 'text-emerald-400' : taxa >= 15 ? 'text-amber-400' : 'text-rose-400',
     },
     {
       label: 'Pendentes',
       value: metrics.pendentes,
       icon: Activity,
-      color: 'text-gray-400',
-      bg: 'from-gray-500/15 to-gray-500/5',
-      border: 'border-gray-500/25',
-      glow: 'shadow-gray-500/10',
+      badgeColor: 'text-zinc-400',
     },
     {
       label: 'Inacessíveis',
       value: metrics.inacessiveis,
       icon: WifiOff,
-      color: 'text-orange-400',
-      bg: 'from-orange-500/15 to-orange-500/5',
-      border: 'border-orange-500/25',
-      glow: 'shadow-orange-500/10',
+      badgeColor: 'text-orange-400',
     },
     {
       label: 'Contatados Hoje',
       value: metrics.contatados_hoje,
       icon: PhoneCall,
-      color: 'text-sky-400',
-      bg: 'from-sky-500/15 to-sky-500/5',
-      border: 'border-sky-500/25',
-      glow: 'shadow-sky-500/10',
+      badgeColor: 'text-sky-400',
     },
     {
       label: 'Cancelaram Hoje',
       value: metrics.cancelados_hoje,
       icon: UserMinus,
-      color: 'text-rose-400',
-      bg: 'from-rose-500/15 to-rose-500/5',
-      border: 'border-rose-500/25',
-      glow: 'shadow-rose-500/10',
+      badgeColor: 'text-rose-400',
     },
   ]
 
@@ -145,17 +125,16 @@ export default function Dashboard({ metrics }: DashboardProps) {
       return {
         name: 'Pendentes',
         value: Math.max(0, s.count - metrics.inacessiveis),
-        color: STATUS_COLORS[s.status] || '#6B7280',
+        color: STATUS_NEUTRAL_COLORS[s.status] || '#71717A',
       }
     }
     return {
       name: STATUS_LABELS[s.status] || s.status,
       value: s.count,
-      color: STATUS_COLORS[s.status] || '#6B7280',
+      color: STATUS_NEUTRAL_COLORS[s.status] || '#71717A',
     }
   }).filter(d => d.value > 0)
 
-  // Append inacessíveis slice if any
   if (metrics.inacessiveis > 0) {
     pieData.push({ name: 'Inacessíveis', value: metrics.inacessiveis, color: '#F97316' })
   }
@@ -176,12 +155,6 @@ export default function Dashboard({ metrics }: DashboardProps) {
       value: p.count,
     }))
 
-  const prioridadeData = metrics.por_prioridade.map((p, i) => ({
-    name: p.prioridade === 'ALTA' ? '🔴 Alta' : p.prioridade === 'MEDIA' ? '🟡 Média' : '🔵 Baixa',
-    value: p.count,
-    fill: p.prioridade === 'ALTA' ? '#EF4444' : p.prioridade === 'MEDIA' ? '#F59E0B' : '#3B82F6',
-  }))
-
   const rawFaturamento = (metrics.por_faturamento || []).filter(f => f.count > 0 && f.faixa !== 'Não Informado')
   const faturamentoTotal = rawFaturamento.reduce((acc, f) => acc + f.count, 0)
   const faturamentoData = rawFaturamento.map(f => ({
@@ -192,73 +165,76 @@ export default function Dashboard({ metrics }: DashboardProps) {
   const maxMotivo = metrics.top_motivos[0]?.count || 1
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* ── KPI Grid ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {statCards.map((card) => {
           const Icon = card.icon
           return (
             <div
               key={card.label}
-              className={`relative overflow-hidden rounded-2xl border ${card.border} bg-gradient-to-br ${card.bg} p-4 shadow-lg ${card.glow} transition-all hover:scale-[1.02] hover:shadow-xl group`}
+              className="bg-[#121316] border border-zinc-800/80 rounded-xl p-4 hover:border-zinc-700/80 transition-all group"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider truncate">{card.label}</p>
-                  <p className={`text-2xl font-black mt-1.5 ${card.color} tabular-nums`}>{card.value}</p>
-                </div>
-                <div className={`p-2 rounded-xl bg-white/5 flex-shrink-0`}>
-                  <Icon className={`w-4 h-4 ${card.color}`} />
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider truncate">
+                  {card.label}
+                </span>
+                <div className="p-1.5 rounded-md bg-zinc-800/50 border border-zinc-700/40 text-zinc-400 flex-shrink-0">
+                  <Icon className="w-3.5 h-3.5" />
                 </div>
               </div>
-              {/* Decorative orb */}
-              <div className={`absolute -bottom-6 -right-6 w-20 h-20 rounded-full ${card.bg} blur-2xl opacity-60 group-hover:opacity-80 transition-opacity`} />
+              <p className={`text-2xl font-bold font-mono tracking-tight mt-2 ${card.badgeColor}`}>
+                {card.value}
+              </p>
             </div>
           )
         })}
       </div>
 
-      {/* ── Conversion funnel + Pie ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* ── Conversion Funnel + Status Breakdown ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         {/* Funil de Reconversão */}
-        <div className="lg:col-span-2 bg-white/3 border border-white/8 rounded-2xl p-5">
+        <div className="lg:col-span-2 bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-purple-500/10 rounded-lg">
-                <TrendingUp className="w-4 h-4 text-purple-400" />
+              <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+                <TrendingUp className="w-4 h-4" />
               </div>
-              <h3 className="text-sm font-semibold text-gray-200">Funil de Reconversão</h3>
+              <div>
+                <h3 className="text-sm font-semibold text-zinc-100">Funil de Reconversão</h3>
+                <p className="text-[11px] text-zinc-500">Distribuição operacional do status dos lojistas</p>
+              </div>
             </div>
-            <span className="text-[11px] text-gray-600 bg-white/5 px-2 py-1 rounded-full">
+            <span className="text-[11px] font-mono text-zinc-400 bg-zinc-800/60 px-2.5 py-1 rounded border border-zinc-700/50">
               {metrics.total} clientes
             </span>
           </div>
 
           <div className="space-y-4">
             {[
-              { label: 'Convertidos', value: metrics.convertidos, color: 'from-emerald-500 to-emerald-400', textColor: 'text-emerald-400', emoji: '✅' },
-              { label: 'Em Negociacão', value: metrics.em_negociacao, color: 'from-amber-500 to-amber-400', textColor: 'text-amber-400', emoji: '🔄' },
-              { label: 'Pendentes', value: metrics.pendentes, color: 'from-gray-600 to-gray-500', textColor: 'text-gray-400', emoji: '⏳' },
-              { label: 'Inacessíveis', value: metrics.inacessiveis, color: 'from-orange-600 to-orange-400', textColor: 'text-orange-400', emoji: '📥' },
-              { label: 'Não Convertidos', value: metrics.nao_convertidos, color: 'from-red-600 to-red-500', textColor: 'text-red-400', emoji: '❌' },
+              { label: 'Convertidos', value: metrics.convertidos, barBg: 'bg-emerald-500', textColor: 'text-emerald-400', dotColor: 'bg-emerald-500' },
+              { label: 'Em Negociação', value: metrics.em_negociacao, barBg: 'bg-amber-500', textColor: 'text-amber-400', dotColor: 'bg-amber-500' },
+              { label: 'Pendentes', value: metrics.pendentes, barBg: 'bg-zinc-500', textColor: 'text-zinc-400', dotColor: 'bg-zinc-500' },
+              { label: 'Inacessíveis', value: metrics.inacessiveis, barBg: 'bg-orange-500', textColor: 'text-orange-400', dotColor: 'bg-orange-500' },
+              { label: 'Não Convertidos', value: metrics.nao_convertidos, barBg: 'bg-rose-500', textColor: 'text-rose-400', dotColor: 'bg-rose-500' },
             ].map(item => {
               const pct = metrics.total > 0 ? (item.value / metrics.total) * 100 : 0
               return (
                 <div key={item.label} className="group">
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center justify-between mb-1.5 text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">{item.emoji}</span>
-                      <span className="text-xs text-gray-400 font-medium">{item.label}</span>
+                      <span className={`w-2 h-2 rounded-full ${item.dotColor}`} />
+                      <span className="text-zinc-300 font-medium">{item.label}</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`text-xs font-bold ${item.textColor}`}>{item.value}</span>
-                      <span className="text-[10px] text-gray-600 w-9 text-right">{pct.toFixed(0)}%</span>
+                    <div className="flex items-center gap-3 font-mono">
+                      <span className={`font-semibold ${item.textColor}`}>{item.value}</span>
+                      <span className="text-[11px] text-zinc-500 w-10 text-right">{pct.toFixed(0)}%</span>
                     </div>
                   </div>
-                  <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
+                  <div className="w-full bg-zinc-800/80 rounded-full h-2 overflow-hidden">
                     <div
-                      className={`h-full rounded-full bg-gradient-to-r ${item.color} transition-all duration-1000 ease-out`}
+                      className={`h-full rounded-full ${item.barBg} transition-all duration-700`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -268,32 +244,32 @@ export default function Dashboard({ metrics }: DashboardProps) {
           </div>
 
           {/* Taxa de conversão destaque */}
-          <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
+          <div className="mt-6 pt-4 border-t border-zinc-800/80 flex items-center justify-between">
             <div>
-              <span className="text-xs text-gray-600">Taxa de conversão real</span>
-              <p className="text-[10px] text-gray-700">excluindo {metrics.inacessiveis} inacessíveis</p>
+              <span className="text-xs text-zinc-400 font-medium">Taxa de Conversão Efetiva</span>
+              <p className="text-[11px] text-zinc-500 font-mono">Exclui {metrics.inacessiveis} lojistas sem telefone ou offline</p>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 w-24 bg-white/5 rounded-full overflow-hidden">
+            <div className="flex items-center gap-3">
+              <div className="h-2 w-28 bg-zinc-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-violet-400 rounded-full transition-all duration-1000"
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-700"
                   style={{ width: `${taxa}%` }}
                 />
               </div>
-              <span className={`text-sm font-black ${taxa >= 30 ? 'text-emerald-400' : taxa >= 15 ? 'text-amber-400' : 'text-red-400'}`}>
+              <span className={`text-base font-mono font-bold ${taxa >= 30 ? 'text-emerald-400' : taxa >= 15 ? 'text-amber-400' : 'text-rose-400'}`}>
                 {taxa}%
               </span>
             </div>
           </div>
         </div>
 
-        {/* Pie - Status */}
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
+        {/* Status Donut Chart */}
+        <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-1.5 bg-violet-500/10 rounded-lg">
-              <BarChart2 className="w-4 h-4 text-violet-400" />
+            <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+              <BarChart3 className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-200">Por Status</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">Visão Geral de Status</h3>
           </div>
           {pieData.length > 0 ? (
             <>
@@ -306,10 +282,10 @@ export default function Dashboard({ metrics }: DashboardProps) {
                     labelLine={false}
                     label={renderCustomizedLabel}
                     outerRadius={70}
-                    innerRadius={28}
+                    innerRadius={36}
                     dataKey="value"
                     strokeWidth={2}
-                    stroke="#07070f"
+                    stroke="#121316"
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -318,114 +294,110 @@ export default function Dashboard({ metrics }: DashboardProps) {
                   <Tooltip {...tooltipStyle} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-1.5 mt-1">
+              <div className="space-y-2 mt-2 pt-2 border-t border-zinc-800/60">
                 {pieData.map(item => (
-                  <div key={item.name} className="flex items-center justify-between">
+                  <div key={item.name} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.color }} />
-                      <span className="text-[11px] text-gray-500">{item.name}</span>
+                      <span className="w-2 h-2 rounded-full" style={{ background: item.color }} />
+                      <span className="text-zinc-400">{item.name}</span>
                     </div>
-                    <span className="text-xs font-bold text-gray-300">{item.value}</span>
+                    <span className="font-mono font-semibold text-zinc-200">{item.value}</span>
                   </div>
                 ))}
               </div>
             </>
           ) : (
-            <div className="h-[200px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
+            <div className="h-[200px] flex items-center justify-center text-zinc-500 text-xs font-mono">Sem dados registrados</div>
           )}
         </div>
       </div>
 
-      {/* ── Charts Row: Checkout + Plataforma ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* ── Charts Row: Checkouts & Plataformas ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
         {/* Checkouts */}
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
+        <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-1.5 bg-cyan-500/10 rounded-lg">
-              <ShoppingBag className="w-4 h-4 text-cyan-400" />
+            <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+              <ShoppingBag className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-200">Checkouts Utilizados</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">Checkouts Mais Utilizados</h3>
           </div>
           {checkoutData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={checkoutData} barCategoryGap="35%" layout="vertical">
-                <XAxis type="number" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
+              <BarChart data={checkoutData} barCategoryGap="30%" layout="vertical">
+                <XAxis type="number" tick={{ fill: '#71717A', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" tick={{ fill: '#A1A1AA', fontSize: 11 }} axisLine={false} tickLine={false} width={95} />
                 <Tooltip {...tooltipStyle} />
-                <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                   {checkoutData.map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} fillOpacity={0.85} />
+                    <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} fillOpacity={0.85} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[200px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
+            <div className="h-[200px] flex items-center justify-center text-zinc-500 text-xs font-mono">Sem dados de checkouts</div>
           )}
         </div>
 
         {/* Plataformas */}
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
+        <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-              <Store className="w-4 h-4 text-emerald-400" />
+            <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+              <Store className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-200">Plataformas de Loja</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">Plataformas de E-Commerce</h3>
           </div>
           {plataformaData.length > 0 ? (
             <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={plataformaData} barCategoryGap="35%" layout="vertical">
-                <XAxis type="number" tick={{ fill: '#4B5563', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
+              <BarChart data={plataformaData} barCategoryGap="30%" layout="vertical">
+                <XAxis type="number" tick={{ fill: '#71717A', fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis type="category" dataKey="name" tick={{ fill: '#A1A1AA', fontSize: 11 }} axisLine={false} tickLine={false} width={95} />
                 <Tooltip {...tooltipStyle} />
-                <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                   {plataformaData.map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[(i + 2) % CHART_COLORS.length]} fillOpacity={0.85} />
+                    <Cell key={i} fill={CHART_PALETTE[(i + 2) % CHART_PALETTE.length]} fillOpacity={0.85} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[200px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
+            <div className="h-[200px] flex items-center justify-center text-zinc-500 text-xs font-mono">Sem dados de plataformas</div>
           )}
         </div>
       </div>
 
-      {/* ── Motivos + Prioridade ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* ── Motivos & Prioridade ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
         {/* Top Motivos de Cancelamento */}
-        <div className="lg:col-span-2 bg-white/3 border border-white/8 rounded-2xl p-5">
+        <div className="lg:col-span-2 bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-5">
-            <div className="p-1.5 bg-rose-500/10 rounded-lg">
-              <MessageSquare className="w-4 h-4 text-rose-400" />
+            <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+              <MessageSquare className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-200">Principais Motivos de Cancelamento</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">Principais Motivos de Cancelamento</h3>
           </div>
 
           {metrics.top_motivos.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {metrics.top_motivos.map((item, i) => {
                 const pct = Math.round((item.count / maxMotivo) * 100)
-                const colors = ['text-rose-400', 'text-orange-400', 'text-amber-400', 'text-yellow-400', 'text-lime-400', 'text-green-400', 'text-teal-400', 'text-cyan-400']
-                const bars = ['from-rose-600 to-rose-400', 'from-orange-600 to-orange-400', 'from-amber-600 to-amber-400', 'from-yellow-600 to-yellow-400', 'from-lime-600 to-lime-400', 'from-green-600 to-green-400', 'from-teal-600 to-teal-400', 'from-cyan-600 to-cyan-400']
                 return (
                   <div key={i} className="group">
-                    <div className="flex items-start justify-between mb-1.5 gap-3">
+                    <div className="flex items-start justify-between mb-1 gap-3 text-xs">
                       <div className="flex items-start gap-2.5 min-w-0">
-                        <span className={`text-[10px] font-black w-5 flex-shrink-0 mt-0.5 ${colors[i] || 'text-gray-500'}`}>
-                          #{i + 1}
-                        </span>
-                        <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">{item.motivo}</p>
+                        <span className="font-mono text-[10px] text-zinc-500 font-semibold mt-0.5">#{i + 1}</span>
+                        <p className="text-zinc-300 leading-snug line-clamp-2">{item.motivo}</p>
                       </div>
-                      <span className={`text-xs font-black flex-shrink-0 ${colors[i] || 'text-gray-500'} bg-white/5 px-2 py-0.5 rounded-full`}>
+                      <span className="font-mono text-xs font-bold text-zinc-200 bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700/50">
                         {item.count}x
                       </span>
                     </div>
-                    <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden ml-7">
+                    <div className="w-full bg-zinc-800/80 rounded-full h-1.5 overflow-hidden ml-6">
                       <div
-                        className={`h-full rounded-full bg-gradient-to-r ${bars[i] || 'from-gray-600 to-gray-500'} transition-all duration-1000`}
+                        className="h-full rounded-full bg-zinc-400 transition-all duration-700"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -434,63 +406,61 @@ export default function Dashboard({ metrics }: DashboardProps) {
               })}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-8 gap-3">
-              <AlertTriangle className="w-8 h-8 text-gray-700" />
-              <p className="text-sm text-gray-600">Nenhum motivo cadastrado ainda</p>
-              <p className="text-xs text-gray-700">Preencha o campo &quot;Motivo do Cancelamento&quot; ao adicionar clientes</p>
+            <div className="flex flex-col items-center justify-center py-8 gap-2">
+              <AlertCircle className="w-6 h-6 text-zinc-600" />
+              <p className="text-xs text-zinc-500 font-mono">Nenhum motivo de cancelamento registrado</p>
             </div>
           )}
         </div>
 
-        {/* Prioridade */}
-        <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
+        {/* Prioridade Breakdown */}
+        <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-1.5 bg-blue-500/10 rounded-lg">
-              <AlertTriangle className="w-4 h-4 text-blue-400" />
+            <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+              <AlertCircle className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-200">Por Prioridade</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">Distribuição por Prioridade</h3>
           </div>
-          {prioridadeData.length > 0 ? (
-            <div className="space-y-3 mt-2">
-              {[
-                { label: '🔴 Alta', value: metrics.por_prioridade.find(p => p.prioridade === 'ALTA')?.count || 0, bar: 'bg-gradient-to-r from-red-600 to-red-400', text: 'text-red-400' },
-                { label: '🟡 Média', value: metrics.por_prioridade.find(p => p.prioridade === 'MEDIA')?.count || 0, bar: 'bg-gradient-to-r from-amber-600 to-amber-400', text: 'text-amber-400' },
-                { label: '🔵 Baixa', value: metrics.por_prioridade.find(p => p.prioridade === 'BAIXA')?.count || 0, bar: 'bg-gradient-to-r from-blue-600 to-blue-400', text: 'text-blue-400' },
-              ].map(p => {
-                const total = metrics.por_prioridade.reduce((s, x) => s + x.count, 0) || 1
-                const pct = Math.round((p.value / total) * 100)
-                return (
-                  <div key={p.label}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs text-gray-400">{p.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-sm font-bold ${p.text}`}>{p.value}</span>
-                        <span className="text-[10px] text-gray-600 w-8 text-right">{pct}%</span>
-                      </div>
-                    </div>
-                    <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${p.bar} transition-all duration-700 ease-out`}
-                        style={{ width: `${pct}%` }}
-                      />
+          <div className="space-y-4 mt-3">
+            {[
+              { label: 'Alta Prioridade', key: 'ALTA', value: metrics.por_prioridade.find(p => p.prioridade === 'ALTA')?.count || 0, bar: 'bg-rose-500', text: 'text-rose-400', badge: 'bg-rose-500/10 border-rose-500/20 text-rose-400' },
+              { label: 'Média Prioridade', key: 'MEDIA', value: metrics.por_prioridade.find(p => p.prioridade === 'MEDIA')?.count || 0, bar: 'bg-amber-500', text: 'text-amber-400', badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400' },
+              { label: 'Baixa Prioridade', key: 'BAIXA', value: metrics.por_prioridade.find(p => p.prioridade === 'BAIXA')?.count || 0, bar: 'bg-sky-500', text: 'text-sky-400', badge: 'bg-sky-500/10 border-sky-500/20 text-sky-400' },
+            ].map(p => {
+              const total = metrics.por_prioridade.reduce((s, x) => s + x.count, 0) || 1
+              const pct = Math.round((p.value / total) * 100)
+              return (
+                <div key={p.key}>
+                  <div className="flex items-center justify-between mb-1.5 text-xs">
+                    <span className="text-zinc-300 font-medium">{p.label}</span>
+                    <div className="flex items-center gap-2 font-mono">
+                      <span className={`font-bold ${p.text}`}>{p.value}</span>
+                      <span className="text-[11px] text-zinc-500 w-8 text-right">{pct}%</span>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="h-[200px] flex items-center justify-center text-gray-600 text-sm">Sem dados</div>
-          )}
+                  <div className="w-full bg-zinc-800/80 rounded-full h-2 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${p.bar} transition-all duration-700`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
 
-      {/* ── Faturamento Anterior ── */}
-      <div className="bg-white/3 border border-white/8 rounded-2xl p-5">
+      {/* ── Faturamento Anterior (Lojas) ── */}
+      <div className="bg-[#121316] border border-zinc-800/80 rounded-xl p-5">
         <div className="flex items-center gap-2 mb-4">
-          <div className="p-1.5 bg-yellow-500/10 rounded-lg">
-            <DollarSign className="w-4 h-4 text-yellow-400" />
+          <div className="p-1.5 bg-zinc-800 rounded-md border border-zinc-700/60 text-zinc-300">
+            <DollarSign className="w-4 h-4" />
           </div>
-          <h3 className="text-sm font-semibold text-gray-200">Faturamento do Mês Anterior (Lojas)</h3>
+          <div>
+            <h3 className="text-sm font-semibold text-zinc-100">Faturamento Mensal Anterior (Base de Lojistas)</h3>
+            <p className="text-[11px] text-zinc-500">Mapeamento de porte dos e-commerces em churn</p>
+          </div>
         </div>
         {faturamentoData.length > 0 ? (
           <>
@@ -501,34 +471,34 @@ export default function Dashboard({ metrics }: DashboardProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  outerRadius={80}
-                  innerRadius={50}
+                  outerRadius={75}
+                  innerRadius={45}
                   paddingAngle={3}
                   dataKey="percent"
                   nameKey="faixa"
                   stroke="none"
                 >
                   {faturamentoData.map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />
                   ))}
                 </Pie>
                 <Tooltip {...tooltipStyle} formatter={(val: any) => [`${val}%`, 'Lojas']} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+            <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
               {faturamentoData.map((item, i) => (
-                <div key={item.faixa} className="flex items-center justify-between bg-white/5 rounded-md px-2 py-1.5">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full shadow-sm flex-shrink-0" style={{ background: CHART_COLORS[i % CHART_COLORS.length] }} />
-                    <span className="text-[11px] text-gray-300 font-medium truncate" title={item.faixa}>{item.faixa}</span>
+                <div key={item.faixa} className="flex items-center justify-between bg-zinc-900/80 border border-zinc-800 rounded-md px-2.5 py-1.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CHART_PALETTE[i % CHART_PALETTE.length] }} />
+                    <span className="text-[11px] text-zinc-400 font-medium truncate" title={item.faixa}>{item.faixa}</span>
                   </div>
-                  <span className="text-xs font-bold text-white">{item.percent}%</span>
+                  <span className="text-xs font-mono font-bold text-zinc-200 ml-1">{item.percent}%</span>
                 </div>
               ))}
             </div>
           </>
         ) : (
-          <div className="h-[260px] flex items-center justify-center text-gray-600 text-sm">Sem faturamentos reportados</div>
+          <div className="h-[200px] flex items-center justify-center text-zinc-500 text-xs font-mono">Sem faturamentos reportados</div>
         )}
       </div>
 
