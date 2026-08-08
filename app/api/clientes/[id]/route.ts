@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { anonymizeCliente } from '@/lib/anonymize'
 
 export async function GET(
   request: NextRequest,
@@ -15,7 +16,7 @@ export async function GET(
       return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 404 })
     }
 
-    return NextResponse.json(cliente)
+    return NextResponse.json(anonymizeCliente(cliente))
   } catch (error) {
     console.error('GET /api/clientes/[id] error:', error)
     return NextResponse.json({ error: 'Erro ao buscar cliente' }, { status: 500 })
@@ -78,7 +79,7 @@ export async function PUT(
       },
     })
 
-    return NextResponse.json(cliente)
+    return NextResponse.json(anonymizeCliente(cliente))
   } catch (error) {
     console.error('PUT /api/clientes/[id] error:', error)
     return NextResponse.json({ error: 'Erro ao atualizar cliente' }, { status: 500 })

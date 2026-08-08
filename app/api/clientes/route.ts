@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { anonymizeCliente } from '@/lib/anonymize'
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,8 +61,10 @@ export async function GET(request: NextRequest) {
       prisma.cliente.count({ where }),
     ])
 
+    const sanitizedClientes = clientes.map(c => anonymizeCliente(c))
+
     return NextResponse.json({
-      clientes,
+      clientes: sanitizedClientes,
       total,
       page,
       totalPages: Math.ceil(total / limit),
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json(cliente, { status: 201 })
+    return NextResponse.json(anonymizeCliente(cliente), { status: 201 })
   } catch (error) {
     console.error('POST /api/clientes error:', error)
     return NextResponse.json({ error: 'Erro ao criar cliente' }, { status: 500 })

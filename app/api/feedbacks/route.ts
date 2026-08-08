@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { anonymizeFeedback } from '@/lib/anonymize'
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +30,9 @@ export async function GET(request: NextRequest) {
       orderBy: [{ prioridade: 'desc' }, { created_at: 'desc' }],
     })
 
-    return NextResponse.json(feedbacks)
+    const sanitizedFeedbacks = feedbacks.map(f => anonymizeFeedback(f))
+
+    return NextResponse.json(sanitizedFeedbacks)
   } catch (error) {
     console.error('GET /api/feedbacks error:', error)
     return NextResponse.json({ error: 'Erro ao buscar feedbacks' }, { status: 500 })
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json(feedback, { status: 201 })
+    return NextResponse.json(anonymizeFeedback(feedback), { status: 201 })
   } catch (error) {
     console.error('POST /api/feedbacks error:', error)
     return NextResponse.json({ error: 'Erro ao criar feedback' }, { status: 500 })
