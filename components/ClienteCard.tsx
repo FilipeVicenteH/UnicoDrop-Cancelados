@@ -21,35 +21,41 @@ interface ClienteCardProps {
 export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardProps) {
   const [expanded, setExpanded] = useState(false)
 
-  const STATUS_BADGE: Record<string, { bg: string; color: string; border: string }> = {
-    CONVERTIDO: { bg: '#ecfdf5', color: '#059669', border: '#a7f3d0' },
-    EM_NEGOCIACAO: { bg: '#fffbeb', color: '#d97706', border: '#fde68a' },
-    PENDENTE: { bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' },
-    NAO_CONVERTIDO: { bg: '#fef2f2', color: '#dc2626', border: '#fecaca' },
+  const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
+    CONVERTIDO: { bg: '#d1fae5', color: '#059669' },
+    EM_NEGOCIACAO: { bg: '#fef3c7', color: '#d97706' },
+    PENDENTE: { bg: '#f1f3f6', color: '#6b7280' },
+    NAO_CONVERTIDO: { bg: '#fee2e2', color: '#dc2626' },
   }
-  const PRIORIDADE_BADGE: Record<string, { bg: string; color: string; border: string }> = {
-    ALTA: { bg: '#fef2f2', color: '#dc2626', border: '#fecaca' },
-    MEDIA: { bg: '#fffbeb', color: '#d97706', border: '#fde68a' },
-    BAIXA: { bg: '#f0f9ff', color: '#0284c7', border: '#bae6fd' },
+  const PRIORIDADE_BADGE: Record<string, { bg: string; color: string }> = {
+    ALTA: { bg: '#fee2e2', color: '#dc2626' },
+    MEDIA: { bg: '#fef3c7', color: '#d97706' },
+    BAIXA: { bg: '#cffafe', color: '#0891b2' },
   }
-  const statusBadge = STATUS_BADGE[cliente.status] || { bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' }
-  const prioridadeBadge = PRIORIDADE_BADGE[cliente.prioridade] || { bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' }
+  const statusBadge = STATUS_BADGE[cliente.status] || { bg: '#f1f3f6', color: '#6b7280' }
+  const prioridadeBadge = PRIORIDADE_BADGE[cliente.prioridade] || { bg: '#f1f3f6', color: '#6b7280' }
 
   const siteIcon = () => {
-    if (cliente.site_online === 'ONLINE') return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-    if (cliente.site_online === 'OFFLINE') return <XCircle className="w-3.5 h-3.5 text-rose-600" />
-    return <AlertCircle className="w-3.5 h-3.5 text-slate-400" />
+    if (cliente.site_online === 'ONLINE') return <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#1eab5a' }} />
+    if (cliente.site_online === 'OFFLINE') return <XCircle className="w-3.5 h-3.5" style={{ color: '#ef4444' }} />
+    return <AlertCircle className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
   }
 
   return (
     <div
-      className="group transition-all duration-150 overflow-hidden bg-white border border-slate-200 rounded-lg shadow-xs hover:border-slate-300"
+      className="group transition-all duration-200 overflow-hidden"
+      style={{
+        background: 'white',
+        border: `1px solid ${expanded ? 'var(--primary)' : 'var(--border-color)'}`,
+        borderRadius: '12px',
+        boxShadow: expanded ? 'var(--shadow-hover)' : 'var(--shadow-card)',
+      }}
     >
       {/* Main Row */}
-      <div className="flex items-center gap-3 px-4 py-3 text-xs">
+      <div className="flex items-center gap-3 px-4 py-3">
         {/* ID Unico */}
         <div className="w-24 flex-shrink-0">
-          <span className="font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+          <span className="text-xs font-bold font-mono px-2 py-0.5 rounded" style={{ background: 'var(--primary-muted)', color: 'var(--primary)' }}>
             {cliente.unico_id || '—'}
           </span>
         </div>
@@ -57,34 +63,28 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         {/* Nome e Empresa */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="font-semibold text-slate-900 truncate">{cliente.nome}</p>
+            <p className="text-sm font-bold truncate" style={{ color: 'var(--text-heading)' }}>{cliente.nome}</p>
             {cliente.telefone_atualizado && (
-              <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0">
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: '#d1fae5', color: '#059669' }}>
                 Tel. ✓
               </span>
             )}
           </div>
           {cliente.empresa && (
-            <p className="text-[11px] text-slate-500 truncate mt-0.5">{cliente.empresa}</p>
+            <p className="text-xs truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>{cliente.empresa}</p>
           )}
         </div>
 
         {/* Status Badge */}
         <div className="flex-shrink-0">
-          <span
-            className="font-semibold px-2.5 py-0.5 rounded border text-[11px]"
-            style={{ background: statusBadge.bg, color: statusBadge.color, borderColor: statusBadge.border }}
-          >
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: statusBadge.bg, color: statusBadge.color }}>
             {STATUS_LABELS[cliente.status]}
           </span>
         </div>
 
         {/* Prioridade */}
         <div className="flex-shrink-0 hidden md:block">
-          <span
-            className="font-semibold px-2 py-0.5 rounded border text-[11px]"
-            style={{ background: prioridadeBadge.bg, color: prioridadeBadge.color, borderColor: prioridadeBadge.border }}
-          >
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: prioridadeBadge.bg, color: prioridadeBadge.color }}>
             {cliente.prioridade}
           </span>
         </div>
@@ -92,7 +92,7 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         {/* Site Status */}
         <div className="flex items-center gap-1.5 flex-shrink-0 hidden lg:flex">
           {siteIcon()}
-          <span className="text-slate-500 font-mono">
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
             {cliente.site_online === 'ONLINE' ? 'Online' : cliente.site_online === 'OFFLINE' ? 'Offline' : '—'}
           </span>
         </div>
@@ -107,53 +107,49 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
               return (
                 <span
                   title={unicoPlugin}
-                  className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded border ${
-                    isNovo
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-slate-100 text-slate-700 border-slate-200'
-                  }`}
+                  className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={{
+                    background: isNovo ? '#d1fae5' : '#f1f3f6',
+                    color: isNovo ? '#059669' : '#6b7280',
+                  }}
                 >
                   <Radio className="w-2.5 h-2.5" />
                   {isNovo ? 'UD Novo' : 'UD Antigo'}
                 </span>
               )
             }
-            return <span className="text-[10px] text-slate-400">Sem plugin</span>
+            return <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Sem plugin</span>
           })()}
         </div>
 
         {/* UD Tools */}
         <div className="flex gap-1 flex-shrink-0 hidden lg:flex">
-          <span title="Dashboard" className={`p-1 rounded ${cliente.usava_dashboard ? 'text-slate-900 bg-slate-100' : 'text-slate-300'}`}>
+          <span title="Dashboard" className="p-1 rounded" style={{ color: cliente.usava_dashboard ? 'var(--primary)' : 'var(--text-muted)', background: cliente.usava_dashboard ? 'var(--primary-muted)' : 'transparent' }}>
             <LayoutDashboard className="w-3.5 h-3.5" />
           </span>
-          <span title="Plugin" className={`p-1 rounded ${cliente.usava_plugin ? 'text-slate-900 bg-slate-100' : 'text-slate-300'}`}>
+          <span title="Plugin" className="p-1 rounded" style={{ color: cliente.usava_plugin ? '#1eab5a' : 'var(--text-muted)', background: cliente.usava_plugin ? '#d1fae5' : 'transparent' }}>
             <Puzzle className="w-3.5 h-3.5" />
           </span>
-          <span title="WhatsApp" className={`p-1 rounded ${cliente.usava_whatsapp ? 'text-emerald-700 bg-emerald-50' : 'text-slate-300'}`}>
+          <span title="WhatsApp" className="p-1 rounded" style={{ color: cliente.usava_whatsapp ? '#25d366' : 'var(--text-muted)', background: cliente.usava_whatsapp ? '#dcfce7' : 'transparent' }}>
             <MessageCircle className="w-3.5 h-3.5" />
           </span>
         </div>
 
         {/* Date */}
-        <div className="text-slate-400 flex-shrink-0 hidden xl:block">
+        <div className="text-xs flex-shrink-0 hidden xl:block" style={{ color: 'var(--text-muted)' }}>
           {cliente.data_contato ? format(new Date(cliente.data_contato), 'dd/MM/yy', { locale: ptBR }) : '—'}
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onEdit(cliente.id)}
-            title="Editar"
-            className="p-1 rounded text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-          >
+          <button onClick={() => onEdit(cliente.id)} title="Editar" className="p-1.5 rounded-lg transition-all" style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--primary-muted)'; (e.currentTarget as HTMLElement).style.color = 'var(--primary)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}>
             <Edit2 className="w-3.5 h-3.5" />
           </button>
-          <button
-            onClick={() => onDelete(cliente.id)}
-            title="Excluir"
-            className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-          >
+          <button onClick={() => onDelete(cliente.id)} title="Excluir" className="p-1.5 rounded-lg transition-all" style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fee2e2'; (e.currentTarget as HTMLElement).style.color = '#dc2626' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}>
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -162,7 +158,8 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         <button
           onClick={() => setExpanded(!expanded)}
           title={expanded ? 'Recolher' : 'Ver detalhes'}
-          className="p-1 rounded text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors flex-shrink-0"
+          className="p-1.5 rounded-lg transition-all flex-shrink-0"
+          style={{ color: expanded ? 'var(--primary)' : 'var(--text-muted)', background: expanded ? 'var(--primary-muted)' : 'transparent' }}
         >
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -170,26 +167,24 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
       {/* Expanded Details */}
       {expanded && (
-        <div className="px-4 pb-4 border-t border-slate-200 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50">
+        <div className="px-5 pb-5 pt-4 grid grid-cols-1 md:grid-cols-2 gap-5" style={{ borderTop: '1px solid var(--border-color)', background: '#f8fafc' }}>
           {/* Left Column */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {cliente.contato && (
               <div>
-                <p className="form-label mb-0.5">Contato</p>
-                <p className="text-xs text-slate-800 font-mono font-medium">{cliente.contato}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Contato</p>
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>{cliente.contato}</p>
               </div>
             )}
 
             {cliente.site_url && (
               <div>
-                <p className="form-label mb-0.5 flex items-center gap-1">
-                  <Globe className="w-3 h-3" /> Site URL
-                </p>
+                <p className="form-label" style={{ marginBottom: 4 }}><Globe className="w-3 h-3 inline mr-1" /> Site URL</p>
                 <a
                   href={cliente.site_url.startsWith('http') ? cliente.site_url : `https://${cliente.site_url}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-blue-600 hover:underline flex items-center gap-1"
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-sm font-semibold flex items-center gap-1 hover:underline"
+                  style={{ color: 'var(--primary)' }}
                 >
                   {cliente.site_url}
                   <ExternalLink className="w-3 h-3" />
@@ -199,15 +194,10 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
             {cliente.plugins_rastreio?.length > 0 && (
               <div>
-                <p className="form-label mb-1">Plugins de Rastreio</p>
-                <div className="flex flex-wrap gap-1">
+                <p className="form-label" style={{ marginBottom: 4 }}>Plugins de Rastreio</p>
+                <div className="flex flex-wrap gap-1.5">
                   {cliente.plugins_rastreio.map(p => (
-                    <span
-                      key={p}
-                      className="text-xs font-semibold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200"
-                    >
-                      {p}
-                    </span>
+                    <span key={p} className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: UNICO_PLUGINS.includes(p) ? '#d1fae5' : '#f1f3f6', color: UNICO_PLUGINS.includes(p) ? '#059669' : '#6b7280' }}>{p}</span>
                   ))}
                 </div>
               </div>
@@ -215,8 +205,8 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
             {(cliente.checkout || cliente.checkout_outro) && (
               <div>
-                <p className="form-label mb-1">Checkout</p>
-                <span className="text-xs font-semibold bg-white text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                <p className="form-label" style={{ marginBottom: 4 }}>Checkout</p>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--primary-muted)', color: 'var(--primary)' }}>
                   {cliente.checkout === 'Outro' ? cliente.checkout_outro : cliente.checkout}
                 </span>
               </div>
@@ -224,43 +214,60 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
             {(cliente.plataforma_loja || cliente.plataforma_loja_outro) && (
               <div>
-                <p className="form-label mb-1">Plataforma de Loja</p>
-                <span className="text-xs font-semibold bg-white text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                <p className="form-label" style={{ marginBottom: 4 }}>Plataforma de Loja</p>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#cffafe', color: '#0891b2' }}>
                   {cliente.plataforma_loja === 'Outro' ? cliente.plataforma_loja_outro : cliente.plataforma_loja}
                 </span>
+              </div>
+            )}
+
+            {cliente.recursos_ud && cliente.recursos_ud.length > 0 && (
+              <div>
+                <p className="form-label" style={{ marginBottom: 4 }}>Recursos Utilizados na UD</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {cliente.recursos_ud.map(r => (
+                    <span key={r} className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#ede9fe', color: '#6610f2' }}>{r}</span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
           {/* Right Column */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {cliente.motivo_cancelamento && (
               <div>
-                <p className="form-label mb-1">Motivo do Cancelamento</p>
-                <p className="text-xs text-slate-700 bg-white p-2.5 rounded border border-slate-200 leading-relaxed">{cliente.motivo_cancelamento}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Motivo do Cancelamento</p>
+                <p className="text-sm leading-relaxed p-3 rounded-xl" style={{ background: '#fee2e2', color: '#7f1d1d', border: '1px solid #fca5a5' }}>{cliente.motivo_cancelamento}</p>
               </div>
             )}
 
             {cliente.feedback_completo && (
               <div>
-                <p className="form-label mb-1">Feedback Completo</p>
-                <p className="text-xs text-slate-600 bg-white p-2.5 rounded border border-slate-200 leading-relaxed">{cliente.feedback_completo}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Feedback Completo</p>
+                <p className="text-sm leading-relaxed p-3 rounded-xl" style={{ background: '#f8fafc', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}>{cliente.feedback_completo}</p>
               </div>
             )}
 
             {cliente.nota_interna && (
               <div>
-                <p className="form-label mb-1">Nota Interna</p>
-                <p className="text-xs text-amber-800 italic bg-amber-50 p-2.5 rounded border border-amber-200 leading-relaxed">{cliente.nota_interna}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Nota Interna</p>
+                <p className="text-sm leading-relaxed italic p-3 rounded-xl" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>{cliente.nota_interna}</p>
               </div>
             )}
 
             {cliente.responsavel && (
               <div>
-                <p className="form-label mb-0.5">Responsável</p>
-                <p className="text-xs text-slate-800 font-medium">{cliente.responsavel}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Responsável</p>
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>{cliente.responsavel}</p>
               </div>
             )}
+
+            <div>
+              <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+                Atualizado {format(new Date(cliente.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+              </p>
+            </div>
           </div>
         </div>
       )}

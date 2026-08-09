@@ -30,19 +30,19 @@ const renderLabel = (props: PieLabelRenderProps) => {
 }
 
 const tt = {
-  contentStyle: { background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', fontFamily: "'Inter', sans-serif" },
-  labelStyle: { color: '#0f172a', fontWeight: 600 },
-  itemStyle: { color: '#475569' },
-  cursor: { fill: 'rgba(241,245,249,0.8)' },
+  contentStyle: { background: '#fff', border: '1px solid #e8ecf0', borderRadius: '12px', color: '#131523', fontSize: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', fontFamily: "'Nunito', sans-serif" },
+  labelStyle: { color: '#131523', fontWeight: 700 },
+  itemStyle: { color: '#7b8fa6' },
+  cursor: { fill: 'rgba(102,16,242,0.04)' },
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  CONVERTIDO: '#059669', EM_NEGOCIACAO: '#d97706', PENDENTE: '#64748b', NAO_CONVERTIDO: '#dc2626',
+  CONVERTIDO: '#1eab5a', EM_NEGOCIACAO: '#f59e0b', PENDENTE: '#a0aec0', NAO_CONVERTIDO: '#ef4444',
 }
 const STATUS_BG: Record<string, string> = {
-  CONVERTIDO: '#ecfdf5', EM_NEGOCIACAO: '#fffbeb', PENDENTE: '#f1f5f9', NAO_CONVERTIDO: '#fef2f2',
+  CONVERTIDO: '#d1fae5', EM_NEGOCIACAO: '#fef3c7', PENDENTE: '#f1f3f6', NAO_CONVERTIDO: '#fee2e2',
 }
-const CHART_PALETTE = ['#0f172a', '#3b82f6', '#059669', '#d97706', '#64748b', '#0284c7', '#ea580c', '#6b21a8']
+const CHART_PALETTE = ['#6610f2', '#1eab5a', '#f59e0b', '#06b6d4', '#ef4444', '#ec4899', '#8b5cf6', '#3b82f6']
 const UNICO_PLUGINS = ['UnicoDrop Novo', 'UnicoDrop Antigo']
 
 export default function RelatoriosPage() {
@@ -98,10 +98,10 @@ export default function RelatoriosPage() {
 
   if (loading || !metrics) {
     return (
-      <div className="p-8 flex items-center justify-center h-64 rounded-xl m-8 bg-white border border-slate-200 shadow-xs">
+      <div className="p-8 flex items-center justify-center h-64 rounded-2xl m-8" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
         <div className="flex flex-col items-center gap-3">
-          <Activity className="w-7 h-7 animate-spin text-slate-700" />
-          <p className="text-xs text-slate-500 font-medium">Gerando relatórios consolidados...</p>
+          <Activity className="w-8 h-8 animate-spin" style={{ color: 'var(--primary)' }} />
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Gerando relatórios...</p>
         </div>
       </div>
     )
@@ -130,10 +130,10 @@ export default function RelatoriosPage() {
   const siteNaoVerif = clientes.length - siteOnline - siteOffline
 
   const pieStatusData = metrics.por_status.map(s => {
-    if (s.status === 'PENDENTE') return { name: 'Pendentes', value: Math.max(0, s.count - metrics.inacessiveis), color: STATUS_COLORS[s.status] || '#64748b' }
-    return { name: STATUS_LABELS[s.status] || s.status, value: s.count, color: STATUS_COLORS[s.status] || '#64748b' }
+    if (s.status === 'PENDENTE') return { name: 'Pendentes', value: Math.max(0, s.count - metrics.inacessiveis), color: STATUS_COLORS[s.status] || '#a0aec0' }
+    return { name: STATUS_LABELS[s.status] || s.status, value: s.count, color: STATUS_COLORS[s.status] || '#a0aec0' }
   }).filter(d => d.value > 0)
-  if (metrics.inacessiveis > 0) pieStatusData.push({ name: 'Inacessíveis', value: metrics.inacessiveis, color: '#ea580c' })
+  if (metrics.inacessiveis > 0) pieStatusData.push({ name: 'Inacessíveis', value: metrics.inacessiveis, color: '#f97316' })
 
   const checkoutChart = metrics.por_checkout.filter(c => c.checkout !== 'Não informado').slice(0, 8).map(c => ({ name: c.checkout.length > 14 ? c.checkout.slice(0, 14) + '…' : c.checkout, value: c.count }))
   const plataformaChart = metrics.por_plataforma.filter(p => p.plataforma !== 'Não informado').slice(0, 8).map(p => ({ name: p.plataforma.length > 14 ? p.plataforma.slice(0, 14) + '…' : p.plataforma, value: p.count }))
@@ -152,69 +152,69 @@ export default function RelatoriosPage() {
   return (
     <div className="animate-fade-in">
       {/* Topbar */}
-      <div className="px-6 md:px-8 py-4 flex items-center justify-between flex-wrap gap-3 bg-white border-b border-slate-200">
+      <div className="px-6 md:px-8 py-4 flex items-center justify-between flex-wrap gap-3"
+        style={{ background: 'white', borderBottom: '1px solid var(--border-color)', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
         <div>
-          <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Análise & Relatórios Operacionais
+          <h1 className="text-xl font-bold" style={{ fontFamily: "'Poppins', sans-serif", color: 'var(--text-heading)' }}>
+            Análise & Relatórios
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Relatório gerado em {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+            Gerado em {format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
           </p>
         </div>
-        <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-all">
-          <Download className="w-3.5 h-3.5" />
-          Exportar Dados (CSV)
+        <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white btn-primary">
+          <Download className="w-4 h-4" />
+          Exportar CSV
         </button>
       </div>
 
       <div className="p-6 md:p-8 max-w-[1500px] mx-auto space-y-6">
         <DateFilterBar value={dateFilter} onChange={setDateFilter} />
 
-        {/* ── 1. KPI Summary Bar ── */}
+        {/* KPI Row */}
         <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3">
           {[
-            { label: 'Total Base', value: metrics.total, color: '#0f172a', bg: '#f8fafc' },
-            { label: 'Convertidos', value: metrics.convertidos, color: '#059669', bg: '#ecfdf5' },
-            { label: 'Em Negociação', value: metrics.em_negociacao, color: '#d97706', bg: '#fffbeb' },
-            { label: 'Pendentes', value: metrics.pendentes, color: '#475569', bg: '#f1f5f9' },
-            { label: 'Inacessíveis', value: metrics.inacessiveis, color: '#ea580c', bg: '#fff7ed' },
-            { label: 'Não Conv.', value: metrics.nao_convertidos, color: '#dc2626', bg: '#fef2f2' },
-            { label: 'Taxa Conv.', value: `${metrics.taxa_conversao}%`, color: '#059669', bg: '#ecfdf5' },
-            { label: 'Contatados Hj', value: metrics.contatados_hoje, color: '#0284c7', bg: '#f0f9ff' },
-            { label: 'Cancelados Hj', value: metrics.cancelados_hoje, color: '#dc2626', bg: '#fef2f2' },
+            { label: 'Total', value: metrics.total, color: '#6610f2', bg: '#f5f3ff' },
+            { label: 'Convertidos', value: metrics.convertidos, color: '#1eab5a', bg: '#d1fae5' },
+            { label: 'Em Neg.', value: metrics.em_negociacao, color: '#d97706', bg: '#fef3c7' },
+            { label: 'Pendentes', value: metrics.pendentes, color: '#6b7280', bg: '#f1f3f6' },
+            { label: 'Inacessíveis', value: metrics.inacessiveis, color: '#ea580c', bg: '#ffedd5' },
+            { label: 'Não Conv.', value: metrics.nao_convertidos, color: '#dc2626', bg: '#fee2e2' },
+            { label: 'Conversão', value: `${metrics.taxa_conversao}%`, color: '#1eab5a', bg: '#d1fae5' },
+            { label: 'Cont. Hoje', value: metrics.contatados_hoje, color: '#0891b2', bg: '#cffafe' },
+            { label: 'Cancel. Hj', value: metrics.cancelados_hoje, color: '#dc2626', bg: '#fee2e2' },
           ].map(item => (
-            <div key={item.label} className="rounded-lg p-3 text-center border border-slate-200 bg-white">
-              <p className="text-base font-extrabold leading-none" style={{ color: item.color }}>{item.value}</p>
-              <p className="text-[10px] font-semibold mt-1 text-slate-500 uppercase tracking-wide truncate">{item.label}</p>
+            <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: item.bg, border: `1px solid ${item.color}22` }}>
+              <p className="text-lg font-black leading-none" style={{ color: item.color, fontFamily: "'Poppins', sans-serif" }}>{item.value}</p>
+              <p className="text-[10px] font-bold mt-1 uppercase tracking-wide" style={{ color: item.color + 'aa' }}>{item.label}</p>
             </div>
           ))}
         </div>
 
-        {/* ── Main Grid ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Left 2 Columns */}
+          {/* Left 2/3 */}
           <div className="lg:col-span-2 space-y-5">
             {/* Status Breakdown */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><Users className="w-4 h-4" /></div>
-                <div>
-                  <h2 className="section-header-title">Distribuição por Status do Lojista</h2>
-                  <p className="section-header-subtitle">Volume absoluto e percentual por etapa do funil</p>
-                </div>
+                <div className="icon-box icon-box-primary" style={{ width: 34, height: 34, borderRadius: 9 }}><Users className="w-4 h-4 text-white" /></div>
+                <h2 className="section-header-title">Distribuição por Status</h2>
               </div>
-              <div className="space-y-3.5">
+              <div className="space-y-4">
                 {metrics.por_status.sort((a, b) => b.count - a.count).map(item => {
                   const pct = metrics.total > 0 ? (item.count / metrics.total) * 100 : 0
-                  const color = STATUS_COLORS[item.status] || '#64748b'
-                  const bg = STATUS_BG[item.status] || '#f1f5f9'
+                  const color = STATUS_COLORS[item.status] || '#a0aec0'
+                  const bg = STATUS_BG[item.status] || '#f1f3f6'
                   return (
                     <div key={item.status}>
-                      <div className="flex items-center justify-between mb-1 text-xs">
-                        <span className="font-medium text-slate-700">{STATUS_LABELS[item.status] || item.status}</span>
+                      <div className="flex items-center justify-between mb-1.5 text-sm">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+                          <span className="font-semibold" style={{ color: 'var(--text-heading)' }}>{STATUS_LABELS[item.status] || item.status}</span>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded border border-transparent" style={{ background: bg, color }}>{item.count}</span>
-                          <span className="text-xs font-mono text-slate-400 w-8 text-right">{pct.toFixed(0)}%</span>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={{ background: bg, color }}>{item.count}</span>
+                          <span className="text-xs w-8 text-right" style={{ color: 'var(--text-muted)' }}>{pct.toFixed(0)}%</span>
                         </div>
                       </div>
                       <div className="progress-bar-crm">
@@ -227,15 +227,18 @@ export default function RelatoriosPage() {
                   const pct = metrics.total > 0 ? (metrics.inacessiveis / metrics.total) * 100 : 0
                   return (
                     <div>
-                      <div className="flex items-center justify-between mb-1 text-xs">
-                        <span className="font-medium text-slate-700 flex items-center gap-1.5"><WifiOff className="w-3.5 h-3.5 text-orange-600" /> Inacessíveis</span>
+                      <div className="flex items-center justify-between mb-1.5 text-sm">
+                        <div className="flex items-center gap-2.5">
+                          <WifiOff className="w-3.5 h-3.5" style={{ color: '#f97316' }} />
+                          <span className="font-semibold" style={{ color: 'var(--text-heading)' }}>Inacessíveis</span>
+                        </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold px-2 py-0.5 rounded border border-orange-200 bg-orange-50 text-orange-700">{metrics.inacessiveis}</span>
-                          <span className="text-xs font-mono text-slate-400 w-8 text-right">{pct.toFixed(0)}%</span>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={{ background: '#ffedd5', color: '#ea580c' }}>{metrics.inacessiveis}</span>
+                          <span className="text-xs w-8 text-right" style={{ color: 'var(--text-muted)' }}>{pct.toFixed(0)}%</span>
                         </div>
                       </div>
                       <div className="progress-bar-crm">
-                        <div className="progress-fill" style={{ width: `${pct}%`, background: '#ea580c' }} />
+                        <div className="progress-fill" style={{ width: `${pct}%`, background: '#f97316' }} />
                       </div>
                     </div>
                   )
@@ -243,126 +246,128 @@ export default function RelatoriosPage() {
               </div>
             </div>
 
-            {/* Motivos de Cancelamento */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Motivos */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><MessageSquare className="w-4 h-4" /></div>
-                <div>
-                  <h2 className="section-header-title">Principais Motivos de Cancelamento</h2>
-                  <p className="section-header-subtitle">Justificativas mais informadas pelos lojistas</p>
-                </div>
+                <div className="icon-box icon-box-warning" style={{ width: 34, height: 34, borderRadius: 9 }}><MessageSquare className="w-4 h-4 text-white" /></div>
+                <h2 className="section-header-title">Principais Motivos de Cancelamento</h2>
               </div>
               {metrics.top_motivos.length > 0 ? (
-                <div className="space-y-3.5">
+                <div className="space-y-4">
                   {metrics.top_motivos.map((item, i) => {
                     const pct = Math.round((item.count / maxMotivo) * 100)
+                    const colors = ['#6610f2', '#1eab5a', '#f59e0b', '#06b6d4', '#ef4444', '#ec4899']
+                    const color = colors[i % colors.length]
                     return (
                       <div key={i}>
-                        <div className="flex items-start justify-between mb-1 gap-3 text-xs">
-                          <span className="text-slate-800 font-medium flex-1">{item.motivo}</span>
-                          <span className="font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">{item.count}×</span>
+                        <div className="flex items-start justify-between mb-1.5 gap-3 text-sm">
+                          <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                            <span className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0 mt-0.5" style={{ background: color }}>{i + 1}</span>
+                            <p style={{ color: 'var(--text-heading)' }}>{item.motivo}</p>
+                          </div>
+                          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full flex-shrink-0" style={{ background: `${color}18`, color }}>{item.count}×</span>
                         </div>
-                        <div className="progress-bar-crm">
-                          <div className="progress-fill" style={{ width: `${pct}%`, background: '#0f172a' }} />
+                        <div className="progress-bar-crm ml-7">
+                          <div className="progress-fill" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, ${color}aa)` }} />
                         </div>
                       </div>
                     )
                   })}
                 </div>
               ) : (
-                <div className="py-6 text-center text-xs text-slate-400">Nenhum motivo registrado</div>
+                <div className="flex flex-col items-center py-8 gap-2">
+                  <AlertCircle className="w-8 h-8" style={{ color: 'var(--text-muted)' }} />
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Nenhum motivo registrado</p>
+                </div>
               )}
             </div>
 
-            {/* ── Faturamento Anterior (Lojistas) ── */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Faturamento Anterior (Lojistas) */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><DollarSign className="w-4 h-4" /></div>
+                <div className="icon-box icon-box-success" style={{ width: 34, height: 34, borderRadius: 9 }}><DollarSign className="w-4 h-4 text-white" /></div>
                 <div>
-                  <h2 className="section-header-title">Faturamento Mensal Anterior dos Lojistas</h2>
-                  <p className="section-header-subtitle">Distribuição por porte de faturamento</p>
+                  <h2 className="section-header-title">Faturamento Mensal Anterior (Lojistas)</h2>
+                  <p className="section-header-subtitle">Porte dos e-commerces em churn</p>
                 </div>
               </div>
               {fatPieData.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                  <ResponsiveContainer width="100%" height={180}>
+                  <ResponsiveContainer width="100%" height={190}>
                     <PieChart>
-                      <Pie data={fatPieData} cx="50%" cy="50%" labelLine={false} outerRadius={70} innerRadius={35} dataKey="value" strokeWidth={2} stroke="#fff">
+                      <Pie data={fatPieData} cx="50%" cy="50%" labelLine={false} outerRadius={75} innerRadius={40} dataKey="value" strokeWidth={3} stroke="#fff">
                         {fatPieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                       </Pie>
                       <Tooltip {...tt} />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {fatPieData.map(item => (
-                      <div key={item.name} className="flex items-center justify-between text-xs p-1.5 rounded bg-slate-50 border border-slate-100">
+                      <div key={item.name} className="flex items-center justify-between text-xs p-2 rounded-xl" style={{ background: '#f8fafc', border: '1px solid var(--border-color)' }}>
                         <div className="flex items-center gap-2">
                           <div className="w-2.5 h-2.5 rounded-full" style={{ background: item.color }} />
-                          <span className="text-slate-700 font-medium">{item.name}</span>
+                          <span className="font-semibold" style={{ color: 'var(--text-heading)' }}>{item.name}</span>
                         </div>
-                        <span className="font-bold text-slate-900">{item.value} ({item.percent}%)</span>
+                        <span className="font-bold" style={{ color: 'var(--primary)' }}>{item.value} ({item.percent}%)</span>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="py-6 text-center text-xs text-slate-400">Sem dados de faturamento</div>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sem dados de faturamento</p>
               )}
             </div>
 
-            {/* Checkouts & Plataformas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Checkouts */}
-              <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Checkouts */}
+            {checkoutChart.length > 0 && (
+              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
                 <div className="section-header">
-                  <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><ShoppingBag className="w-4 h-4" /></div>
+                  <div className="icon-box icon-box-info" style={{ width: 34, height: 34, borderRadius: 9 }}><ShoppingBag className="w-4 h-4 text-white" /></div>
                   <h2 className="section-header-title">Checkouts Utilizados</h2>
                 </div>
-                {checkoutChart.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={checkoutChart} barCategoryGap="30%" layout="vertical">
-                      <XAxis type="number" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} width={95} />
-                      <Tooltip {...tt} />
-                      <Bar dataKey="value" fill="#0f172a" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-[200px] flex items-center justify-center text-xs text-slate-400">Sem dados</div>
-                )}
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={checkoutChart} barCategoryGap="30%" layout="vertical">
+                    <XAxis type="number" tick={{ fill: '#a0aec0', fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" tick={{ fill: '#7b8fa6', fontSize: 11 }} axisLine={false} tickLine={false} width={100} />
+                    <Tooltip {...tt} />
+                    <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                      {checkoutChart.map((_, i) => <Cell key={i} fill={CHART_PALETTE[i % CHART_PALETTE.length]} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
+            )}
 
-              {/* Plataformas */}
-              <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Plataformas */}
+            {plataformaChart.length > 0 && (
+              <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
                 <div className="section-header">
-                  <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><Store className="w-4 h-4" /></div>
+                  <div className="icon-box icon-box-success" style={{ width: 34, height: 34, borderRadius: 9 }}><Store className="w-4 h-4 text-white" /></div>
                   <h2 className="section-header-title">Plataformas de Loja</h2>
                 </div>
-                {plataformaChart.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={plataformaChart} barCategoryGap="30%" layout="vertical">
-                      <XAxis type="number" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis type="category" dataKey="name" tick={{ fill: '#475569', fontSize: 11 }} axisLine={false} tickLine={false} width={95} />
-                      <Tooltip {...tt} />
-                      <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-[200px] flex items-center justify-center text-xs text-slate-400">Sem dados</div>
-                )}
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={plataformaChart} barCategoryGap="30%" layout="vertical">
+                    <XAxis type="number" tick={{ fill: '#a0aec0', fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" tick={{ fill: '#7b8fa6', fontSize: 11 }} axisLine={false} tickLine={false} width={100} />
+                    <Tooltip {...tt} />
+                    <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                      {plataformaChart.map((_, i) => <Cell key={i} fill={CHART_PALETTE[(i + 3) % CHART_PALETTE.length]} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Right Column */}
+          {/* Right 1/3 */}
           <div className="space-y-5">
-            {/* ── Recursos UD Utilizados ── */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Recursos UD Utilizados */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><Zap className="w-4 h-4" /></div>
+                <div className="icon-box icon-box-primary" style={{ width: 34, height: 34, borderRadius: 9 }}><Zap className="w-4 h-4 text-white" /></div>
                 <div>
                   <h2 className="section-header-title">Recursos UD Utilizados</h2>
-                  <p className="section-header-subtitle">Funcionalidades adotadas na plataforma</p>
+                  <p className="section-header-subtitle">Funcionalidades adotadas</p>
                 </div>
               </div>
               <div className="space-y-3">
@@ -372,13 +377,13 @@ export default function RelatoriosPage() {
                   return (
                     <div key={r.key}>
                       <div className="flex items-center justify-between mb-1 text-xs">
-                        <span className="text-slate-700 font-medium flex items-center gap-1.5">
+                        <span className="font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-heading)' }}>
                           <span>{r.icon}</span> {r.key}
                         </span>
-                        <span className="font-semibold text-slate-900">{count} ({pct}%)</span>
+                        <span className="font-bold" style={{ color: 'var(--primary)' }}>{count} ({pct}%)</span>
                       </div>
                       <div className="progress-bar-crm">
-                        <div className="progress-fill" style={{ width: `${pct}%`, background: '#0f172a' }} />
+                        <div className="progress-fill" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #6610f2, #7c3aed)' }} />
                       </div>
                     </div>
                   )
@@ -386,33 +391,33 @@ export default function RelatoriosPage() {
               </div>
             </div>
 
-            {/* ── Ferramentas Usadas (Dashboard / Plugin / WhatsApp) ── */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Ferramentas Usadas */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><LayoutDashboard className="w-4 h-4" /></div>
+                <div className="icon-box icon-box-info" style={{ width: 34, height: 34, borderRadius: 9 }}><LayoutDashboard className="w-4 h-4 text-white" /></div>
                 <div>
-                  <h2 className="section-header-title">Uso de Ferramentas Principais</h2>
-                  <p className="section-header-subtitle">Adoção das 3 ferramentas chave</p>
+                  <h2 className="section-header-title">Ferramentas Usadas</h2>
+                  <p className="section-header-subtitle">Dashboard / Plugin / WhatsApp</p>
                 </div>
               </div>
               <div className="space-y-3.5">
                 {[
-                  { label: 'Dashboard UnicoDrop', count: usavaDashboardCount, icon: LayoutDashboard },
-                  { label: 'Plugin de Rastreio', count: usavaPluginCount, icon: Puzzle },
-                  { label: 'Notificações WhatsApp', count: usavaWhatsappCount, icon: MessageCircle },
+                  { label: 'Dashboard UnicoDrop', count: usavaDashboardCount, icon: LayoutDashboard, color: '#6610f2' },
+                  { label: 'Plugin de Rastreio', count: usavaPluginCount, icon: Puzzle, color: '#1eab5a' },
+                  { label: 'Notificações WhatsApp', count: usavaWhatsappCount, icon: MessageCircle, color: '#06b6d4' },
                 ].map(tool => {
                   const pct = clientes.length > 0 ? Math.round((tool.count / clientes.length) * 100) : 0
                   const Icon = tool.icon
                   return (
                     <div key={tool.label}>
                       <div className="flex items-center justify-between mb-1 text-xs">
-                        <span className="text-slate-700 font-medium flex items-center gap-1.5">
-                          <Icon className="w-3.5 h-3.5 text-slate-500" /> {tool.label}
+                        <span className="font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-heading)' }}>
+                          <Icon className="w-3.5 h-3.5" style={{ color: tool.color }} /> {tool.label}
                         </span>
-                        <span className="font-semibold text-slate-900">{tool.count} ({pct}%)</span>
+                        <span className="font-bold" style={{ color: tool.color }}>{tool.count} ({pct}%)</span>
                       </div>
                       <div className="progress-bar-crm">
-                        <div className="progress-fill" style={{ width: `${pct}%`, background: '#3b82f6' }} />
+                        <div className="progress-fill" style={{ width: `${pct}%`, background: tool.color }} />
                       </div>
                     </div>
                   )
@@ -420,27 +425,27 @@ export default function RelatoriosPage() {
               </div>
             </div>
 
-            {/* ── Por Prioridade ── */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Por Prioridade */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><AlertTriangle className="w-4 h-4" /></div>
-                <h2 className="section-header-title">Por Nível de Prioridade</h2>
+                <div className="icon-box icon-box-danger" style={{ width: 34, height: 34, borderRadius: 9 }}><AlertTriangle className="w-4 h-4 text-white" /></div>
+                <h2 className="section-header-title">Por Prioridade</h2>
               </div>
               <div className="space-y-3">
                 {[
-                  { key: 'ALTA', label: 'Alta Prioridade', color: '#dc2626', bg: '#fef2f2' },
-                  { key: 'MEDIA', label: 'Média Prioridade', color: '#d97706', bg: '#fffbeb' },
-                  { key: 'BAIXA', label: 'Baixa Prioridade', color: '#0284c7', bg: '#f0f9ff' },
+                  { key: 'ALTA', label: 'Alta Prioridade', color: '#ef4444', bg: '#fee2e2' },
+                  { key: 'MEDIA', label: 'Média Prioridade', color: '#f59e0b', bg: '#fef3c7' },
+                  { key: 'BAIXA', label: 'Baixa Prioridade', color: '#06b6d4', bg: '#cffafe' },
                 ].map(p => {
                   const count = metrics.por_prioridade.find(x => x.prioridade === p.key)?.count || 0
                   const pct = metrics.total > 0 ? Math.round((count / metrics.total) * 100) : 0
                   return (
                     <div key={p.key}>
                       <div className="flex items-center justify-between mb-1 text-xs">
-                        <span className="font-medium text-slate-700">{p.label}</span>
+                        <span className="font-semibold" style={{ color: 'var(--text-heading)' }}>{p.label}</span>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold px-2 py-0.5 rounded text-xs" style={{ background: p.bg, color: p.color }}>{count}</span>
-                          <span className="text-slate-400 font-mono text-[11px] w-8 text-right">{pct}%</span>
+                          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: p.bg, color: p.color }}>{count}</span>
+                          <span className="text-xs w-8 text-right" style={{ color: 'var(--text-muted)' }}>{pct}%</span>
                         </div>
                       </div>
                       <div className="progress-bar-crm">
@@ -452,14 +457,14 @@ export default function RelatoriosPage() {
               </div>
             </div>
 
-            {/* Plugins Rastreio */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Plugins */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><Radio className="w-4 h-4" /></div>
-                <h2 className="section-header-title">Plugins de Rastreio Utilizados</h2>
+                <div className="icon-box icon-box-primary" style={{ width: 34, height: 34, borderRadius: 9 }}><Radio className="w-4 h-4 text-white" /></div>
+                <h2 className="section-header-title">Plugins de Rastreio</h2>
               </div>
               {pluginsSorted.length > 0 ? (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {pluginsSorted.map(([plugin, count]) => {
                     const isUnico = UNICO_PLUGINS.includes(plugin)
                     const pct = Math.round((count / maxPlugin) * 100)
@@ -467,42 +472,75 @@ export default function RelatoriosPage() {
                       <div key={plugin}>
                         <div className="flex items-center justify-between mb-1 text-xs">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            {isUnico && <Radio className="w-3 h-3 flex-shrink-0 text-emerald-600" />}
-                            <span className={`truncate ${isUnico ? 'font-semibold text-slate-900' : 'text-slate-600'}`} title={plugin}>{plugin}</span>
-                            {isUnico && <span className="text-[9px] font-bold px-1 rounded bg-emerald-100 text-emerald-700">UD</span>}
+                            {isUnico && <Radio className="w-3 h-3 flex-shrink-0" style={{ color: '#1eab5a' }} />}
+                            <span className="truncate font-semibold" style={{ color: isUnico ? 'var(--text-heading)' : 'var(--text-secondary)' }} title={plugin}>{plugin}</span>
+                            {isUnico && <span className="text-[9px] font-bold px-1.5 rounded-full" style={{ background: '#d1fae5', color: '#059669' }}>UD</span>}
                           </div>
-                          <span className="font-semibold text-slate-900">{count}</span>
+                          <span className="font-bold ml-2" style={{ color: 'var(--text-heading)' }}>{count}</span>
                         </div>
                         <div className="progress-bar-crm">
-                          <div className="progress-fill" style={{ width: `${pct}%`, background: isUnico ? '#059669' : '#0f172a' }} />
+                          <div className="progress-fill" style={{ width: `${pct}%`, background: isUnico ? '#1eab5a' : 'var(--primary)' }} />
                         </div>
                       </div>
                     )
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400">Nenhum plugin registrado</p>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Nenhum plugin registrado</p>
               )}
             </div>
 
-            {/* Sites Status */}
-            <div className="bg-white rounded-lg p-5 border border-slate-200 shadow-xs">
+            {/* Status Pie */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
               <div className="section-header">
-                <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center text-slate-700"><Globe className="w-4 h-4" /></div>
-                <h2 className="section-header-title">Status dos Sites dos Lojistas</h2>
+                <div className="icon-box icon-box-warning" style={{ width: 34, height: 34, borderRadius: 9 }}><BarChart2 className="w-4 h-4 text-white" /></div>
+                <h2 className="section-header-title">Status Geral</h2>
+              </div>
+              {pieStatusData.length > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height={160}>
+                    <PieChart>
+                      <Pie data={pieStatusData} cx="50%" cy="50%" labelLine={false} label={renderLabel} outerRadius={72} innerRadius={36} dataKey="value" strokeWidth={3} stroke="#fff">
+                        {pieStatusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                      </Pie>
+                      <Tooltip {...tt} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="space-y-1.5 mt-2 pt-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+                    {pieStatusData.map(item => (
+                      <div key={item.name} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full" style={{ background: item.color }} />
+                          <span style={{ color: 'var(--text-secondary)' }}>{item.name}</span>
+                        </div>
+                        <span className="font-bold" style={{ color: 'var(--text-heading)' }}>{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="h-[180px] flex items-center justify-center text-sm" style={{ color: 'var(--text-muted)' }}>Sem dados</div>
+              )}
+            </div>
+
+            {/* Sites */}
+            <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
+              <div className="section-header">
+                <div className="icon-box icon-box-info" style={{ width: 34, height: 34, borderRadius: 9 }}><Globe className="w-4 h-4 text-white" /></div>
+                <h2 className="section-header-title">Status dos Sites</h2>
               </div>
               <div className="space-y-3">
                 {[
-                  { label: 'Online', value: siteOnline, bar: '#059669', bg: '#ecfdf5', text: '#059669' },
-                  { label: 'Offline', value: siteOffline, bar: '#dc2626', bg: '#fef2f2', text: '#dc2626' },
-                  { label: 'Não Verificado', value: siteNaoVerif, bar: '#64748b', bg: '#f1f5f9', text: '#475569' },
+                  { label: 'Online', value: siteOnline, bar: '#1eab5a', bg: '#d1fae5', text: '#059669' },
+                  { label: 'Offline', value: siteOffline, bar: '#ef4444', bg: '#fee2e2', text: '#dc2626' },
+                  { label: 'Não Verificado', value: siteNaoVerif, bar: '#a0aec0', bg: '#f1f3f6', text: '#6b7280' },
                 ].map(item => {
                   const pct = clientes.length > 0 ? Math.round((item.value / clientes.length) * 100) : 0
                   return (
                     <div key={item.label}>
                       <div className="flex items-center justify-between mb-1 text-xs">
-                        <span className="font-medium text-slate-700">{item.label}</span>
-                        <span className="font-semibold px-2 py-0.5 rounded border border-transparent" style={{ background: item.bg, color: item.text }}>{item.value}</span>
+                        <span className="font-semibold" style={{ color: 'var(--text-heading)' }}>{item.label}</span>
+                        <span className="font-bold px-2 py-0.5 rounded-full" style={{ background: item.bg, color: item.text }}>{item.value}</span>
                       </div>
                       <div className="progress-bar-crm">
                         <div className="progress-fill" style={{ width: `${pct}%`, background: item.bar }} />

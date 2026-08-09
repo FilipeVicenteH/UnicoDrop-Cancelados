@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Users, BarChart2, MessageSquarePlus,
-  ChevronRight, ShieldCheck
+  ChevronRight, Zap
 } from 'lucide-react'
 
 const navItems = [
@@ -19,34 +19,37 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="w-60 flex-shrink-0 flex flex-col h-screen sticky top-0 bg-white"
+      className="w-64 flex-shrink-0 flex flex-col h-screen sticky top-0"
       style={{
+        background: '#ffffff',
         borderRight: '1px solid var(--border-color)',
+        boxShadow: '2px 0 12px rgba(0,0,0,0.05)',
       }}
     >
       {/* ── Brand Logo ── */}
       <div
-        className="px-5 py-4 flex items-center gap-3"
+        className="px-6 py-5 flex items-center gap-3"
         style={{ borderBottom: '1px solid var(--border-color)' }}
       >
         <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-sm"
-          style={{ background: '#0f172a' }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center text-white"
+          style={{ background: 'linear-gradient(135deg, #6610f2 0%, #7c3aed 100%)', boxShadow: '0 4px 12px rgba(102,16,242,0.35)' }}
         >
-          U
+          <Zap className="w-5 h-5" />
         </div>
         <div>
-          <p className="font-bold text-sm leading-tight text-slate-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <p className="font-bold text-sm leading-tight" style={{ color: 'var(--text-heading)', fontFamily: "'Poppins', sans-serif" }}>
             UnicoCRM
           </p>
-          <p className="text-[11px] text-slate-500">Gestão de Churn SaaS</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Gestão de Churn</p>
         </div>
       </div>
 
       {/* ── Navigation ── */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto">
-        <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          Menu Operacional
+      <nav className="flex-1 px-3 py-5 overflow-y-auto">
+        {/* Label de seção */}
+        <p className="px-3 mb-3 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+          Menu Principal
         </p>
 
         <div className="space-y-1">
@@ -57,24 +60,37 @@ export default function Sidebar() {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-150 relative ${
-                  active
-                    ? 'bg-slate-900 text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${
+                  active ? 'nav-active-pill' : ''
                 }`}
+                style={!active ? {
+                  color: 'var(--text-secondary)',
+                } : {
+                  color: 'white',
+                }}
               >
+                {/* Hover background */}
+                {!active && (
+                  <span
+                    className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: 'var(--primary-muted)' }}
+                  />
+                )}
+
                 <Icon
-                  className="w-4 h-4 flex-shrink-0"
-                  style={{ color: active ? '#ffffff' : '#64748b' }}
+                  className="w-4.5 h-4.5 flex-shrink-0 relative z-10 transition-colors"
+                  style={{ color: active ? 'white' : 'var(--text-muted)' }}
                 />
-                <span className="flex-1">{label}</span>
+                <span className="flex-1 relative z-10" style={{ color: active ? 'white' : 'var(--text-secondary)' }}>
+                  {label}
+                </span>
 
                 {badge && (
                   <span
-                    className="text-[9px] font-bold px-1.5 py-0.5 rounded"
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded-full relative z-10"
                     style={{
-                      background: active ? 'rgba(255,255,255,0.2)' : '#e0e7ff',
-                      color: active ? '#ffffff' : '#4338ca',
+                      background: active ? 'rgba(255,255,255,0.25)' : 'var(--primary-muted)',
+                      color: active ? 'white' : 'var(--primary)',
                     }}
                   >
                     {badge}
@@ -82,44 +98,48 @@ export default function Sidebar() {
                 )}
 
                 {active && (
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  <ChevronRight className="w-3.5 h-3.5 relative z-10 text-white/70" />
                 )}
               </Link>
             )
           })}
         </div>
 
-        {/* ── System Status ── */}
+        {/* ── Quick Stats ── */}
         <div
-          className="mt-8 p-3 rounded-lg border text-xs"
-          style={{ background: '#f8fafc', borderColor: '#e2e8f0' }}
+          className="mt-8 mx-0 p-4 rounded-2xl"
+          style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)', border: '1px solid #ddd6fe' }}
         >
-          <div className="flex items-center gap-1.5 font-semibold text-slate-800">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>UnicoDrop SaaS</span>
-          </div>
-          <p className="text-[11px] text-slate-500 mt-1">
-            Dados Anônimos Protegidos
+          <p className="text-xs font-bold mb-0.5" style={{ color: 'var(--primary)', fontFamily: "'Poppins', sans-serif" }}>
+            UnicoDrop SaaS
           </p>
+          <p className="text-[11px]" style={{ color: '#7c3aed' }}>
+            Sistema de Retenção & Churn
+          </p>
+          <div className="mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-[11px] font-semibold text-green-700">Sistema Online</span>
+          </div>
         </div>
       </nav>
 
       {/* ── Footer ── */}
       <div
-        className="px-4 py-3 flex items-center justify-between"
+        className="px-4 py-3.5 flex items-center justify-between"
         style={{ borderTop: '1px solid var(--border-color)' }}
       >
         <div className="flex items-center gap-2.5">
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold bg-slate-800"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
+            style={{ background: 'linear-gradient(135deg, #6610f2, #7c3aed)' }}
           >
             F
           </div>
           <div>
-            <p className="text-xs font-semibold text-slate-900 leading-tight">
+            <p className="text-xs font-semibold leading-tight" style={{ color: 'var(--text-heading)', fontFamily: "'Poppins', sans-serif" }}>
               Filipe Vicente
             </p>
-            <p className="text-[10px] text-slate-400">Analista N2 / Admin</p>
+            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Admin</p>
           </div>
         </div>
       </div>
