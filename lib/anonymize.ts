@@ -23,16 +23,16 @@ const MOCK_NAMES = [
 ]
 
 const MOCK_STORES = [
-  'Moda & Estilo E-Commerce',
-  'Boutique Exemplo Brasil',
-  'DropStore Eletrônicos',
-  'Nexus Accessories Demo',
-  'Urban Wear E-Commerce',
-  'Bella Vita Cosméticos',
-  'TechGadgets Brasil',
-  'Casa & Conforto Store',
-  'MegaVariedades Demo',
-  'Prime Outfitters E-Commerce',
+  'Empresa Demo #101',
+  'Loja Demo #102',
+  'E-Commerce #103',
+  'Empresa Demo #104',
+  'Loja Virtual #105',
+  'Empresa Demo #106',
+  'E-Commerce #107',
+  'Loja Demo #108',
+  'Empresa Demo #109',
+  'Loja Virtual #110',
 ]
 
 function getHashIndex(str: string, max: number): number {
@@ -77,7 +77,7 @@ export function anonymizeCliente<T extends Partial<Cliente>>(cliente: T): T {
     // Mask contact phone
     contato: cliente.contato ? maskPhoneNumber(cliente.contato) : null,
     // Anonymize company / store name
-    empresa: cliente.empresa ? MOCK_STORES[storeIndex] : `Loja Demo #${cliente.id || '1'}`,
+    empresa: cliente.empresa ? MOCK_STORES[storeIndex] : `Empresa Demo #${cliente.id || '1'}`,
     // Anonymize site URL
     site_url: cliente.site_url ? `https://loja-demo-${cliente.id || 1}.com.br` : null,
     // Anonymize unico_id

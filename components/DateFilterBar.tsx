@@ -46,27 +46,26 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
 
   return (
     <div className="mb-2">
-      <div className="flex items-center gap-2.5 flex-wrap">
+      <div className="flex items-center gap-2 flex-wrap">
         <button
           onClick={() => setOpen(o => !o)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-          style={{
-            border: `1.5px solid ${open || hasFilter ? 'var(--primary)' : 'var(--border-color)'}`,
-            background: open || hasFilter ? 'var(--primary-muted)' : 'white',
-            color: open || hasFilter ? 'var(--primary)' : 'var(--text-secondary)',
-          }}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+            open || hasFilter
+              ? 'border-slate-900 bg-slate-900 text-white'
+              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+          }`}
         >
-          <CalendarRange className="w-4 h-4" />
+          <CalendarRange className="w-3.5 h-3.5" />
           Filtrar por Período
           {hasFilter && (
-            <span className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white" style={{ background: 'var(--primary)' }}>1</span>
+            <span className="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold bg-white text-slate-900">1</span>
           )}
-          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
 
         {hasFilter && !open && (
-          <div className="flex items-center gap-2 text-sm font-semibold px-3 py-1.5 rounded-full" style={{ background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' }}>
-            <Calendar className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded border border-amber-200 bg-amber-50 text-amber-800">
+            <Calendar className="w-3 h-3" />
             <span>
               {value.dateField === 'contato' ? 'Contato' : 'Cancelamento'}
               {value.dateFrom && ` de ${fmtDate(value.dateFrom)}`}
@@ -78,32 +77,30 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
       </div>
 
       {open && (
-        <div className="mt-3 p-5 rounded-2xl animate-fade-in space-y-4" style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="mt-3 p-4 rounded-lg bg-white border border-slate-200 shadow-xs space-y-3.5 animate-fade-in text-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CalendarRange className="w-4 h-4" style={{ color: 'var(--primary)' }} />
-              <span className="text-sm font-bold" style={{ color: 'var(--text-heading)', fontFamily: "'Poppins', sans-serif" }}>Seletor de Período</span>
+              <CalendarRange className="w-3.5 h-3.5 text-slate-700" />
+              <span className="font-semibold text-slate-900">Seletor de Período</span>
             </div>
             {hasFilter && (
-              <button onClick={clearDates} className="text-xs font-bold flex items-center gap-1" style={{ color: '#dc2626' }}>
+              <button onClick={clearDates} className="font-semibold text-red-600 hover:underline flex items-center gap-1">
                 <X className="w-3 h-3" /> Limpar
               </button>
             )}
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {DATE_FIELD_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 onClick={() => onChange({ ...value, dateField: opt.value })}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-semibold transition-all"
-                style={{
-                  border: `1.5px solid ${value.dateField === opt.value ? 'var(--primary)' : 'var(--border-color)'}`,
-                  background: value.dateField === opt.value ? 'var(--primary-muted)' : '#f8fafc',
-                  color: value.dateField === opt.value ? 'var(--primary)' : 'var(--text-secondary)',
-                }}
+                className={`px-2.5 py-1 rounded font-semibold transition-all border ${
+                  value.dateField === opt.value
+                    ? 'border-slate-900 bg-slate-900 text-white'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                }`}
               >
-                <Calendar className="w-3 h-3" />
                 {opt.label}
               </button>
             ))}
@@ -114,26 +111,25 @@ export default function DateFilterBar({ value, onChange }: DateFilterBarProps) {
               <button
                 key={p.key}
                 onClick={() => applyPreset(p.key)}
-                className="text-xs px-3 py-1.5 rounded-lg font-semibold transition-all"
-                style={{
-                  border: `1.5px solid ${activePreset === p.key ? 'var(--primary)' : 'var(--border-color)'}`,
-                  background: activePreset === p.key ? 'var(--primary-muted)' : '#f8fafc',
-                  color: activePreset === p.key ? 'var(--primary)' : 'var(--text-secondary)',
-                }}
+                className={`px-2.5 py-1 rounded font-semibold transition-all border ${
+                  activePreset === p.key
+                    ? 'border-slate-900 bg-slate-900 text-white'
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                }`}
               >
                 {p.label}
               </button>
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 max-w-sm">
+          <div className="grid grid-cols-2 gap-3 max-w-xs">
             <div>
               <label className="form-label">De</label>
-              <input type="date" className="form-input" style={{ fontSize: '13px' }} value={value.dateFrom} onChange={e => { onChange({ ...value, dateFrom: e.target.value }); setActivePreset('') }} />
+              <input type="date" className="form-input" style={{ fontSize: '12px' }} value={value.dateFrom} onChange={e => { onChange({ ...value, dateFrom: e.target.value }); setActivePreset('') }} />
             </div>
             <div>
               <label className="form-label">Até</label>
-              <input type="date" className="form-input" style={{ fontSize: '13px' }} value={value.dateTo} onChange={e => { onChange({ ...value, dateTo: e.target.value }); setActivePreset('') }} />
+              <input type="date" className="form-input" style={{ fontSize: '12px' }} value={value.dateTo} onChange={e => { onChange({ ...value, dateTo: e.target.value }); setActivePreset('') }} />
             </div>
           </div>
         </div>
