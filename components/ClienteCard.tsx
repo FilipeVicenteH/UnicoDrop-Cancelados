@@ -1,7 +1,7 @@
 'use client'
 
 import { Cliente } from '@/lib/types'
-import { STATUS_LABELS, PRIORIDADE_LABELS } from '@/lib/constants'
+import { STATUS_LABELS } from '@/lib/constants'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import {
@@ -21,35 +21,41 @@ interface ClienteCardProps {
 export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardProps) {
   const [expanded, setExpanded] = useState(false)
 
+  const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
+    CONVERTIDO: { bg: '#d1fae5', color: '#059669' },
+    EM_NEGOCIACAO: { bg: '#fef3c7', color: '#d97706' },
+    PENDENTE: { bg: '#f1f3f6', color: '#6b7280' },
+    NAO_CONVERTIDO: { bg: '#fee2e2', color: '#dc2626' },
+  }
+  const PRIORIDADE_BADGE: Record<string, { bg: string; color: string }> = {
+    ALTA: { bg: '#fee2e2', color: '#dc2626' },
+    MEDIA: { bg: '#fef3c7', color: '#d97706' },
+    BAIXA: { bg: '#cffafe', color: '#0891b2' },
+  }
+  const statusBadge = STATUS_BADGE[cliente.status] || { bg: '#f1f3f6', color: '#6b7280' }
+  const prioridadeBadge = PRIORIDADE_BADGE[cliente.prioridade] || { bg: '#f1f3f6', color: '#6b7280' }
+
   const siteIcon = () => {
-    if (cliente.site_online === 'ONLINE') return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-    if (cliente.site_online === 'OFFLINE') return <XCircle className="w-3.5 h-3.5 text-rose-400" />
-    return <AlertCircle className="w-3.5 h-3.5 text-zinc-500" />
+    if (cliente.site_online === 'ONLINE') return <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#1eab5a' }} />
+    if (cliente.site_online === 'OFFLINE') return <XCircle className="w-3.5 h-3.5" style={{ color: '#ef4444' }} />
+    return <AlertCircle className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
   }
 
-  const statusBadgeClass = {
-    CONVERTIDO: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    EM_NEGOCIACAO: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    PENDENTE: 'bg-zinc-800 text-zinc-300 border-zinc-700',
-    NAO_CONVERTIDO: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-  }[cliente.status] || 'bg-zinc-800 text-zinc-400 border-zinc-700'
-
-  const prioridadeClass = {
-    ALTA: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
-    MEDIA: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
-    BAIXA: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
-  }[cliente.prioridade] || 'text-zinc-400 bg-zinc-800 border-zinc-700'
-
   return (
-    <div className={`group bg-[#121316] border rounded-xl transition-all duration-200 overflow-hidden ${
-      expanded ? 'border-zinc-700' : 'border-zinc-800/80 hover:border-zinc-700/80'
-    }`}>
+    <div
+      className="group transition-all duration-200 overflow-hidden"
+      style={{
+        background: 'white',
+        border: `1px solid ${expanded ? 'var(--primary)' : 'var(--border-color)'}`,
+        borderRadius: '12px',
+        boxShadow: expanded ? 'var(--shadow-hover)' : 'var(--shadow-card)',
+      }}
+    >
       {/* Main Row */}
       <div className="flex items-center gap-3 px-4 py-3">
-
         {/* ID Unico */}
         <div className="w-24 flex-shrink-0">
-          <span className="text-xs font-mono text-zinc-300 bg-zinc-800/70 px-2 py-0.5 rounded border border-zinc-700/50">
+          <span className="text-xs font-bold font-mono px-2 py-0.5 rounded" style={{ background: 'var(--primary-muted)', color: 'var(--primary)' }}>
             {cliente.unico_id || '—'}
           </span>
         </div>
@@ -57,36 +63,36 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         {/* Nome e Empresa */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-xs font-semibold text-zinc-100 truncate">{cliente.nome}</p>
+            <p className="text-sm font-bold truncate" style={{ color: 'var(--text-heading)' }}>{cliente.nome}</p>
             {cliente.telefone_atualizado && (
-              <span className="text-[9px] font-mono font-medium px-1.5 py-0.2 rounded border bg-emerald-500/10 text-emerald-400 border-emerald-500/20 flex-shrink-0">
-                Tel. Atualizado
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: '#d1fae5', color: '#059669' }}>
+                Tel. ✓
               </span>
             )}
           </div>
           {cliente.empresa && (
-            <p className="text-[11px] text-zinc-500 truncate mt-0.5">{cliente.empresa}</p>
+            <p className="text-xs truncate mt-0.5" style={{ color: 'var(--text-muted)' }}>{cliente.empresa}</p>
           )}
         </div>
 
         {/* Status Badge */}
         <div className="flex-shrink-0">
-          <span className={`text-xs font-mono font-medium px-2.5 py-0.5 rounded-full border ${statusBadgeClass}`}>
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: statusBadge.bg, color: statusBadge.color }}>
             {STATUS_LABELS[cliente.status]}
           </span>
         </div>
 
         {/* Prioridade */}
         <div className="flex-shrink-0 hidden md:block">
-          <span className={`text-xs font-mono font-medium px-2 py-0.5 rounded border ${prioridadeClass}`}>
-            {PRIORIDADE_LABELS[cliente.prioridade]}
+          <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: prioridadeBadge.bg, color: prioridadeBadge.color }}>
+            {cliente.prioridade}
           </span>
         </div>
 
         {/* Site Status */}
         <div className="flex items-center gap-1.5 flex-shrink-0 hidden lg:flex">
           {siteIcon()}
-          <span className="text-xs text-zinc-400 font-mono">
+          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
             {cliente.site_online === 'ONLINE' ? 'Online' : cliente.site_online === 'OFFLINE' ? 'Offline' : '—'}
           </span>
         </div>
@@ -101,55 +107,49 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
               return (
                 <span
                   title={unicoPlugin}
-                  className={`inline-flex items-center gap-1 text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${
-                    isNovo
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                      : 'bg-zinc-800 text-zinc-300 border-zinc-700'
-                  }`}
+                  className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+                  style={{
+                    background: isNovo ? '#d1fae5' : '#f1f3f6',
+                    color: isNovo ? '#059669' : '#6b7280',
+                  }}
                 >
                   <Radio className="w-2.5 h-2.5" />
                   {isNovo ? 'UD Novo' : 'UD Antigo'}
                 </span>
               )
             }
-            return <span className="text-[10px] font-mono text-zinc-600">Sem plugin</span>
+            return <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Sem plugin</span>
           })()}
         </div>
 
         {/* UD Tools */}
         <div className="flex gap-1 flex-shrink-0 hidden lg:flex">
-          <span title="Dashboard" className={`p-1 rounded ${cliente.usava_dashboard ? 'text-zinc-200 bg-zinc-800' : 'text-zinc-700'}`}>
+          <span title="Dashboard" className="p-1 rounded" style={{ color: cliente.usava_dashboard ? 'var(--primary)' : 'var(--text-muted)', background: cliente.usava_dashboard ? 'var(--primary-muted)' : 'transparent' }}>
             <LayoutDashboard className="w-3.5 h-3.5" />
           </span>
-          <span title="Plugin" className={`p-1 rounded ${cliente.usava_plugin ? 'text-zinc-200 bg-zinc-800' : 'text-zinc-700'}`}>
+          <span title="Plugin" className="p-1 rounded" style={{ color: cliente.usava_plugin ? '#1eab5a' : 'var(--text-muted)', background: cliente.usava_plugin ? '#d1fae5' : 'transparent' }}>
             <Puzzle className="w-3.5 h-3.5" />
           </span>
-          <span title="WhatsApp" className={`p-1 rounded ${cliente.usava_whatsapp ? 'text-zinc-200 bg-zinc-800' : 'text-zinc-700'}`}>
+          <span title="WhatsApp" className="p-1 rounded" style={{ color: cliente.usava_whatsapp ? '#25d366' : 'var(--text-muted)', background: cliente.usava_whatsapp ? '#dcfce7' : 'transparent' }}>
             <MessageCircle className="w-3.5 h-3.5" />
           </span>
         </div>
 
         {/* Date */}
-        <div className="text-xs font-mono text-zinc-500 flex-shrink-0 hidden xl:block">
-          {cliente.data_contato
-            ? format(new Date(cliente.data_contato), 'dd/MM/yy', { locale: ptBR })
-            : '—'}
+        <div className="text-xs flex-shrink-0 hidden xl:block" style={{ color: 'var(--text-muted)' }}>
+          {cliente.data_contato ? format(new Date(cliente.data_contato), 'dd/MM/yy', { locale: ptBR }) : '—'}
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onEdit(cliente.id)}
-            title="Editar cliente"
-            className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors"
-          >
+          <button onClick={() => onEdit(cliente.id)} title="Editar" className="p-1.5 rounded-lg transition-all" style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--primary-muted)'; (e.currentTarget as HTMLElement).style.color = 'var(--primary)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}>
             <Edit2 className="w-3.5 h-3.5" />
           </button>
-          <button
-            onClick={() => onDelete(cliente.id)}
-            title="Excluir cliente"
-            className="p-1 rounded-md hover:bg-rose-500/10 text-zinc-400 hover:text-rose-400 transition-colors"
-          >
+          <button onClick={() => onDelete(cliente.id)} title="Excluir" className="p-1.5 rounded-lg transition-all" style={{ color: 'var(--text-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fee2e2'; (e.currentTarget as HTMLElement).style.color = '#dc2626' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)' }}>
             <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -157,8 +157,9 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         {/* Expand */}
         <button
           onClick={() => setExpanded(!expanded)}
-          title={expanded ? 'Recolher detalhes' : 'Ver detalhes'}
-          className="p-1 rounded-md hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition-colors flex-shrink-0"
+          title={expanded ? 'Recolher' : 'Ver detalhes'}
+          className="p-1.5 rounded-lg transition-all flex-shrink-0"
+          style={{ color: expanded ? 'var(--primary)' : 'var(--text-muted)', background: expanded ? 'var(--primary-muted)' : 'transparent' }}
         >
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
@@ -166,26 +167,24 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
       {/* Expanded Details */}
       {expanded && (
-        <div className="px-4 pb-4 border-t border-zinc-800/80 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-zinc-950/40">
+        <div className="px-5 pb-5 pt-4 grid grid-cols-1 md:grid-cols-2 gap-5" style={{ borderTop: '1px solid var(--border-color)', background: '#f8fafc' }}>
           {/* Left Column */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {cliente.contato && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-0.5">Contato</p>
-                <p className="text-xs font-mono text-zinc-300">{cliente.contato}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Contato</p>
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>{cliente.contato}</p>
               </div>
             )}
 
             {cliente.site_url && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                  <Globe className="w-3 h-3" /> Site URL
-                </p>
+                <p className="form-label" style={{ marginBottom: 4 }}><Globe className="w-3 h-3 inline mr-1" /> Site URL</p>
                 <a
                   href={cliente.site_url.startsWith('http') ? cliente.site_url : `https://${cliente.site_url}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-sm font-semibold flex items-center gap-1 hover:underline"
+                  style={{ color: 'var(--primary)' }}
                 >
                   {cliente.site_url}
                   <ExternalLink className="w-3 h-3" />
@@ -195,15 +194,10 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
             {cliente.plugins_rastreio?.length > 0 && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-1">Plugins de Rastreio</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Plugins de Rastreio</p>
                 <div className="flex flex-wrap gap-1.5">
                   {cliente.plugins_rastreio.map(p => (
-                    <span
-                      key={p}
-                      className="text-xs font-mono px-2 py-0.5 rounded border bg-zinc-800/80 text-zinc-300 border-zinc-700/60"
-                    >
-                      {p}
-                    </span>
+                    <span key={p} className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: UNICO_PLUGINS.includes(p) ? '#d1fae5' : '#f1f3f6', color: UNICO_PLUGINS.includes(p) ? '#059669' : '#6b7280' }}>{p}</span>
                   ))}
                 </div>
               </div>
@@ -211,8 +205,8 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
             {(cliente.checkout || cliente.checkout_outro) && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-1">Checkout</p>
-                <span className="text-xs font-mono bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700/60">
+                <p className="form-label" style={{ marginBottom: 4 }}>Checkout</p>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--primary-muted)', color: 'var(--primary)' }}>
                   {cliente.checkout === 'Outro' ? cliente.checkout_outro : cliente.checkout}
                 </span>
               </div>
@@ -220,8 +214,8 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
             {(cliente.plataforma_loja || cliente.plataforma_loja_outro) && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-1">Plataforma de Loja</p>
-                <span className="text-xs font-mono bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700/60">
+                <p className="form-label" style={{ marginBottom: 4 }}>Plataforma de Loja</p>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#cffafe', color: '#0891b2' }}>
                   {cliente.plataforma_loja === 'Outro' ? cliente.plataforma_loja_outro : cliente.plataforma_loja}
                 </span>
               </div>
@@ -229,12 +223,10 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
 
             {cliente.recursos_ud && cliente.recursos_ud.length > 0 && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-1">Recursos Utilizados na UD</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Recursos Utilizados na UD</p>
                 <div className="flex flex-wrap gap-1.5">
                   {cliente.recursos_ud.map(r => (
-                    <span key={r} className="text-xs font-mono bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700/60">
-                      {r}
-                    </span>
+                    <span key={r} className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: '#ede9fe', color: '#6610f2' }}>{r}</span>
                   ))}
                 </div>
               </div>
@@ -242,37 +234,37 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
           </div>
 
           {/* Right Column */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {cliente.motivo_cancelamento && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-1">Motivo do Cancelamento</p>
-                <p className="text-xs text-zinc-300 leading-relaxed bg-zinc-900/60 p-2.5 rounded border border-zinc-800">{cliente.motivo_cancelamento}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Motivo do Cancelamento</p>
+                <p className="text-sm leading-relaxed p-3 rounded-xl" style={{ background: '#fee2e2', color: '#7f1d1d', border: '1px solid #fca5a5' }}>{cliente.motivo_cancelamento}</p>
               </div>
             )}
 
             {cliente.feedback_completo && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-1">Feedback Completo</p>
-                <p className="text-xs text-zinc-400 leading-relaxed bg-zinc-900/60 p-2.5 rounded border border-zinc-800">{cliente.feedback_completo}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Feedback Completo</p>
+                <p className="text-sm leading-relaxed p-3 rounded-xl" style={{ background: '#f8fafc', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}>{cliente.feedback_completo}</p>
               </div>
             )}
 
             {cliente.nota_interna && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-1">Nota Interna</p>
-                <p className="text-xs text-amber-300/90 leading-relaxed italic bg-amber-500/5 p-2.5 rounded border border-amber-500/20">{cliente.nota_interna}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Nota Interna</p>
+                <p className="text-sm leading-relaxed italic p-3 rounded-xl" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}>{cliente.nota_interna}</p>
               </div>
             )}
 
             {cliente.responsavel && (
               <div>
-                <p className="text-[11px] font-mono font-medium text-zinc-500 uppercase tracking-wider mb-0.5">Responsável</p>
-                <p className="text-xs text-zinc-300">{cliente.responsavel}</p>
+                <p className="form-label" style={{ marginBottom: 4 }}>Responsável</p>
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-heading)' }}>{cliente.responsavel}</p>
               </div>
             )}
 
             <div>
-              <p className="text-[11px] font-mono text-zinc-600">
+              <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
                 Atualizado {format(new Date(cliente.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
               </p>
             </div>

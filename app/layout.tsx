@@ -1,44 +1,40 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import Sidebar from '@/components/Sidebar'
 import { Toaster } from 'react-hot-toast'
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
   title: 'UnicoCRM — Gestão & Reconversão de Churn',
   description: 'Sistema de acompanhamento e reconversão de clientes cancelados da UnicoDrop.',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} h-full`}>
-      <body className="h-full flex bg-[#09090b] text-zinc-200 antialiased selection:bg-zinc-800 selection:text-zinc-100">
+    <html lang="pt-BR" className="h-full">
+      <body className="h-full flex" style={{ background: 'var(--bg-body)', color: 'var(--text-primary)', fontFamily: "'Nunito', sans-serif" }}>
         <Sidebar />
-        <main className="flex-1 min-h-screen overflow-y-auto bg-[#09090b]">
-          {children}
-        </main>
+        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+          <main className="flex-1 overflow-y-auto">
+            {children}
+          </main>
+        </div>
         <Toaster
           position="top-right"
           toastOptions={{
             style: {
-              background: '#18181b',
-              color: '#f4f4f5',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
+              background: '#ffffff',
+              color: '#131523',
+              border: '1px solid #e8ecf0',
+              borderRadius: '12px',
               fontSize: '13px',
-              fontFamily: 'Inter, sans-serif',
+              fontFamily: "'Nunito', sans-serif",
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
             },
             success: {
-              iconTheme: { primary: '#10b981', secondary: '#18181b' },
+              iconTheme: { primary: '#1eab5a', secondary: '#fff' },
             },
             error: {
-              iconTheme: { primary: '#f43f5e', secondary: '#18181b' },
+              iconTheme: { primary: '#ef4444', secondary: '#fff' },
             },
           }}
         />

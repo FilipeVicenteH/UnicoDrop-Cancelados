@@ -4,27 +4,17 @@ import { useEffect, useState, useCallback } from 'react'
 import Dashboard from '@/components/Dashboard'
 import DateFilterBar from '@/components/DateFilterBar'
 import { DashboardMetrics } from '@/lib/types'
-import { RefreshCw, Plus, Calendar, Activity } from 'lucide-react'
+import { RefreshCw, Plus, Calendar, TrendingUp, Activity } from 'lucide-react'
 import ClienteForm from '@/components/ClienteForm'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 const emptyMetrics: DashboardMetrics = {
-  total: 0,
-  convertidos: 0,
-  nao_convertidos: 0,
-  em_negociacao: 0,
-  pendentes: 0,
-  inacessiveis: 0,
-  taxa_conversao: 0,
-  contatados_hoje: 0,
-  cancelados_hoje: 0,
-  por_status: [],
-  por_checkout: [],
-  por_prioridade: [],
-  por_plataforma: [],
-  top_motivos: [],
-  por_faturamento: [],
+  total: 0, convertidos: 0, nao_convertidos: 0, em_negociacao: 0,
+  pendentes: 0, inacessiveis: 0, taxa_conversao: 0,
+  contatados_hoje: 0, cancelados_hoje: 0,
+  por_status: [], por_checkout: [], por_prioridade: [],
+  por_plataforma: [], top_motivos: [], por_faturamento: [],
 }
 
 export default function HomePage() {
@@ -34,9 +24,7 @@ export default function HomePage() {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
 
   const [dateFilter, setDateFilter] = useState({
-    dateField: 'cancelamento',
-    dateFrom: '',
-    dateTo: '',
+    dateField: 'cancelamento', dateFrom: '', dateTo: '',
   })
 
   const fetchMetrics = useCallback(async () => {
@@ -73,35 +61,49 @@ export default function HomePage() {
   const hasDateFilter = dateFilter.dateFrom || dateFilter.dateTo
 
   return (
-    <div className="p-6 md:p-8 max-w-[1400px] mx-auto animate-fade-in space-y-6">
-      {/* Header Bar */}
-      <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
+    <div className="animate-fade-in">
+      {/* ── Page Header (Topbar style) ── */}
+      <div
+        className="px-6 md:px-8 py-4 flex items-center justify-between flex-wrap gap-3"
+        style={{
+          background: 'white',
+          borderBottom: '1px solid var(--border-color)',
+          boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
+        }}
+      >
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[11px] font-mono font-medium text-emerald-400 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              Overview
-            </span>
-            <span className="text-[11px] text-zinc-500 font-mono">UnicoCRM Analytics</span>
-          </div>
-          <h1 className="text-xl font-bold tracking-tight text-zinc-100">Visão Geral de Retenção & Churn</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <Calendar className="w-3.5 h-3.5 text-zinc-500" />
-            <p className="text-xs text-zinc-400">{todayCapitalized}</p>
+          <h1 className="text-xl font-bold leading-tight" style={{ fontFamily: "'Poppins', sans-serif", color: 'var(--text-heading)' }}>
+            Dashboard
+          </h1>
+          <div className="flex items-center gap-2 mt-0.5">
+            <Calendar className="w-3.5 h-3.5" style={{ color: 'var(--text-muted)' }} />
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{todayCapitalized}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5">
+          {/* Refresh time */}
+          <span className="text-xs hidden sm:block" style={{ color: 'var(--text-muted)' }}>
+            Atualizado: {format(lastRefresh, 'HH:mm', { locale: ptBR })}
+          </span>
+
           <button
             onClick={fetchMetrics}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-medium transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-semibold transition-all"
+            style={{
+              borderColor: 'var(--border-color)',
+              color: 'var(--text-secondary)',
+              background: 'white',
+            }}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Atualizar</span>
           </button>
+
           <button
             onClick={() => setFormOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-semibold shadow-sm transition-all"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white transition-all btn-primary"
           >
             <Plus className="w-4 h-4" />
             Novo Cliente
@@ -109,40 +111,28 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Subheader info */}
-      <div className="flex items-center justify-between text-xs text-zinc-500 font-mono -mt-2">
-        <p>
-          Atualizado às {format(lastRefresh, 'HH:mm:ss', { locale: ptBR })}
-          {!hasDateFilter && ' • Auto-refresh 60s'}
-        </p>
-        {hasDateFilter && (
-          <span className="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded text-[11px]">
-            Filtro de período ativo
-          </span>
+      {/* ── Content ── */}
+      <div className="p-6 md:p-8 max-w-[1500px] mx-auto space-y-6">
+        {/* Date Filter */}
+        <DateFilterBar value={dateFilter} onChange={setDateFilter} />
+
+        {/* Dashboard */}
+        {loading && metrics.total === 0 ? (
+          <div
+            className="flex items-center justify-center h-64 rounded-2xl"
+            style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
+          >
+            <div className="flex flex-col items-center gap-3">
+              <Activity className="w-8 h-8 animate-spin" style={{ color: 'var(--primary)' }} />
+              <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Carregando métricas...</p>
+            </div>
+          </div>
+        ) : (
+          <Dashboard metrics={metrics} />
         )}
       </div>
 
-      {/* Date Filter Bar */}
-      <DateFilterBar value={dateFilter} onChange={setDateFilter} />
-
-      {/* Dashboard Content */}
-      {loading && metrics.total === 0 ? (
-        <div className="flex items-center justify-center h-64 border border-zinc-800 rounded-xl bg-zinc-900/30">
-          <div className="flex flex-col items-center gap-3">
-            <Activity className="w-6 h-6 text-zinc-500 animate-spin" />
-            <p className="text-xs text-zinc-400 font-mono">Carregando métricas da operação...</p>
-          </div>
-        </div>
-      ) : (
-        <Dashboard metrics={metrics} />
-      )}
-
-      {/* Form Modal */}
-      <ClienteForm
-        isOpen={formOpen}
-        onClose={() => setFormOpen(false)}
-        onSaved={fetchMetrics}
-      />
+      <ClienteForm isOpen={formOpen} onClose={() => setFormOpen(false)} onSaved={fetchMetrics} />
     </div>
   )
 }

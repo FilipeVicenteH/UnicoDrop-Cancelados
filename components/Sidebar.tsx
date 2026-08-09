@@ -3,73 +3,144 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard,
-  Users,
-  BarChart2,
-  MessageSquarePlus,
-  Command,
+  LayoutDashboard, Users, BarChart2, MessageSquarePlus,
+  ChevronRight, Zap
 } from 'lucide-react'
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/clientes', label: 'Clientes', icon: Users },
-  { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
-  { href: '/feedbacks', label: 'Feedbacks de Melhoria', icon: MessageSquarePlus },
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard, badge: null },
+  { href: '/clientes', label: 'Clientes', icon: Users, badge: null },
+  { href: '/relatorios', label: 'Relatórios', icon: BarChart2, badge: null },
+  { href: '/feedbacks', label: 'Feedbacks', icon: MessageSquarePlus, badge: 'Novo' },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="w-60 flex-shrink-0 bg-[#0c0c0e] border-r border-zinc-800/80 flex flex-col h-screen sticky top-0 select-none">
-      {/* Brand Header */}
-      <div className="px-5 py-4 border-b border-zinc-800/80 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-md bg-zinc-800 border border-zinc-700/80 flex items-center justify-center text-zinc-200">
-            <Command className="w-3.5 h-3.5" />
-          </div>
-          <div>
-            <p className="text-xs font-semibold text-zinc-100 tracking-tight flex items-center gap-1.5">
-              UnicoCRM
-              <span className="text-[9px] font-mono font-medium px-1.5 py-0.2 bg-zinc-800 text-zinc-400 rounded border border-zinc-700/50">PRO</span>
-            </p>
-            <p className="text-[10px] text-zinc-500 font-mono">UnicoDrop SaaS</p>
-          </div>
+    <aside
+      className="w-64 flex-shrink-0 flex flex-col h-screen sticky top-0"
+      style={{
+        background: '#ffffff',
+        borderRight: '1px solid var(--border-color)',
+        boxShadow: '2px 0 12px rgba(0,0,0,0.05)',
+      }}
+    >
+      {/* ── Brand Logo ── */}
+      <div
+        className="px-6 py-5 flex items-center gap-3"
+        style={{ borderBottom: '1px solid var(--border-color)' }}
+      >
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center text-white"
+          style={{ background: 'linear-gradient(135deg, #6610f2 0%, #7c3aed 100%)', boxShadow: '0 4px 12px rgba(102,16,242,0.35)' }}
+        >
+          <Zap className="w-5 h-5" />
+        </div>
+        <div>
+          <p className="font-bold text-sm leading-tight" style={{ color: 'var(--text-heading)', fontFamily: "'Poppins', sans-serif" }}>
+            UnicoCRM
+          </p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Gestão de Churn</p>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-2.5 py-4 space-y-1">
-        <div className="px-2 pb-2">
-          <p className="text-[10px] font-mono font-semibold text-zinc-500 uppercase tracking-wider">Menu Principal</p>
+      {/* ── Navigation ── */}
+      <nav className="flex-1 px-3 py-5 overflow-y-auto">
+        {/* Label de seção */}
+        <p className="px-3 mb-3 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+          Menu Principal
+        </p>
+
+        <div className="space-y-1">
+          {navItems.map(({ href, label, icon: Icon, badge }) => {
+            const active = pathname === href || (href !== '/' && pathname.startsWith(href))
+
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 group relative ${
+                  active ? 'nav-active-pill' : ''
+                }`}
+                style={!active ? {
+                  color: 'var(--text-secondary)',
+                } : {
+                  color: 'white',
+                }}
+              >
+                {/* Hover background */}
+                {!active && (
+                  <span
+                    className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: 'var(--primary-muted)' }}
+                  />
+                )}
+
+                <Icon
+                  className="w-4.5 h-4.5 flex-shrink-0 relative z-10 transition-colors"
+                  style={{ color: active ? 'white' : 'var(--text-muted)' }}
+                />
+                <span className="flex-1 relative z-10" style={{ color: active ? 'white' : 'var(--text-secondary)' }}>
+                  {label}
+                </span>
+
+                {badge && (
+                  <span
+                    className="text-[9px] font-bold px-1.5 py-0.5 rounded-full relative z-10"
+                    style={{
+                      background: active ? 'rgba(255,255,255,0.25)' : 'var(--primary-muted)',
+                      color: active ? 'white' : 'var(--primary)',
+                    }}
+                  >
+                    {badge}
+                  </span>
+                )}
+
+                {active && (
+                  <ChevronRight className="w-3.5 h-3.5 relative z-10 text-white/70" />
+                )}
+              </Link>
+            )
+          })}
         </div>
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || (href !== '/' && pathname.startsWith(href))
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all group ${
-                active
-                  ? 'bg-zinc-800/90 text-zinc-100 border border-zinc-700/60 shadow-sm'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
-              }`}
-            >
-              <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${active ? 'text-emerald-400' : 'text-zinc-500 group-hover:text-zinc-300'}`} />
-              {label}
-            </Link>
-          )
-        })}
+
+        {/* ── Quick Stats ── */}
+        <div
+          className="mt-8 mx-0 p-4 rounded-2xl"
+          style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)', border: '1px solid #ddd6fe' }}
+        >
+          <p className="text-xs font-bold mb-0.5" style={{ color: 'var(--primary)', fontFamily: "'Poppins', sans-serif" }}>
+            UnicoDrop SaaS
+          </p>
+          <p className="text-[11px]" style={{ color: '#7c3aed' }}>
+            Sistema de Retenção & Churn
+          </p>
+          <div className="mt-3 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-[11px] font-semibold text-green-700">Sistema Online</span>
+          </div>
+        </div>
       </nav>
 
-      {/* Footer System Status */}
-      <div className="px-4 py-3.5 border-t border-zinc-800/80 bg-zinc-950/40">
-        <div className="flex items-center justify-between text-[11px]">
-          <span className="text-zinc-500 font-mono">Retenção & Churn</span>
-          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Online
-          </span>
+      {/* ── Footer ── */}
+      <div
+        className="px-4 py-3.5 flex items-center justify-between"
+        style={{ borderTop: '1px solid var(--border-color)' }}
+      >
+        <div className="flex items-center gap-2.5">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
+            style={{ background: 'linear-gradient(135deg, #6610f2, #7c3aed)' }}
+          >
+            F
+          </div>
+          <div>
+            <p className="text-xs font-semibold leading-tight" style={{ color: 'var(--text-heading)', fontFamily: "'Poppins', sans-serif" }}>
+              Filipe Vicente
+            </p>
+            <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Admin</p>
+          </div>
         </div>
       </div>
     </aside>

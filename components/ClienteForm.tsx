@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { X, Loader2, Globe, CheckCircle2, XCircle, AlertCircle, Phone, ExternalLink } from 'lucide-react'
+import { X, Loader2, Globe, CheckCircle2, XCircle, AlertCircle, Phone, ExternalLink, Users } from 'lucide-react'
 import { CHECKOUTS, PLATAFORMAS_LOJA, PLUGINS_RASTREIO, RECURSOS_UD } from '@/lib/constants'
 import { ClienteFormData, SiteStatus, StatusCliente, Prioridade } from '@/lib/types'
 import toast from 'react-hot-toast'
@@ -202,42 +202,41 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 modal-overlay">
 
       {/* Modal */}
-      <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col bg-[#0c0c0e] border border-zinc-800 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+      <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-fade-in modal-container">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-zinc-800 bg-zinc-950/60">
-          <div>
-            <h2 className="text-sm font-semibold text-zinc-100">
-              {clienteId ? 'Editar Registro de Cliente' : 'Novo Cliente Cancelado'}
-            </h2>
-            <p className="text-[11px] text-zinc-500 font-mono">Preencha os dados operacionais do contato</p>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
+          <div className="flex items-center gap-3">
+            <div className="icon-box icon-box-primary" style={{ width: 36, height: 36, borderRadius: 10 }}>
+              <Users className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold" style={{ fontFamily: "'Poppins', sans-serif", color: 'var(--text-heading)' }}>
+                {clienteId ? 'Editar Cliente' : 'Novo Cliente Cancelado'}
+              </h2>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Preencha os dados operacionais do contato</p>
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-zinc-100 transition-colors"
-          >
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 transition-colors" style={{ color: 'var(--text-muted)' }}>
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-zinc-800 bg-[#0c0c0e]">
+        <div className="flex" style={{ borderBottom: '2px solid var(--border-color)', background: '#f8fafc' }}>
           {tabs.map((tab, i) => (
             <button
               key={tab}
               onClick={() => setActiveTab(i)}
-              className={`flex-1 py-2.5 text-xs font-mono font-medium transition-all border-b-2 ${
-                activeTab === i
-                  ? 'border-zinc-100 text-zinc-100 bg-zinc-900/60'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-300'
-              }`}
+              className="flex-1 py-2.5 text-xs font-semibold transition-all"
+              style={{
+                color: activeTab === i ? 'var(--primary)' : 'var(--text-muted)',
+                borderBottom: `2px solid ${activeTab === i ? 'var(--primary)' : 'transparent'}`,
+                background: 'transparent',
+                marginBottom: '-2px',
+              }}
             >
               {tab}
             </button>
@@ -245,7 +244,7 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden" style={{ background: 'white' }}>
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
 
             {/* ── Tab 0: Identificação ── */}
@@ -573,16 +572,18 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-6 py-3.5 border-t border-zinc-800 bg-zinc-950/60">
+          <div className="flex items-center justify-between px-6 py-4" style={{ borderTop: '1px solid var(--border-color)', background: '#f8fafc' }}>
             <div className="flex gap-1.5">
               {tabs.map((_, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => setActiveTab(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    activeTab === i ? 'bg-zinc-200 w-4' : 'bg-zinc-700'
-                  }`}
+                  className="h-1.5 rounded-full transition-all"
+                  style={{
+                    width: activeTab === i ? '20px' : '6px',
+                    background: activeTab === i ? 'var(--primary)' : 'var(--border-color)',
+                  }}
                 />
               ))}
             </div>
@@ -591,16 +592,17 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                 <button
                   type="button"
                   onClick={() => setActiveTab(prev => prev - 1)}
-                  className="px-3 py-1.5 text-xs font-mono text-zinc-400 hover:text-zinc-200 border border-zinc-800 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-semibold rounded-xl border transition-all"
+                  style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)', background: 'white' }}
                 >
-                  Anterior
+                  ← Anterior
                 </button>
               )}
               {activeTab < tabs.length - 1 ? (
                 <button
                   type="button"
                   onClick={() => setActiveTab(prev => prev + 1)}
-                  className="px-4 py-1.5 text-xs font-mono font-semibold bg-zinc-100 hover:bg-white text-zinc-950 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-bold text-white rounded-xl btn-primary"
                 >
                   Próximo →
                 </button>
@@ -608,9 +610,9 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-1.5 text-xs font-semibold bg-zinc-100 hover:bg-white text-zinc-950 rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-5 py-2 text-sm font-bold text-white rounded-xl btn-primary disabled:opacity-50"
                 >
-                  {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                   {clienteId ? 'Salvar Alterações' : 'Adicionar Cliente'}
                 </button>
               )}
