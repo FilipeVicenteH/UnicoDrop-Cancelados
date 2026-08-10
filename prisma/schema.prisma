@@ -104,3 +104,34 @@ enum StatusFeedback {
   PLANEJADO
   CONCLUIDO
 }
+
+model BugReport {
+  id          Int            @id @default(autoincrement())
+  titulo      String
+  descricao   String
+  modulo      String         @default("Geral")
+  severidade  SeveridadeBug  @default(MEDIA)
+  url_pagina  String?
+  user_agent  String?
+  status      StatusBug      @default(ABERTO)
+
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+
+  @@map("bug_reports")
+}
+
+enum SeveridadeBug {
+  BAIXA
+  MEDIA
+  ALTA
+  CRITICA
+}
+
+enum StatusBug {
+  ABERTO
+  EM_ANALISE
+  RESOLVIDO
+  CANCELADO
+}
+
