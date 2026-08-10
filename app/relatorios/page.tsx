@@ -175,104 +175,79 @@ export default function RelatoriosPage() {
       <div className="p-6 md:p-8 max-w-[1500px] mx-auto space-y-6">
         <DateFilterBar value={dateFilter} onChange={setDateFilter} />
 
-        {/* ── Executive KPI Cards Grid (4 Spacious Columns) ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4.5">
-          {/* Card 1: Total Base */}
-          <div
-            className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default flex flex-col justify-between"
-            style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="icon-box icon-box-primary">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full" style={{ background: '#f5f3ff', color: '#6610f2' }}>
-                Base Geral
-              </span>
-            </div>
-            <div>
-              <p className="text-3xl font-black leading-none" style={{ color: 'var(--text-heading)', fontFamily: "'Poppins', sans-serif" }}>
-                {metrics.total}
-              </p>
-              <p className="text-xs font-bold mt-1.5" style={{ color: 'var(--text-secondary)' }}>Total de Clientes em Churn</p>
-            </div>
-            <div className="mt-3 pt-3 flex items-center justify-between text-[11px] font-semibold" style={{ borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
-              <span>Contatados hoje: <strong style={{ color: '#0891b2' }}>{metrics.contatados_hoje}</strong></span>
-              <span>Novos hoje: <strong style={{ color: '#dc2626' }}>{metrics.cancelados_hoje}</strong></span>
-            </div>
+        {/* ── All 9 Standalone Metric Cards (2-Row Spacious Grid) ── */}
+        <div className="space-y-3.5">
+          {/* Row 1: Pipeline Status (5 Cards) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            {[
+              { label: 'Total de Clientes', value: metrics.total, icon: Users, iconBox: 'icon-box-primary', textColor: '#6610f2', sub: 'Base completa' },
+              { label: 'Convertidos', value: metrics.convertidos, icon: CheckCircle2, iconBox: 'icon-box-success', textColor: '#1eab5a', sub: 'Retidos' },
+              { label: 'Em Negociação', value: metrics.em_negociacao, icon: Clock, iconBox: 'icon-box-warning', textColor: '#d97706', sub: 'Em contato' },
+              { label: 'Pendentes', value: metrics.pendentes, icon: AlertCircle, iconBox: 'icon-box-info', textColor: '#6b7280', sub: 'Fila' },
+              { label: 'Inacessíveis', value: metrics.inacessiveis, icon: WifiOff, iconBox: 'icon-box-orange', textColor: '#ea580c', sub: 'Sem contato' },
+            ].map(card => {
+              const Icon = card.icon
+              return (
+                <div
+                  key={card.label}
+                  className="rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default"
+                  style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
+                >
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div className={`icon-box ${card.iconBox}`} style={{ width: 36, height: 36, borderRadius: 10 }}>
+                      <Icon className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#f8fafc', color: card.textColor, border: '1px solid var(--border-color)' }}>
+                      {card.sub}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black leading-none" style={{ color: card.textColor, fontFamily: "'Poppins', sans-serif" }}>
+                      {card.value}
+                    </p>
+                    <p className="text-xs font-bold mt-1.5 truncate" style={{ color: 'var(--text-heading)' }}>
+                      {card.label}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
 
-          {/* Card 2: Conversão & Retenção */}
-          <div
-            className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default flex flex-col justify-between"
-            style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="icon-box icon-box-success">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full" style={{ background: '#d1fae5', color: '#059669' }}>
-                EFICIÊNCIA
-              </span>
-            </div>
-            <div>
-              <p className="text-3xl font-black leading-none" style={{ color: '#1eab5a', fontFamily: "'Poppins', sans-serif" }}>
-                {metrics.taxa_conversao}%
-              </p>
-              <p className="text-xs font-bold mt-1.5" style={{ color: 'var(--text-secondary)' }}>Taxa de Reconversão Real</p>
-            </div>
-            <div className="mt-3 pt-3 flex items-center justify-between text-[11px] font-semibold" style={{ borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
-              <span>Retidos: <strong style={{ color: '#1eab5a' }}>{metrics.convertidos}</strong></span>
-              <span>Churn final: <strong style={{ color: '#dc2626' }}>{metrics.nao_convertidos}</strong></span>
-            </div>
-          </div>
-
-          {/* Card 3: Em Atendimento N2 */}
-          <div
-            className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default flex flex-col justify-between"
-            style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="icon-box icon-box-warning">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full" style={{ background: '#fef3c7', color: '#d97706' }}>
-                EM ANDAMENTO
-              </span>
-            </div>
-            <div>
-              <p className="text-3xl font-black leading-none" style={{ color: '#d97706', fontFamily: "'Poppins', sans-serif" }}>
-                {metrics.em_negociacao}
-              </p>
-              <p className="text-xs font-bold mt-1.5" style={{ color: 'var(--text-secondary)' }}>Em Negociação com Suporte N2</p>
-            </div>
-            <div className="mt-3 pt-3 flex items-center justify-between text-[11px] font-semibold" style={{ borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
-              <span>Aguardando na fila: <strong style={{ color: 'var(--text-heading)' }}>{metrics.pendentes}</strong></span>
-            </div>
-          </div>
-
-          {/* Card 4: Inacessíveis */}
-          <div
-            className="rounded-2xl p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default flex flex-col justify-between"
-            style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="icon-box icon-box-orange">
-                <WifiOff className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full" style={{ background: '#ffedd5', color: '#ea580c' }}>
-                SEM CONTATO
-              </span>
-            </div>
-            <div>
-              <p className="text-3xl font-black leading-none" style={{ color: '#ea580c', fontFamily: "'Poppins', sans-serif" }}>
-                {metrics.inacessiveis}
-              </p>
-              <p className="text-xs font-bold mt-1.5" style={{ color: 'var(--text-secondary)' }}>Lojistas Inacessíveis</p>
-            </div>
-            <div className="mt-3 pt-3 flex items-center justify-between text-[11px] font-semibold" style={{ borderTop: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
-              <span>Telefone ou site inválido</span>
-            </div>
+          {/* Row 2: Performance & Activity (4 Cards) */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {[
+              { label: 'Não Convertidos', value: metrics.nao_convertidos, icon: XCircle, iconBox: 'icon-box-danger', textColor: '#dc2626', sub: 'Churn final' },
+              { label: 'Taxa de Conversão', value: `${metrics.taxa_conversao}%`, icon: TrendingUp, iconBox: 'icon-box-success', textColor: '#1eab5a', sub: 'Eficiência' },
+              { label: 'Contatados Hoje', value: metrics.contatados_hoje, icon: PhoneCall, iconBox: 'icon-box-info', textColor: '#0891b2', sub: 'Hoje' },
+              { label: 'Cancelaram Hoje', value: metrics.cancelados_hoje, icon: UserMinus, iconBox: 'icon-box-danger', textColor: '#dc2626', sub: 'Hoje' },
+            ].map(card => {
+              const Icon = card.icon
+              return (
+                <div
+                  key={card.label}
+                  className="rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default"
+                  style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
+                >
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div className={`icon-box ${card.iconBox}`} style={{ width: 36, height: 36, borderRadius: 10 }}>
+                      <Icon className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#f8fafc', color: card.textColor, border: '1px solid var(--border-color)' }}>
+                      {card.sub}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-black leading-none" style={{ color: card.textColor, fontFamily: "'Poppins', sans-serif" }}>
+                      {card.value}
+                    </p>
+                    <p className="text-xs font-bold mt-1.5 truncate" style={{ color: 'var(--text-heading)' }}>
+                      {card.label}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
 
