@@ -143,24 +143,45 @@ export default function Dashboard({ metrics }: DashboardProps) {
 
   return (
     <div className="space-y-6">
-      {/* ── KPI Summary Row ── */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3">
+      {/* ── Enterprise KPI Cards Grid ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-3.5">
         {[
-          { label: 'Total', value: metrics.total, color: '#6610f2', bg: '#f5f3ff' },
-          { label: 'Convertidos', value: metrics.convertidos, color: '#1eab5a', bg: '#d1fae5' },
-          { label: 'Em Neg.', value: metrics.em_negociacao, color: '#d97706', bg: '#fef3c7' },
-          { label: 'Pendentes', value: metrics.pendentes, color: '#6b7280', bg: '#f1f3f6' },
-          { label: 'Inacessíveis', value: metrics.inacessiveis, color: '#ea580c', bg: '#ffedd5' },
-          { label: 'Não Conv.', value: metrics.nao_convertidos, color: '#dc2626', bg: '#fee2e2' },
-          { label: 'Conversão', value: `${metrics.taxa_conversao}%`, color: '#1eab5a', bg: '#d1fae5' },
-          { label: 'Cont. Hoje', value: metrics.contatados_hoje, color: '#0891b2', bg: '#cffafe' },
-          { label: 'Cancel. Hj', value: metrics.cancelados_hoje, color: '#dc2626', bg: '#fee2e2' },
-        ].map(item => (
-          <div key={item.label} className="rounded-xl p-3 text-center" style={{ background: item.bg, border: `1px solid ${item.color}22` }}>
-            <p className="text-lg font-black leading-none" style={{ color: item.color, fontFamily: "'Poppins', sans-serif" }}>{item.value}</p>
-            <p className="text-[10px] font-bold mt-1 uppercase tracking-wide" style={{ color: item.color + 'aa' }}>{item.label}</p>
-          </div>
-        ))}
+          { label: 'Total Base', value: metrics.total, icon: Users, color: '#6610f2', bg: '#f5f3ff', sub: 'Lojistas' },
+          { label: 'Convertidos', value: metrics.convertidos, icon: CheckCircle2, color: '#1eab5a', bg: '#d1fae5', sub: 'Retidos' },
+          { label: 'Em Negociação', value: metrics.em_negociacao, icon: Clock, color: '#d97706', bg: '#fef3c7', sub: 'Contato' },
+          { label: 'Pendentes', value: metrics.pendentes, icon: AlertCircle, color: '#475569', bg: '#f1f3f6', sub: 'Fila' },
+          { label: 'Inacessíveis', value: metrics.inacessiveis, icon: WifiOff, color: '#ea580c', bg: '#ffedd5', sub: 'Sem tel' },
+          { label: 'Não Convertidos', value: metrics.nao_convertidos, icon: XCircle, color: '#dc2626', bg: '#fee2e2', sub: 'Churn' },
+          { label: 'Conversão', value: `${metrics.taxa_conversao}%`, icon: TrendingUp, color: '#1eab5a', bg: '#d1fae5', sub: 'Taxa' },
+          { label: 'Contatados Hoje', value: metrics.contatados_hoje, icon: PhoneCall, color: '#0891b2', bg: '#cffafe', sub: 'Hoje' },
+          { label: 'Cancelaram Hoje', value: metrics.cancelados_hoje, icon: UserMinus, color: '#dc2626', bg: '#fee2e2', sub: 'Hoje' },
+        ].map(item => {
+          const Icon = item.icon
+          return (
+            <div
+              key={item.label}
+              className="rounded-2xl p-4 flex flex-col justify-between transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default"
+              style={{ background: 'white', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-card)' }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: item.bg, color: item.color }}>
+                  <Icon className="w-4 h-4" />
+                </div>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: item.bg, color: item.color }}>
+                  {item.sub}
+                </span>
+              </div>
+              <div>
+                <p className="text-2xl font-black leading-none" style={{ color: 'var(--text-heading)', fontFamily: "'Poppins', sans-serif" }}>
+                  {item.value}
+                </p>
+                <p className="text-xs font-semibold mt-2 truncate" style={{ color: 'var(--text-secondary)' }}>
+                  {item.label}
+                </p>
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {/* ── Row 2: Funil + Pie ── */}
