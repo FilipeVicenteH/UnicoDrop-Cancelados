@@ -117,9 +117,12 @@ export default function RelatoriosPage() {
   clientes.forEach(c => {
     (c.plugins_rastreio || []).forEach(p => { pluginsCount[p] = (pluginsCount[p] || 0) + 1 })
     ;(c.recursos_ud || []).forEach(r => { recursosCount[r] = (recursosCount[r] || 0) + 1 })
-    if (c.usava_dashboard) usavaDashboardCount++
-    if (c.usava_plugin) usavaPluginCount++
-    if (c.usava_whatsapp) usavaWhatsappCount++
+    const isDash = c.usava_dashboard || (c.recursos_ud || []).some(r => r.toLowerCase().includes('relatórios') || r.toLowerCase().includes('dashboard'))
+    const isPlug = c.usava_plugin || (c.plugins_rastreio || []).some(p => p.includes('UnicoDrop')) || (c.recursos_ud || []).some(r => r.toLowerCase().includes('rastreio'))
+    const isWA   = c.usava_whatsapp || (c.recursos_ud || []).some(r => r.toLowerCase().includes('whatsapp'))
+    if (isDash) usavaDashboardCount++
+    if (isPlug) usavaPluginCount++
+    if (isWA) usavaWhatsappCount++
   })
 
   const pluginsSorted = Object.entries(pluginsCount).sort((a, b) => b[1] - a[1])

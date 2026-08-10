@@ -123,17 +123,24 @@ export default function ClienteCard({ cliente, onEdit, onDelete }: ClienteCardPr
         </div>
 
         {/* UD Tools */}
-        <div className="flex gap-1 flex-shrink-0 hidden lg:flex">
-          <span title="Dashboard" className="p-1 rounded" style={{ color: cliente.usava_dashboard ? 'var(--primary)' : 'var(--text-muted)', background: cliente.usava_dashboard ? 'var(--primary-muted)' : 'transparent' }}>
-            <LayoutDashboard className="w-3.5 h-3.5" />
-          </span>
-          <span title="Plugin" className="p-1 rounded" style={{ color: cliente.usava_plugin ? '#1eab5a' : 'var(--text-muted)', background: cliente.usava_plugin ? '#d1fae5' : 'transparent' }}>
-            <Puzzle className="w-3.5 h-3.5" />
-          </span>
-          <span title="WhatsApp" className="p-1 rounded" style={{ color: cliente.usava_whatsapp ? '#25d366' : 'var(--text-muted)', background: cliente.usava_whatsapp ? '#dcfce7' : 'transparent' }}>
-            <MessageCircle className="w-3.5 h-3.5" />
-          </span>
-        </div>
+        {(() => {
+          const isDash = cliente.usava_dashboard || (cliente.recursos_ud || []).some(r => r.toLowerCase().includes('relatórios') || r.toLowerCase().includes('dashboard'))
+          const isPlug = cliente.usava_plugin || (cliente.plugins_rastreio || []).some(p => p.includes('UnicoDrop')) || (cliente.recursos_ud || []).some(r => r.toLowerCase().includes('rastreio'))
+          const isWA   = cliente.usava_whatsapp || (cliente.recursos_ud || []).some(r => r.toLowerCase().includes('whatsapp'))
+          return (
+            <div className="flex gap-1 flex-shrink-0 hidden lg:flex">
+              <span title="Dashboard" className="p-1 rounded" style={{ color: isDash ? 'var(--primary)' : 'var(--text-muted)', background: isDash ? 'var(--primary-muted)' : 'transparent' }}>
+                <LayoutDashboard className="w-3.5 h-3.5" />
+              </span>
+              <span title="Plugin" className="p-1 rounded" style={{ color: isPlug ? '#1eab5a' : 'var(--text-muted)', background: isPlug ? '#d1fae5' : 'transparent' }}>
+                <Puzzle className="w-3.5 h-3.5" />
+              </span>
+              <span title="WhatsApp" className="p-1 rounded" style={{ color: isWA ? '#25d366' : 'var(--text-muted)', background: isWA ? '#dcfce7' : 'transparent' }}>
+                <MessageCircle className="w-3.5 h-3.5" />
+              </span>
+            </div>
+          )
+        })()}
 
         {/* Date */}
         <div className="text-xs flex-shrink-0 hidden xl:block" style={{ color: 'var(--text-muted)' }}>
