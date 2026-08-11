@@ -1,99 +1,63 @@
-# UnicoCRM — Clientes Cancelados UnicoDrop
+# 🚀 UnicoCRM — SaaS Analytics & Reconversão de Churn
 
-Sistema CRM profissional para acompanhamento e reconversão de clientes cancelados.
+[![Next.js](https://img.shields.io/badge/Next.js-15.x-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38BDF8?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.x-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Neon PostgreSQL](https://img.shields.io/badge/Neon-PostgreSQL-02E693?style=for-the-badge&logo=postgresql&logoColor=black)](https://neon.tech/)
+[![Vercel Status](https://img.shields.io/badge/Vercel-Production-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://unico-crm.vercel.app)
 
-## Stack
+> **Sistema SaaS Full Stack desenvolvido para acompanhamento, categorização de motivos de saída e reconversão estratégica de clientes cancelados da plataforma UnicoDrop.**
 
-- **Framework**: Next.js 15 (App Router + TypeScript)
-- **Database**: Neon PostgreSQL (serverless, grátis)
-- **ORM**: Prisma com driver adapter Neon
-- **Deploy**: Vercel (grátis)
-- **UI**: Tailwind CSS 4 + Lucide Icons + Recharts
+🔗 **Live Demo**: [unico-crm.vercel.app](https://unico-crm.vercel.app)
 
 ---
 
-## Setup Local (Desenvolvimento)
+## 📊 Arquitetura de Dados & Recursos
 
-### 1. Instalar dependências
+- **Dashboard de Métricas em Tempo Real**: KPIs de MRR recuperado, taxa de churn por motivo (preço, suporte, bugs, concorrência) e gráficos com Recharts.
+- **Verificação Automática de Disponibilidade**: Checagem assíncrona de status HTTP dos e-commerces dos clientes.
+- **Formulário Multi-Step Intuitivo**: Onboarding completo de registros de cancelamento com validação de dados.
+- **Relatórios & Exportação**: Filtros combinados avançados por prioridade, recursos utilizados e exportação em formato CSV.
+
+---
+
+## 🛠️ Tech Stack & Ferramentas
+
+- **Front-End & SSR**: Next.js 15 (App Router, Server Components & Server Actions).
+- **Linguagem & Tipagem**: TypeScript.
+- **Estilização & UI**: Tailwind CSS 4, Lucide Icons, Recharts, React Hot Toast.
+- **Banco de Dados & ORM**: Neon PostgreSQL Serverless, Prisma ORM (Driver Adapter).
+- **Hospedagem & CI/CD**: Vercel.
+
+---
+
+## ⚡ Setup Local (Desenvolvimento)
+
 ```bash
+# 1. Clone o repositório
+git clone https://github.com/FilipeVicenteH/UnicoDrop-Cancelados.git
+
+# 2. Acesse a pasta do projeto
+cd UnicoDrop-Cancelados
+
+# 3. Instale as dependências
 npm install
-```
 
-### 2. Configurar banco de dados
+# 4. Configure a variável de ambiente (.env.local)
+DATABASE_URL="postgresql://usuario:senha@ep-xyz.neon.tech/neondb?sslmode=require"
 
-1. Acesse [https://console.neon.tech](https://console.neon.tech) e crie uma conta gratuita
-2. Crie um novo projeto
-3. Vá em **Connection Details** → selecione **Prisma** no dropdown
-4. Copie a `DATABASE_URL`
-
-Crie o arquivo `.env.local`:
-```bash
-DATABASE_URL="postgresql://..."
-```
-
-### 3. Criar as tabelas
-```bash
+# 5. Execute as migrations do Prisma
 npx prisma db push
-```
 
-### 4. Iniciar o servidor
-```bash
+# 6. Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-Acesse: [http://localhost:3000](http://localhost:3000)
-
 ---
 
-## Deploy no Vercel
+## 👤 Autor
 
-### 1. Subir o código no GitHub
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/SEU_USUARIO/unico-crm.git
-git push -u origin main
-```
-
-### 2. Conectar ao Vercel
-1. Acesse [https://vercel.com](https://vercel.com)
-2. Clique em **New Project** → importe o repositório
-3. Em **Environment Variables**, adicione:
-   - `DATABASE_URL` → cole a URL do Neon
-
-### 3. Fazer deploy
-O Vercel faz o deploy automaticamente após cada push no GitHub.
-
----
-
-## Funcionalidades
-
-- ✅ Dashboard com métricas em tempo real
-- ✅ Cadastro completo de clientes cancelados
-- ✅ Registro de: site, plugin de rastreio, checkout, uso na UD
-- ✅ Verificação automática se site está online
-- ✅ Filtros avançados por status, prioridade, recursos usados
-- ✅ Formulário multi-step intuitivo
-- ✅ Gráficos de conversão e distribuição
-- ✅ Página de relatórios com exportação CSV
-- ✅ Multi-usuário simultâneo (via banco de dados na nuvem)
-- ✅ Responsivo e otimizado para Vercel
-
----
-
-## Comandos Úteis
-
-```bash
-# Rodar em desenvolvimento
-npm run dev
-
-# Abrir Prisma Studio (interface visual do banco)
-npx prisma studio
-
-# Resetar banco (⚠️ apaga todos os dados)
-npx prisma db push --force-reset
-
-# Build de produção
-npm run build
-```
+**Filipe Vicente Hidalgo**  
+- **LinkedIn**: [linkedin.com/in/filipevicentehidalgo](https://www.linkedin.com/in/filipevicentehidalgo)  
+- **Portfólio**: [filipevicenteh.vercel.app](https://filipevicenteh.vercel.app)
