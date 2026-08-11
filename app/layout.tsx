@@ -6,6 +6,22 @@ import { Toaster } from 'react-hot-toast'
 export const metadata: Metadata = {
   title: 'UnicoCRM — Gestão & Reconversão de Churn',
   description: 'Sistema de acompanhamento e reconversão de clientes cancelados da UnicoDrop.',
+  openGraph: {
+    title: 'UnicoCRM — Plataforma SaaS CRM & Analytics',
+    description: 'Sistema completo de gestão de relacionamento e relatórios operacionais desenvolvido com React e arquitetura limpa.',
+    url: 'https://unico-crm.vercel.app',
+    siteName: 'UnicoCRM',
+    images: [
+      {
+        url: 'https://unico-crm.vercel.app/preview_linkedin.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'UnicoCRM Preview',
+      },
+    ],
+    locale: 'pt_BR',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
