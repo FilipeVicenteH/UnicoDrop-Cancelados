@@ -1,20 +1,27 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-import { PrismaNeon } from '@prisma/adapter-neon'
+import { prisma } from '@/lib/prisma'
 
-const connectionString = process.env.DATABASE_URL || ''
-const adapter = new PrismaNeon({ connectionString })
-const prisma = new PrismaClient({ adapter })
+function formatPhoneForWhatsApp(raw: string): string | null {
+  const digits = raw.replace(/\D/g, '')
+  // Already has country code 55
+  if (digits.length === 13 && digits.startsWith('55')) return digits
+  if (digits.length === 12 && digits.startsWith('55')) return digits
+  // Just DDD + number
+  if (digits.length === 11) return `55${digits}`
+  if (digits.length === 10) return `55${digits}`
+  return null
+}
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { cliente_id, template_id, mensagem_customizada } = body
+    const { cliente_id, template_id } = body
 
     if (!cliente_id) {
       return NextResponse.json({ error: 'ID do cliente é obrigatório' }, { status: 400 })
     }
 
+    // Fetch REAL client data (no anonymization)
     const cliente = await prisma.cliente.findUnique({
       where: { id: parseInt(cliente_id) }
     })
@@ -27,37 +34,48 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Cliente não possui contato/telefone cadastrado' }, { status: 400 })
     }
 
-    let rawTemplate = mensagem_customizada
-
-    if (!rawTemplate) {
-      if (template_id) {
-        const tpl = await prisma.whatsappTemplate.findUnique({
-          where: { id: parseInt(template_id) }
-        })
-        rawTemplate = tpl?.conteudo
-      } else {
-        const defaultTpl = await prisma.whatsappTemplate.findFirst({
-          where: { is_default: true }
-        }) || await prisma.whatsappTemplate.findFirst()
-
-        rawTemplate = defaultTpl?.conteudo || 'Olá {nome}, recebemos sua solicitação de suporte.'
-      }
+    const formattedPhone = formatPhoneForWhatsApp(cliente.contato)
+    if (!formattedPhone) {
+      return NextResponse.json({ error: `Número "${cliente.contato}" não é um telefone válido` }, { status: 400 })
     }
 
-    // Replace variables in template
-    const finalMessage = rawTemplate
-      .replace(/\{nome\}/g, cliente.nome || 'Cliente')
-      .replace(/\{empresa\}/g, cliente.empresa || 'Sua Loja')
-      .replace(/\{unico_id\}/g, cliente.unico_id || 'UC-00000')
-      .replace(/\{responsavel\}/g, cliente.responsavel || 'Equipe UnicoDrop')
-      .replace(/\{motivo\}/g, cliente.motivo_cancelamento || 'reajuste operacional')
+    // Find message template
+    let template: { conteudo: string } | null = null
 
-    // Clean phone number for WhatsApp link
-    const digits = cliente.contato.replace(/\D/g, '')
-    const formattedPhone = digits.length === 11 ? `55${digits}` : digits
+    if (template_id) {
+      template = await prisma.whatsappTemplate.findUnique({
+        where: { id: parseInt(template_id) },
+        select: { conteudo: true },
+      })
+    }
+
+    if (!template) {
+      template = await prisma.whatsappTemplate.findFirst({
+        where: { is_default: true },
+        select: { conteudo: true },
+      })
+    }
+
+    if (!template) {
+      template = await prisma.whatsappTemplate.findFirst({
+        select: { conteudo: true },
+      })
+    }
+
+    const rawContent = template?.conteudo || 'Olá {nome}, gostaríamos de conversar sobre sua conta.'
+
+    // Replace variables with REAL client data
+    const finalMessage = rawContent
+      .replace(/\{nome\}/g, cliente.nome || 'Cliente')
+      .replace(/\{empresa\}/g, cliente.empresa || 'Sua Empresa')
+      .replace(/\{unico_id\}/g, cliente.unico_id || '')
+      .replace(/\{responsavel\}/g, cliente.responsavel || 'Equipe UnicoDrop')
+      .replace(/\{motivo\}/g, cliente.motivo_cancelamento || 'não informado')
+
+    // Generate functional wa.me link
     const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(finalMessage)}`
 
-    // Log the automated/manual dispatch
+    // Log the dispatch
     const log = await prisma.whatsappLog.create({
       data: {
         cliente_id: cliente.id,
@@ -72,8 +90,10 @@ export async function POST(req: Request) {
       log,
       finalMessage,
       waUrl,
+      phone: formattedPhone,
     })
   } catch (error) {
+    console.error('POST /api/whatsapp/send error:', error)
     return NextResponse.json({ error: 'Erro ao processar disparo de WhatsApp' }, { status: 500 })
   }
 }
