@@ -14,7 +14,7 @@ const navItems = [
   { href: '/clientes', label: 'Clientes', icon: Users, badge: null },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2, badge: null },
   { href: '/feedbacks', label: 'Feedbacks', icon: MessageSquarePlus, badge: 'Novo' },
-  { href: '/whatsapp', label: 'Automação WhatsApp', icon: Zap, badge: 'IA' },
+  { href: '/whatsapp', label: 'Automação WhatsApp', icon: Zap, badge: null },
 ]
 
 export default function Sidebar() {
