@@ -75,6 +75,23 @@ export async function POST(req: Request) {
     // Generate functional wa.me link
     const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(finalMessage)}`
 
+    // Trigger N8N Webhook for automated background processing
+    const n8nWebhookUrl = 'https://filipevh.app.n8n.cloud/webhook/whatsapp-send'
+    try {
+      await fetch(n8nWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: formattedPhone,
+          message: finalMessage,
+          cliente_nome: cliente.nome || 'Cliente',
+          unico_id: cliente.unico_id
+        })
+      })
+    } catch (webhookError) {
+      console.error('Failed to trigger N8N webhook:', webhookError)
+    }
+
     // Log the dispatch
     const log = await prisma.whatsappLog.create({
       data: {
