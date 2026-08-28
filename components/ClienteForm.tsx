@@ -374,7 +374,7 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                   <label className="form-label">URL do Site</label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         className="form-input pl-9 text-xs font-mono"
                         placeholder="https://meusite.com.br"
@@ -386,7 +386,7 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                       type="button"
                       onClick={handleCheckSite}
                       disabled={checkingSite}
-                      className="px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 text-xs font-mono rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                      className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
                     >
                       {checkingSite ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : siteStatusIcon()}
                       Verificar
@@ -402,10 +402,10 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                         key={plugin}
                         type="button"
                         onClick={() => togglePlugin(plugin)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono border transition-all text-left ${
+                        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium border transition-all text-left ${
                           form.plugins_rastreio.includes(plugin)
-                            ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-semibold'
-                            : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                            ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-sm'
+                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                         }`}
                       >
                         {plugin}
@@ -423,10 +423,10 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                           key={co}
                           type="button"
                           onClick={() => setForm(p => ({ ...p, checkout: co }))}
-                          className={`px-2 py-1 rounded-md text-xs font-mono border transition-all ${
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                             form.checkout === co
-                              ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-semibold'
-                              : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                              ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-sm'
+                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                           }`}
                         >
                           {co}
@@ -443,10 +443,10 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                           key={pl}
                           type="button"
                           onClick={() => setForm(p => ({ ...p, plataforma_loja: pl }))}
-                          className={`px-2 py-1 rounded-md text-xs font-mono border transition-all ${
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-all ${
                             form.plataforma_loja === pl
-                              ? 'border-zinc-600 bg-zinc-800 text-zinc-100 font-semibold'
-                              : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                              ? 'border-purple-500 bg-purple-50 text-purple-700 font-bold shadow-sm'
+                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                           }`}
                         >
                           {pl}
@@ -461,21 +461,21 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
             {/* ── Tab 2: Uso na UD ── */}
             {activeTab === 2 && (
               <div className="space-y-3">
-                <p className="text-xs text-zinc-400 font-mono">Mapeie os recursos da UnicoDrop que o lojista utilizava:</p>
+                <p className="text-xs text-slate-500 font-medium">Mapeie os recursos da UnicoDrop que o lojista utilizava:</p>
                 <div className="grid grid-cols-1 gap-2">
                   {RECURSOS_UD.map(item => (
                     <button
                       key={item.key}
                       type="button"
                       onClick={() => toggleRecurso(item.key)}
-                      className={`flex items-center justify-between p-3 rounded-lg border transition-all text-left ${
+                      className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
                         form.recursos_ud.includes(item.key)
-                          ? 'border-zinc-700 bg-zinc-800/80 text-zinc-100'
-                          : 'border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700'
+                          ? 'border-purple-500 bg-purple-50/60 text-purple-900 font-semibold shadow-sm'
+                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                       }`}
                     >
-                      <span className="text-xs font-mono">{item.key}</span>
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded ${form.recursos_ud.includes(item.key) ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-zinc-600'}`}>
+                      <span className="text-xs font-medium">{item.key}</span>
+                      <span className={`text-xs font-bold px-2.5 py-0.5 rounded-md ${form.recursos_ud.includes(item.key) ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' : 'bg-slate-200 text-slate-600'}`}>
                         {form.recursos_ud.includes(item.key) ? 'Sim' : 'Não'}
                       </span>
                     </button>
@@ -492,19 +492,19 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                     <label className="form-label">Status do Cliente</label>
                     <div className="grid grid-cols-2 gap-1.5 mt-1.5">
                       {[
-                        { value: 'PENDENTE', label: 'Pendente', class: 'bg-zinc-800 text-zinc-300 border-zinc-700' },
-                        { value: 'EM_NEGOCIACAO', label: 'Em Negociação', class: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-                        { value: 'CONVERTIDO', label: 'Convertido', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
-                        { value: 'NAO_CONVERTIDO', label: 'Não Convertido', class: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+                        { value: 'PENDENTE', label: 'Pendente', selectedClass: 'bg-purple-100 text-purple-800 border-purple-400 font-bold' },
+                        { value: 'EM_NEGOCIACAO', label: 'Em Negociação', selectedClass: 'bg-amber-100 text-amber-800 border-amber-400 font-bold' },
+                        { value: 'CONVERTIDO', label: 'Convertido', selectedClass: 'bg-emerald-100 text-emerald-800 border-emerald-400 font-bold' },
+                        { value: 'NAO_CONVERTIDO', label: 'Não Convertido', selectedClass: 'bg-rose-100 text-rose-800 border-rose-400 font-bold' },
                       ].map(s => (
                         <button
                           key={s.value}
                           type="button"
                           onClick={() => setForm(p => ({ ...p, status: s.value as StatusCliente }))}
-                          className={`py-1.5 px-2 rounded-md text-xs font-mono border transition-all ${
+                          className={`py-2 px-2.5 rounded-lg text-xs font-semibold border transition-all ${
                             form.status === s.value
-                              ? s.class
-                              : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                              ? s.selectedClass
+                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                           }`}
                         >
                           {s.label}
@@ -517,18 +517,18 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                     <label className="form-label">Prioridade</label>
                     <div className="grid grid-cols-3 gap-1.5 mt-1.5">
                       {[
-                        { value: 'BAIXA', label: 'Baixa', class: 'bg-sky-500/10 text-sky-400 border-sky-500/20' },
-                        { value: 'MEDIA', label: 'Média', class: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-                        { value: 'ALTA', label: 'Alta', class: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
+                        { value: 'BAIXA', label: 'Baixa', selectedClass: 'bg-sky-100 text-sky-800 border-sky-400 font-bold' },
+                        { value: 'MEDIA', label: 'Média', selectedClass: 'bg-amber-100 text-amber-800 border-amber-400 font-bold' },
+                        { value: 'ALTA', label: 'Alta', selectedClass: 'bg-rose-100 text-rose-800 border-rose-400 font-bold' },
                       ].map(p => (
                         <button
                           key={p.value}
                           type="button"
                           onClick={() => setForm(prev => ({ ...prev, prioridade: p.value as Prioridade }))}
-                          className={`py-1.5 px-2 rounded-md text-xs font-mono border transition-all ${
+                          className={`py-2 px-2.5 rounded-lg text-xs font-semibold border transition-all ${
                             form.prioridade === p.value
-                              ? p.class
-                              : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 hover:text-zinc-300'
+                              ? p.selectedClass
+                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
                           }`}
                         >
                           {p.label}
