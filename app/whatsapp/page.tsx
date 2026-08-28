@@ -215,53 +215,49 @@ export default function WhatsappPage() {
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      {/* ── Header Banner ── */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-          <Zap className="w-64 h-64" />
+      {/* ── Header ── */}
+      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            Disparos WhatsApp
+          </h1>
+          <p className="text-sm text-slate-500 mt-1 max-w-2xl">
+            Gerencie templates de reconversão e dispare mensagens para seus contatos de forma manual ou automatizada.
+          </p>
         </div>
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Automação de Mensageria
-              </span>
-              
-              {/* MODE SELECTOR */}
-              <div className="flex bg-black/20 p-1 rounded-full border border-white/10">
-                <button 
-                  onClick={() => setDispatchMode('manual')}
-                  className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${dispatchMode === 'manual' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white'}`}
-                >
-                  Modo Manual (wa.me)
-                </button>
-                <button 
-                  onClick={() => {
-                    setDispatchMode('api')
-                    setActiveTab('qr')
-                  }}
-                  className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${dispatchMode === 'api' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white'}`}
-                >
-                  Modo API (QR Code)
-                </button>
-              </div>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold" style={{ fontFamily: "'Poppins', sans-serif" }}>
-              Disparos WhatsApp
-            </h1>
-            <p className="text-sm text-emerald-200 mt-1 max-w-2xl">
-              Gerencie templates de reconversão com variáveis dinâmicas e dispare mensagens personalizadas para seus contatos.
-            </p>
+
+        <div className="flex flex-col items-end gap-4">
+          {/* MODE SELECTOR */}
+          <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <button 
+              onClick={() => {
+                setDispatchMode('manual')
+                if(activeTab === 'qr') setActiveTab('disparo')
+              }}
+              className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${dispatchMode === 'manual' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Manual (wa.me)
+            </button>
+            <button 
+              onClick={() => {
+                setDispatchMode('api')
+                setActiveTab('qr')
+              }}
+              className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${dispatchMode === 'api' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              Automático (API)
+            </button>
           </div>
-          <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/20">
-            <PhoneCall className="w-5 h-5 text-emerald-300" />
-            <div>
-              <p className="text-xs text-emerald-200 font-medium">Contatos</p>
-              <p className="text-lg font-extrabold text-white">{contatos.length}</p>
+          
+          <div className="flex items-center gap-4 text-slate-600">
+            <div className="text-right">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Contatos</p>
+              <p className="text-lg font-extrabold text-slate-900">{contatos.length}</p>
             </div>
-            <div className="border-l border-white/20 pl-3 ml-1">
-              <p className="text-xs text-emerald-200 font-medium">Enviados</p>
-              <p className="text-lg font-extrabold text-white">{logs.length}</p>
+            <div className="w-px h-8 bg-slate-200"></div>
+            <div className="text-left">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Enviados</p>
+              <p className="text-lg font-extrabold text-slate-900">{logs.length}</p>
             </div>
           </div>
         </div>
@@ -270,7 +266,7 @@ export default function WhatsappPage() {
       {/* ── Navigation Tabs ── */}
       <div className="flex bg-white rounded-xl p-1.5 shadow-sm space-x-1 border border-slate-200">
         {[
-          ...(dispatchMode === 'api' ? [{ id: 'qr', label: 'Conexão (Scanner QR)', icon: Zap }] : []),
+          ...(dispatchMode === 'api' ? [{ id: 'qr', label: 'Conexão do Aparelho', icon: PhoneCall }] : []),
           { id: 'disparo', label: 'Disparo de Mensagens', icon: Send },
           { id: 'templates', label: 'Mensagens Padrão', icon: MessageSquare },
           { id: 'historico', label: 'Histórico', icon: Clock },
@@ -282,7 +278,7 @@ export default function WhatsappPage() {
               key={t.id}
               onClick={() => setActiveTab(t.id as typeof activeTab)}
               className={`flex-1 py-3 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                isActive ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                isActive ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -295,90 +291,62 @@ export default function WhatsappPage() {
       {/* ── Content ── */}
       {loading ? (
         <div className="flex flex-col items-center justify-center h-64 bg-white rounded-2xl p-8 shadow-sm">
-          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+          <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
           <p className="text-sm text-slate-500 font-semibold mt-3">Carregando dados...</p>
         </div>
       ) : (
         <>
           {/* ── TAB: Conexão QR Code (Only in API mode) ── */}
           {activeTab === 'qr' && dispatchMode === 'api' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center justify-center shadow-sm text-center">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Microsserviço Local</h3>
-                <p className="text-sm text-slate-500 mb-6">
-                  Certifique-se de que o servidor Node.js (whatsapp-web.js) está rodando em <code>{apiUrl}</code>.
-                </p>
-
-                {apiStatus === 'DISCONNECTED' && (
-                  <div className="p-4 bg-rose-50 text-rose-700 rounded-xl w-full border border-rose-200">
-                    <p className="font-bold mb-1">Servidor Offline</p>
-                    <p className="text-xs">Não foi possível conectar ao servidor local. Inicie o microsserviço no terminal.</p>
-                  </div>
-                )}
-
-                {apiStatus === 'INITIALIZING' && (
-                  <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
-                    <p className="font-bold text-slate-700">Iniciando WhatsApp...</p>
-                  </div>
-                )}
-
-                {apiStatus === 'WAITING_QR' && qrCode && (
-                  <div className="flex flex-col items-center gap-4">
-                    <p className="font-bold text-amber-600">Escaneie o QR Code abaixo:</p>
-                    <div className="p-3 bg-white border-2 border-dashed border-emerald-200 rounded-xl">
-                      <img src={qrCode} alt="WhatsApp QR Code" className="w-64 h-64" />
-                    </div>
-                  </div>
-                )}
-
-                {apiStatus === 'CONNECTED' && (
-                  <div className="flex flex-col items-center gap-4 w-full">
-                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
-                      <CheckCircle2 className="w-10 h-10 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold text-slate-900">WhatsApp Conectado!</p>
-                      <p className="text-xs text-slate-500 mt-1">Sessão pareada e pronta para disparos invisíveis.</p>
-                    </div>
-                    <button 
-                      onClick={handleLogout}
-                      className="px-6 py-2.5 bg-rose-50 text-rose-600 font-bold text-xs rounded-xl hover:bg-rose-100 border border-rose-200 transition-colors"
-                    >
-                      Desconectar
-                    </button>
-                  </div>
-                )}
+            <div className="bg-white rounded-2xl border border-slate-200 p-10 flex flex-col items-center justify-center shadow-sm text-center max-w-3xl mx-auto">
+              <div className="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                <Zap className="w-8 h-8 text-slate-400" />
               </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2">Conecte seu WhatsApp</h3>
+              <p className="text-sm text-slate-500 mb-8 max-w-md">
+                Para habilitar os disparos automáticos em segundo plano, escaneie o QR Code usando o aplicativo do WhatsApp no seu celular (Configurações ➔ Aparelhos Conectados).
+              </p>
 
-              <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200">
-                <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-600" /> Como funciona o Modo API?
-                </h3>
-                <ul className="space-y-4 text-sm text-slate-600">
-                  <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">1</span>
-                    <p>Ao selecionar este modo, o sistema se conecta a um <strong>microsserviço em Node.js</strong> rodando na mesma máquina.</p>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">2</span>
-                    <p>O microsserviço usa a biblioteca <code>whatsapp-web.js</code> (com Chromium em background) para segurar a sessão.</p>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">3</span>
-                    <p>Quando você clica em "Disparar", o envio acontece nos bastidores (Background), <strong>sem abrir abas do navegador</strong>.</p>
-                  </li>
-                </ul>
-                <div className="mt-6 pt-6 border-t border-slate-200">
-                  <label className="block text-xs font-bold text-slate-700 mb-2">URL do Servidor Local</label>
-                  <input 
-                    type="text" 
-                    value={apiUrl}
-                    onChange={(e) => setApiUrl(e.target.value)}
-                    className="w-full text-xs p-2.5 border border-slate-300 rounded-lg"
-                  />
+              {apiStatus === 'DISCONNECTED' && (
+                <div className="p-4 bg-slate-50 text-slate-600 rounded-xl w-full max-w-md border border-slate-200">
+                  <p className="font-bold mb-1">Servidor de Automação Offline</p>
+                  <p className="text-xs">Não foi possível estabelecer conexão. Verifique se o serviço de integração está ativo.</p>
                 </div>
-              </div>
+              )}
+
+              {apiStatus === 'INITIALIZING' && (
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="w-10 h-10 text-slate-400 animate-spin" />
+                  <p className="font-bold text-slate-600">Gerando QR Code...</p>
+                </div>
+              )}
+
+              {apiStatus === 'WAITING_QR' && qrCode && (
+                <div className="flex flex-col items-center gap-4">
+                  <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
+                    <img src={qrCode} alt="WhatsApp QR Code" className="w-64 h-64" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Aguardando leitura...</p>
+                </div>
+              )}
+
+              {apiStatus === 'CONNECTED' && (
+                <div className="flex flex-col items-center gap-4 w-full">
+                  <div className="w-20 h-20 bg-green-50 border border-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-10 h-10 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-slate-900">Aparelho Conectado</p>
+                    <p className="text-xs text-slate-500 mt-1">O sistema está pronto para realizar disparos automáticos.</p>
+                  </div>
+                  <button 
+                    onClick={handleLogout}
+                    className="mt-2 px-6 py-2.5 bg-white text-rose-600 font-bold text-xs rounded-xl hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition-colors"
+                  >
+                    Desconectar Aparelho
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
