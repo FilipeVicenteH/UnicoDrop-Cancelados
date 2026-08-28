@@ -63,7 +63,9 @@ export default function WhatsappPage() {
     if (dispatchMode === 'api') {
       const checkStatus = async () => {
         try {
-          const res = await fetch(`${apiUrl}/api/status`)
+          const res = await fetch(`${apiUrl}/api/status`, {
+            headers: { 'Bypass-Tunnel-Reminder': 'true' }
+          })
           if (res.ok) {
             const data = await res.json()
             setApiStatus(data.status)
@@ -157,7 +159,10 @@ export default function WhatsappPage() {
         
         const localRes = await fetch(`${apiUrl}/api/send`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': 'true'
+          },
           body: JSON.stringify({ phone: data.phone, message: data.finalMessage })
         })
         const localData = await localRes.json()
