@@ -135,3 +135,37 @@ enum StatusBug {
   CANCELADO
 }
 
+model WhatsappSession {
+  id               Int      @id @default(autoincrement())
+  numero_conectado String?
+  status           String   @default("DISCONNECTED") // CONNECTED, WAITING_QR, DISCONNECTED
+  qr_code_base64   String?
+  updated_at       DateTime @updatedAt
+
+  @@map("whatsapp_sessions")
+}
+
+model WhatsappTemplate {
+  id         Int      @id @default(autoincrement())
+  titulo     String
+  conteudo   String
+  is_default Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("whatsapp_templates")
+}
+
+model WhatsappLog {
+  id          Int      @id @default(autoincrement())
+  cliente_id  Int?
+  contato     String
+  mensagem    String
+  status      String   @default("ENVIADO") // ENVIADO, ERRO
+  erro_msg    String?
+  enviado_em  DateTime @default(now())
+
+  @@map("whatsapp_logs")
+}
+
+

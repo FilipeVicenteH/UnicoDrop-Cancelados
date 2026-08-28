@@ -90,6 +90,7 @@ export interface ClienteFormData {
   nota_interna?: string
   status: StatusCliente
   prioridade: Prioridade
+  enviar_whatsapp_padrao?: boolean
 }
 
 export type TipoClienteFeedback = 'ATIVO' | 'CANCELADO'

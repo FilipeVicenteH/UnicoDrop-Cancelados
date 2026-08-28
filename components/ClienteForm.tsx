@@ -181,7 +181,30 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
 
       if (!res.ok) throw new Error('Erro na requisição')
 
+      const savedCliente = await res.json().catch(() => null)
+
       toast.success(clienteId ? 'Cliente atualizado!' : 'Cliente adicionado!')
+
+      if (form.enviar_whatsapp_padrao && savedCliente?.id) {
+        toast.loading('Disparando mensagem padrão no WhatsApp...', { id: 'wa-dispatch' })
+        try {
+          const waRes = await fetch('/api/whatsapp/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cliente_id: savedCliente.id }),
+          })
+          const waData = await waRes.json()
+          if (waData.waUrl) {
+            toast.success('Mensagem padrão registrada! Abrindo WhatsApp...', { id: 'wa-dispatch' })
+            window.open(waData.waUrl, '_blank')
+          } else {
+            toast.success('Mensagem padrão disparada com sucesso!', { id: 'wa-dispatch' })
+          }
+        } catch {
+          toast.error('Cliente salvo, mas falhou ao disparar WhatsApp.', { id: 'wa-dispatch' })
+        }
+      }
+
       onSaved()
       onClose()
     } catch {
@@ -363,6 +386,20 @@ export default function ClienteForm({ isOpen, onClose, onSaved, clienteId, initi
                       onChange={e => setForm(p => ({ ...p, faturamento_anterior: e.target.value }))}
                     />
                   </div>
+                </div>
+
+                {/* Automação WhatsApp Checkbox */}
+                <div className="flex items-center gap-2.5 p-3.5 bg-purple-50 border border-purple-200 rounded-xl mt-2">
+                  <input
+                    type="checkbox"
+                    id="enviar_whatsapp_padrao"
+                    checked={form.enviar_whatsapp_padrao || false}
+                    onChange={e => setForm(p => ({ ...p, enviar_whatsapp_padrao: e.target.checked }))}
+                    className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 cursor-pointer"
+                  />
+                  <label htmlFor="enviar_whatsapp_padrao" className="text-xs font-bold text-purple-900 cursor-pointer flex items-center gap-1.5">
+                    📱 Enviar mensagem padrão no WhatsApp automaticamente ao salvar
+                  </label>
                 </div>
               </div>
             )}
