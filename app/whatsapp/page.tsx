@@ -38,7 +38,9 @@ interface Log {
 const VARIABLES = ['{nome}', '{empresa}', '{unico_id}', '{responsavel}', '{motivo}']
 
 export default function WhatsappPage() {
-  const [activeTab, setActiveTab] = useState<'templates' | 'disparo' | 'historico'>('disparo')
+  const [activeTab, setActiveTab] = useState<'qr' | 'templates' | 'disparo' | 'historico'>('qr')
+  const [dispatchMode, setDispatchMode] = useState<'manual' | 'api'>('manual')
+  
   const [templates, setTemplates] = useState<Template[]>([])
   const [contatos, setContatos] = useState<Contato[]>([])
   const [logs, setLogs] = useState<Log[]>([])
@@ -46,11 +48,38 @@ export default function WhatsappPage() {
   const [loading, setLoading] = useState(true)
   const [sendingId, setSendingId] = useState<number | null>(null)
 
+  const [apiStatus, setApiStatus] = useState<'INITIALIZING' | 'WAITING_QR' | 'CONNECTED' | 'DISCONNECTED'>('DISCONNECTED')
+  const [qrCode, setQrCode] = useState<string | null>(null)
+  const [apiUrl, setApiUrl] = useState('http://localhost:3001')
+
   // New Template
   const [newTitle, setNewTitle] = useState('')
   const [newContent, setNewContent] = useState('')
   const [newIsDefault, setNewIsDefault] = useState(false)
   const [savingTemplate, setSavingTemplate] = useState(false)
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+    if (dispatchMode === 'api') {
+      const checkStatus = async () => {
+        try {
+          const res = await fetch(`${apiUrl}/api/status`)
+          if (res.ok) {
+            const data = await res.json()
+            setApiStatus(data.status)
+            setQrCode(data.qrCode)
+          } else {
+            setApiStatus('DISCONNECTED')
+          }
+        } catch {
+          setApiStatus('DISCONNECTED')
+        }
+      }
+      checkStatus()
+      interval = setInterval(checkStatus, 3000)
+    }
+    return () => clearInterval(interval)
+  }, [dispatchMode, apiUrl])
 
   const loadTemplates = useCallback(async () => {
     try {
@@ -110,7 +139,7 @@ export default function WhatsappPage() {
     } catch { toast.error('Erro ao excluir') }
   }
 
-  // ── SEND (functional wa.me) ──
+  // ── SEND (functional) ──
   const handleSend = async (clienteId: number) => {
     setSendingId(clienteId)
     try {
@@ -121,15 +150,29 @@ export default function WhatsappPage() {
         body: JSON.stringify({ cliente_id: clienteId, template_id: defaultTpl?.id }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Erro')
+      if (!res.ok) throw new Error(data.error || 'Erro interno')
 
-      if (data.waUrl) {
-        window.open(data.waUrl, '_blank')
-        toast.success('WhatsApp aberto com a mensagem pronta!')
+      if (dispatchMode === 'api') {
+        if (apiStatus !== 'CONNECTED') throw new Error('Servidor Node.js não conectado (QR Code pendente).')
+        
+        const localRes = await fetch(`${apiUrl}/api/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: data.phone, message: data.finalMessage })
+        })
+        const localData = await localRes.json()
+        if (!localRes.ok) throw new Error(localData.error || 'Erro no Microsserviço')
+        
+        toast.success('Mensagem enviada automaticamente (Background)!')
+      } else {
+        if (data.waUrl) {
+          window.open(data.waUrl, '_blank')
+          toast.success('WhatsApp aberto!')
+        }
       }
       loadLogs()
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao enviar')
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao enviar')
     } finally { setSendingId(null) }
   }
 
@@ -143,6 +186,15 @@ export default function WhatsappPage() {
       .replace(/\{unico_id\}/g, contato.unico_id || '')
       .replace(/\{responsavel\}/g, contato.responsavel || 'Equipe')
       .replace(/\{motivo\}/g, contato.motivo_cancelamento || 'não informado')
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${apiUrl}/api/logout`, { method: 'POST' })
+      toast.success('Desconectado com sucesso')
+    } catch {
+      toast.error('Erro ao desconectar')
+    }
   }
 
   const defaultTemplate = templates.find(t => t.is_default) || templates[0]
@@ -169,22 +221,41 @@ export default function WhatsappPage() {
               <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-amber-300" /> Automação de Mensageria
               </span>
+              
+              {/* MODE SELECTOR */}
+              <div className="flex bg-black/20 p-1 rounded-full border border-white/10">
+                <button 
+                  onClick={() => setDispatchMode('manual')}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${dispatchMode === 'manual' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white'}`}
+                >
+                  Modo Manual (wa.me)
+                </button>
+                <button 
+                  onClick={() => {
+                    setDispatchMode('api')
+                    setActiveTab('qr')
+                  }}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-colors ${dispatchMode === 'api' ? 'bg-white text-slate-900' : 'text-slate-300 hover:text-white'}`}
+                >
+                  Modo API (QR Code)
+                </button>
+              </div>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold" style={{ fontFamily: "'Poppins', sans-serif" }}>
               Disparos WhatsApp
             </h1>
             <p className="text-sm text-emerald-200 mt-1 max-w-2xl">
-              Gerencie templates de reconversão com variáveis dinâmicas e dispare mensagens personalizadas para seus contatos com 1 clique.
+              Gerencie templates de reconversão com variáveis dinâmicas e dispare mensagens personalizadas para seus contatos.
             </p>
           </div>
           <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md p-3.5 rounded-xl border border-white/20">
             <PhoneCall className="w-5 h-5 text-emerald-300" />
             <div>
-              <p className="text-xs text-emerald-200 font-medium">Contatos com Telefone</p>
+              <p className="text-xs text-emerald-200 font-medium">Contatos</p>
               <p className="text-lg font-extrabold text-white">{contatos.length}</p>
             </div>
             <div className="border-l border-white/20 pl-3 ml-1">
-              <p className="text-xs text-emerald-200 font-medium">Mensagens Enviadas</p>
+              <p className="text-xs text-emerald-200 font-medium">Enviados</p>
               <p className="text-lg font-extrabold text-white">{logs.length}</p>
             </div>
           </div>
@@ -194,9 +265,10 @@ export default function WhatsappPage() {
       {/* ── Navigation Tabs ── */}
       <div className="flex bg-white rounded-xl p-1.5 shadow-sm space-x-1 border border-slate-200">
         {[
+          ...(dispatchMode === 'api' ? [{ id: 'qr', label: 'Conexão (Scanner QR)', icon: Zap }] : []),
           { id: 'disparo', label: 'Disparo de Mensagens', icon: Send },
-          { id: 'templates', label: 'Mensagens Padrão (Templates)', icon: MessageSquare },
-          { id: 'historico', label: 'Histórico de Envios', icon: Clock },
+          { id: 'templates', label: 'Mensagens Padrão', icon: MessageSquare },
+          { id: 'historico', label: 'Histórico', icon: Clock },
         ].map(t => {
           const Icon = t.icon
           const isActive = activeTab === t.id
@@ -223,6 +295,88 @@ export default function WhatsappPage() {
         </div>
       ) : (
         <>
+          {/* ── TAB: Conexão QR Code (Only in API mode) ── */}
+          {activeTab === 'qr' && dispatchMode === 'api' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center justify-center shadow-sm text-center">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">Microsserviço Local</h3>
+                <p className="text-sm text-slate-500 mb-6">
+                  Certifique-se de que o servidor Node.js (whatsapp-web.js) está rodando em <code>{apiUrl}</code>.
+                </p>
+
+                {apiStatus === 'DISCONNECTED' && (
+                  <div className="p-4 bg-rose-50 text-rose-700 rounded-xl w-full border border-rose-200">
+                    <p className="font-bold mb-1">Servidor Offline</p>
+                    <p className="text-xs">Não foi possível conectar ao servidor local. Inicie o microsserviço no terminal.</p>
+                  </div>
+                )}
+
+                {apiStatus === 'INITIALIZING' && (
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="w-10 h-10 text-emerald-600 animate-spin" />
+                    <p className="font-bold text-slate-700">Iniciando WhatsApp...</p>
+                  </div>
+                )}
+
+                {apiStatus === 'WAITING_QR' && qrCode && (
+                  <div className="flex flex-col items-center gap-4">
+                    <p className="font-bold text-amber-600">Escaneie o QR Code abaixo:</p>
+                    <div className="p-3 bg-white border-2 border-dashed border-emerald-200 rounded-xl">
+                      <img src={qrCode} alt="WhatsApp QR Code" className="w-64 h-64" />
+                    </div>
+                  </div>
+                )}
+
+                {apiStatus === 'CONNECTED' && (
+                  <div className="flex flex-col items-center gap-4 w-full">
+                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
+                      <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">WhatsApp Conectado!</p>
+                      <p className="text-xs text-slate-500 mt-1">Sessão pareada e pronta para disparos invisíveis.</p>
+                    </div>
+                    <button 
+                      onClick={handleLogout}
+                      className="px-6 py-2.5 bg-rose-50 text-rose-600 font-bold text-xs rounded-xl hover:bg-rose-100 border border-rose-200 transition-colors"
+                    >
+                      Desconectar
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200">
+                <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-600" /> Como funciona o Modo API?
+                </h3>
+                <ul className="space-y-4 text-sm text-slate-600">
+                  <li className="flex gap-3">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">1</span>
+                    <p>Ao selecionar este modo, o sistema se conecta a um <strong>microsserviço em Node.js</strong> rodando na mesma máquina.</p>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">2</span>
+                    <p>O microsserviço usa a biblioteca <code>whatsapp-web.js</code> (com Chromium em background) para segurar a sessão.</p>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center flex-shrink-0 text-xs">3</span>
+                    <p>Quando você clica em "Disparar", o envio acontece nos bastidores (Background), <strong>sem abrir abas do navegador</strong>.</p>
+                  </li>
+                </ul>
+                <div className="mt-6 pt-6 border-t border-slate-200">
+                  <label className="block text-xs font-bold text-slate-700 mb-2">URL do Servidor Local</label>
+                  <input 
+                    type="text" 
+                    value={apiUrl}
+                    onChange={(e) => setApiUrl(e.target.value)}
+                    className="w-full text-xs p-2.5 border border-slate-300 rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ── TAB: Disparo de Mensagens ── */}
           {activeTab === 'disparo' && (
             <div className="space-y-4">
