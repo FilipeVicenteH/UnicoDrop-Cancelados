@@ -50,7 +50,7 @@ export default function WhatsappPage() {
 
   const [apiStatus, setApiStatus] = useState<'INITIALIZING' | 'WAITING_QR' | 'CONNECTED' | 'DISCONNECTED'>('DISCONNECTED')
   const [qrCode, setQrCode] = useState<string | null>(null)
-  const [apiUrl, setApiUrl] = useState('http://localhost:3001')
+  const [apiUrl, setApiUrl] = useState(process.env.NEXT_PUBLIC_MICROSERVICE_URL || 'http://localhost:3001')
 
   // New Template
   const [newTitle, setNewTitle] = useState('')
